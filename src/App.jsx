@@ -19,6 +19,9 @@ import ChromaGrid from "./components/ChromaGrid";
 import Courses from "./components/Courses";
 import MeetOurFaculty from "./components/MeetOurFaculty";
 import PopupModal from "./components/PopupModal";
+import StudyWithMe from "./components/StudyWithMe";
+import BlogsSection from "./components/BlogsSection";
+import ContactSection from "./components/ContactSection";
 
 // Course Components
 import CourseCurriculum from "./components/CourseDetails";
@@ -106,10 +109,13 @@ function App() {
                   {/* <NewHero /> */}
                   <ProfessionalHero />
                   <About />
-                  <MeetOurFaculty />
+                  {/* <MeetOurFaculty /> */}
                   <Courses />
-                  <ChromaGrid />
-                  <CTA />
+                  <StudyWithMe />
+                  <BlogsSection />
+                  <ContactSection />
+                  {/* <ChromaGrid /> */}
+                  {/* <CTA /> */}
                   <Footer />
                 </>
               }

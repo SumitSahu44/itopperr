@@ -2,13 +2,12 @@ import React, { useEffect } from "react";
 import { Link } from "react-router-dom";
 import { HashLink } from "react-router-hash-link";
 import Navigation from "./Navigation";
-import { BookOpen, Star, PlayCircle, Trophy } from "lucide-react";
 import { motion } from "framer-motion";
 import confetti from "canvas-confetti";
 
 const ProfessionalHero = () => {
   useEffect(() => {
-    // Fire confetti from bottom left and right
+    // Burst confetti on mount for an impressive, premium welcome effect
     const duration = 2000;
     const animationEnd = Date.now() + duration;
 
@@ -29,7 +28,7 @@ const ProfessionalHero = () => {
         spread: 360,
         ticks: 60,
         origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 },
-        colors: ['#2563eb', '#3b82f6', '#60a5fa', '#fbbf24']
+        colors: ['#163F66', '#EF961D', '#3b82f6', '#fbbf24']
       });
       confetti({
         particleCount,
@@ -37,28 +36,46 @@ const ProfessionalHero = () => {
         spread: 360,
         ticks: 60,
         origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 },
-        colors: ['#2563eb', '#3b82f6', '#60a5fa', '#fbbf24']
+        colors: ['#163F66', '#EF961D', '#3b82f6', '#fbbf24']
       });
     }, 250);
     
-    // Simple bottom blast
     confetti({
       particleCount: 150,
       spread: 100,
       startVelocity: 60,
       origin: { y: 1, x: 0.5 },
-      colors: ['#2563eb', '#3b82f6', '#60a5fa', '#fbbf24', '#ffffff']
+      colors: ['#163F66', '#EF961D', '#3b82f6', '#fbbf24', '#ffffff']
     });
     
     return () => clearInterval(interval);
   }, []);
 
+  const facultyData = [
+    {
+      name: "Varun Jain",
+      // NOTE: You can replace these external placeholder image URLs with local paths (e.g., "/images/varun_jain.png") if you upload portrait pictures.
+      image: "https://randomuser.me/api/portraits/men/44.jpg",
+      description: "4 UPSC Mains, 2 Interviews, IIT Roorkee",
+    },
+    {
+      name: "Dr. Shivin Chaudhary",
+      image: "https://randomuser.me/api/portraits/men/32.jpg",
+      description: "AIR 297, UPSC CSE 2022",
+    },
+    {
+      name: "Sajal Singh",
+      image: "https://randomuser.me/api/portraits/men/46.jpg",
+      description: "Mentor to 450+ successful rankers, 3 UPSC Interviews",
+    },
+  ];
+
   return (
-    <section className="relative w-full min-h-[95vh] bg-slate-50 overflow-hidden flex flex-col">
-      {/* Abstract Background Shapes */}
+    <section className="relative w-full min-h-screen bg-gradient-to-b from-[#f2f8fc] via-[#f7fbfd] to-white overflow-hidden flex flex-col">
+      {/* Decorative Subtle Background Gradients */}
       <div className="absolute top-0 right-0 w-full h-full overflow-hidden z-0 pointer-events-none">
-        <div className="absolute -top-[10%] -right-[5%] w-[500px] h-[500px] rounded-full bg-blue-100/40 blur-[80px]" />
-        <div className="absolute top-[40%] -left-[10%] w-[400px] h-[400px] rounded-full bg-indigo-100/40 blur-[80px]" />
+        <div className="absolute -top-[10%] -right-[5%] w-[450px] h-[450px] rounded-full bg-blue-100/30 blur-[100px]" />
+        <div className="absolute top-[30%] -left-[10%] w-[350px] h-[350px] rounded-full bg-[#EF961D]/5 blur-[100px]" />
       </div>
 
       {/* Navigation Layer */}
@@ -67,151 +84,116 @@ const ProfessionalHero = () => {
       </div>
 
       {/* Main Hero Container */}
-      <div className="flex-1 container mx-auto px-4 sm:px-6 flex items-center pt-32 pb-16 relative z-10 max-w-7xl">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-8 items-center w-full">
-          
-          {/* Left Column: Content */}
-          <div className="flex flex-col items-start text-left max-w-2xl xl:max-w-3xl z-10">
-            {/* Trust Badge */}
-            <motion.div 
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5 }}
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white border border-slate-200 shadow-sm mb-8"
-            >
-              <Trophy size={16} className="text-yellow-500" />
-              <span className="text-sm font-bold text-slate-800 tracking-wide">
-                India's Premium UPSC Institute
-              </span>
-            </motion.div>
+      <div className="flex-1 container mx-auto px-4 sm:px-6 flex flex-col items-center justify-center pt-32 pb-16 relative z-10 max-w-7xl">
+        
+        {/* Center Logo/Branding Block */}
+        <motion.div 
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, ease: "easeOut" }}
+          className="text-center mt-6 md:mt-10 mb-4 sm:mb-6 select-none"
+        >
+          <h1 className="text-6xl sm:text-8xl md:text-9xl font-black tracking-tight flex items-center justify-center font-sans">
+            <span className="text-[#163F66] lowercase">i</span>
+            <span className="text-[#EF961D] uppercase">Topper</span>
+          </h1>
+        </motion.div>
 
-            {/* Headline */}
-            <motion.h1 
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.1 }}
-              className="text-5xl sm:text-6xl lg:text-7xl font-black text-slate-900 leading-[1.1] mb-6 tracking-tight"
-            >
-              Dream Big. <br className="hidden md:block" />
-              Achieve <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600">Greater.</span>
-            </motion.h1>
-
-            {/* Sub-headline */}
-            <motion.p 
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.2 }}
-              className="text-lg sm:text-xl text-slate-600 mb-10 leading-relaxed max-w-xl font-medium"
-            >
-              Transform your aspirations into reality. Expert guidance, dynamic curriculum, and unwavering support to help you conquer the Civil Services Examination.
-            </motion.p>
-
-            {/* Call to Actions */}
-            <motion.div 
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.3 }}
-              className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto mb-14"
-            >
-              <HashLink
-                smooth
-                to="/#courses"
-                className="inline-flex justify-center items-center px-8 py-4 text-base font-bold text-white bg-slate-900 hover:bg-blue-600 rounded-full transition-all shadow-lg hover:shadow-blue-500/30"
-              >
-                Start Preparation
-              </HashLink>
-              <Link
-                to="/register"
-                className="inline-flex justify-center items-center px-8 py-4 text-base font-bold text-slate-700 bg-white border border-slate-200 hover:border-blue-500 hover:text-blue-600 rounded-full transition-all gap-2 shadow-sm"
-              >
-                <PlayCircle size={20} />
-                Watch Demo
-              </Link>
-            </motion.div>
-
-            {/* Trust Metrics */}
-            <motion.div 
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.4 }}
-              className="flex flex-wrap items-center gap-8 sm:gap-12 pt-8 border-t border-slate-200 w-full max-w-xl"
-            >
-              <div>
-                <h4 className="text-3xl font-black text-slate-900 mb-1">50k+</h4>
-                <p className="text-sm text-slate-500 font-medium uppercase tracking-wider text-[10px]">Aspirants Mentored</p>
-              </div>
-              <div className="w-px h-10 bg-slate-200 hidden sm:block"></div>
-              <div>
-                <h4 className="text-3xl font-black text-slate-900 mb-1">600+</h4>
-                <p className="text-sm text-slate-500 font-medium uppercase tracking-wider text-[10px]">Selections</p>
-              </div>
-              <div className="w-px h-10 bg-slate-200 hidden sm:block"></div>
-              <div>
-                <h4 className="text-3xl font-black text-slate-900 mb-1">Top 10</h4>
-                <p className="text-sm text-slate-500 font-medium uppercase tracking-wider text-[10px]">AIR Ranks</p>
-              </div>
-            </motion.div>
+        {/* Pillars / Key Features Underlined */}
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
+          className="grid grid-cols-2 md:flex md:flex-row items-center justify-center gap-y-6 gap-x-4 md:gap-12 lg:gap-20 mb-14 md:mb-18 text-center w-full max-w-5xl px-4"
+        >
+          {/* Pillar 1 */}
+          <div className="flex flex-col items-center group">
+            <span className="text-[15px] sm:text-lg md:text-2xl lg:text-3xl font-black text-slate-800 tracking-tight transition-colors duration-300 group-hover:text-[#163F66] whitespace-nowrap">
+              Credible Faculty
+            </span>
+            <div className="w-[85%] h-[3px] bg-[#EF961D] mt-2 rounded-full transition-all duration-300 group-hover:w-full group-hover:scale-105"></div>
           </div>
 
-          {/* Right Column: Visuals (3D Floating Image) */}
-          <div className="relative w-full flex justify-center lg:justify-end mt-12 lg:mt-0 z-10 px-4 sm:px-0">
-            {/* Main Floating Image */}
-            <motion.div 
-              animate={{ 
-                y: [0, -20, 0],
-                rotateZ: [0, 2, -1, 0]
-              }}
-              transition={{ 
-                duration: 6, 
-                repeat: Infinity, 
-                ease: "easeInOut" 
-              }}
-              className="relative w-full max-w-[500px]"
-            >
-              {/* Backglow for 3D effect */}
-              <div className="absolute inset-0 bg-blue-500/20 blur-3xl rounded-full transform scale-90 translate-y-10" />
-              
-              <img 
-                src="/images/upsc_3d_hero.png" 
-                alt="UPSC Preparation at iTopper" 
-                className="w-full h-auto object-contain drop-shadow-2xl rounded-2xl relative z-10 border-4 border-white"
-              />
-
-              {/* Floating Card 1 */}
-              <motion.div 
-                animate={{ y: [0, 15, 0] }}
-                transition={{ duration: 4, repeat: Infinity, ease: "easeInOut", delay: 1 }}
-                className="absolute -top-6 -right-6 sm:-right-12 bg-white/90 backdrop-blur-md p-4 rounded-2xl shadow-xl border border-white/50 flex items-center gap-3 z-20"
-              >
-                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white shrink-0 shadow-inner">
-                  <BookOpen size={24} />
-                </div>
-                <div>
-                  <p className="text-xs text-slate-500 font-semibold uppercase">Daily</p>
-                  <p className="text-sm font-black text-slate-900">Live Classes</p>
-                </div>
-              </motion.div>
-
-              {/* Floating Card 2 */}
-              <motion.div 
-                animate={{ y: [0, -15, 0] }}
-                transition={{ duration: 5, repeat: Infinity, ease: "easeInOut", delay: 2 }}
-                className="absolute -bottom-8 -left-4 sm:-left-12 bg-white/90 backdrop-blur-md p-4 rounded-2xl shadow-xl border border-white/50 flex flex-col gap-1 z-20"
-              >
-                <div className="flex items-center gap-1 text-yellow-400 mb-1">
-                  <Star size={16} fill="currentColor" />
-                  <Star size={16} fill="currentColor" />
-                  <Star size={16} fill="currentColor" />
-                  <Star size={16} fill="currentColor" />
-                  <Star size={16} fill="currentColor" />
-                </div>
-                <p className="text-sm font-black text-slate-900">Top Rated Tutors</p>
-                <p className="text-xs text-slate-500 font-semibold">by 10k+ Students</p>
-              </motion.div>
-            </motion.div>
+          {/* Pillar 2 */}
+          <div className="flex flex-col items-center group">
+            <span className="text-[15px] sm:text-lg md:text-2xl lg:text-3xl font-black text-slate-800 tracking-tight transition-colors duration-300 group-hover:text-[#163F66] whitespace-nowrap">
+              Quality Content
+            </span>
+            <div className="w-[85%] h-[3px] bg-[#EF961D] mt-2 rounded-full transition-all duration-300 group-hover:w-full group-hover:scale-105"></div>
           </div>
-          
-        </div>
+
+          {/* Pillar 3 */}
+          <div className="col-span-2 md:col-span-1 flex flex-col items-center group">
+            <span className="text-[15px] sm:text-lg md:text-2xl lg:text-3xl font-black text-slate-800 tracking-tight transition-colors duration-300 group-hover:text-[#163F66] whitespace-nowrap">
+              Affordable Courses
+            </span>
+            <div className="w-[45%] md:w-[85%] h-[3px] bg-[#EF961D] mt-2 rounded-full transition-all duration-300 group-hover:w-full group-hover:scale-105"></div>
+          </div>
+        </motion.div>
+
+        {/* Faculty Grid */}
+        <motion.div 
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.4, ease: "easeOut" }}
+          className="grid grid-cols-1 md:grid-cols-3 gap-16 md:gap-8 lg:gap-16 w-full max-w-6xl px-4 sm:px-6"
+        >
+          {facultyData.map((faculty, index) => (
+            <div key={index} className="flex flex-col items-center">
+              {/* Circular Headshot Container with custom yellow-orange border */}
+              <div className="relative w-44 h-44 sm:w-52 sm:h-52 rounded-full p-1 border border-[#EF961D] bg-white shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02]">
+                <div className="w-full h-full rounded-full overflow-hidden bg-slate-50 flex items-center justify-center">
+                  <img
+                    src={faculty.image}
+                    alt={faculty.name}
+                    className="w-full h-full object-cover object-top hover:scale-105 transition-transform duration-500"
+                  />
+                </div>
+              </div>
+
+              {/* Slanted Parallelogram Name Banner */}
+              <div className="relative w-full max-w-[200px] sm:max-w-[240px] flex justify-center z-10 mt-[-20px] px-2 select-none">
+                {/* Underlay Ribbon Shadow */}
+                <div className="absolute top-1.5 left-2 w-full h-9 sm:h-10 bg-[#163F66] -skew-x-12 z-0 rounded-[2px]" />
+                
+                {/* Foreground Ribbon */}
+                <div className="bg-[#EF961D] py-1.5 sm:py-2 w-full font-black text-center text-xs sm:text-sm md:text-base text-black -skew-x-12 z-10 shadow-md rounded-[2px] border border-[#EF961D]/10">
+                  <div className="skew-x-12 tracking-wide font-extrabold uppercase">
+                    {faculty.name}
+                  </div>
+                </div>
+              </div>
+
+              {/* Description below */}
+              <p className="mt-5 text-center text-xs sm:text-sm md:text-base text-slate-700 font-bold max-w-[250px] leading-relaxed">
+                {faculty.description}
+              </p>
+            </div>
+          ))}
+        </motion.div>
+
+        {/* Premium CTA Buttons */}
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.6, ease: "easeOut" }}
+          className="flex flex-col sm:flex-row gap-4 items-center justify-center mt-16 sm:mt-20 w-full max-w-md px-4 relative z-20"
+        >
+          <HashLink
+            smooth
+            to="/#courses"
+            className="w-full sm:w-auto px-8 py-3.5 bg-[#163F66] text-white hover:bg-[#EF961D] hover:text-black transition-all duration-300 font-extrabold rounded-lg shadow-lg hover:shadow-[#EF961D]/20 text-center uppercase tracking-wider text-sm"
+          >
+            Start Preparation
+          </HashLink>
+          <Link
+            to="/register"
+            className="w-full sm:w-auto px-8 py-3.5 border-2 border-[#163F66] text-[#163F66] hover:bg-[#163F66] hover:text-white transition-all duration-300 font-extrabold rounded-lg text-center uppercase tracking-wider text-sm bg-white"
+          >
+            Register Now
+          </Link>
+        </motion.div>
+
       </div>
     </section>
   );
