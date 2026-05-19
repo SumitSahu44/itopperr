@@ -53,15 +53,14 @@ const ProfessionalHero = () => {
 
   const facultyData = [
     {
-      name: "Varun Jain",
-      // NOTE: You can replace these external placeholder image URLs with local paths (e.g., "/images/varun_jain.png") if you upload portrait pictures.
-      image: "https://randomuser.me/api/portraits/men/44.jpg",
-      description: "4 UPSC Mains, 2 Interviews, IIT Roorkee",
+      name: "Abhinav Bharati",
+      image: "/images/Abhinav Bharati.jpeg",
+      description: "( Founder and Mentor )",
     },
     {
-      name: "Dr. Shivin Chaudhary",
-      image: "https://randomuser.me/api/portraits/men/32.jpg",
-      description: "AIR 297, UPSC CSE 2022",
+      name: "Amit Kumar",
+      image: "/images/Amit Kumar.jpeg",
+      description: "Mentor (Ex-IRS)",
     },
   ];
 
@@ -79,16 +78,16 @@ const ProfessionalHero = () => {
       </div>
 
       {/* Main Hero Container */}
-      <div className="flex-1 container mx-auto px-4 sm:px-6 flex flex-col items-center justify-center pt-32 pb-16 relative z-10 max-w-7xl">
+      <div className="flex-1 container mx-auto px-4 sm:px-6 flex flex-col items-center justify-center pt-20 md:pt-28 pb-12 sm:pb-16 relative z-10 max-w-7xl">
         
         {/* Center Logo/Branding Block */}
         <motion.div 
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, ease: "easeOut" }}
-          className="text-center mt-6 md:mt-10 mb-4 sm:mb-6 select-none"
+          className="text-center mt-2 md:mt-4 mb-2 sm:mb-4 select-none"
         >
-          <h1 className="text-6xl sm:text-8xl md:text-9xl font-black tracking-tight flex items-center justify-center font-sans">
+          <h1 className="text-5xl sm:text-7xl md:text-8xl lg:text-9xl font-black tracking-tight flex items-center justify-center font-sans">
             <span className="text-[#0a2968] lowercase">i</span>
             <span className="text-[#0a2968] uppercase">Topper</span>
           </h1>
@@ -99,7 +98,7 @@ const ProfessionalHero = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
-          className="grid grid-cols-2 md:flex md:flex-row items-center justify-center gap-y-6 gap-x-4 md:gap-12 lg:gap-20 mb-14 md:mb-18 text-center w-full max-w-5xl px-4"
+          className="grid grid-cols-2 md:flex md:flex-row items-center justify-center gap-y-6 gap-x-4 md:gap-12 lg:gap-20 mb-6 md:mb-10 text-center w-full max-w-5xl px-4"
         >
           {/* Pillar 1 */}
           <div className="flex flex-col items-center group">
@@ -131,7 +130,7 @@ const ProfessionalHero = () => {
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.4, ease: "easeOut" }}
-          className="grid grid-cols-1 md:grid-cols-2 gap-16 md:gap-8 lg:gap-16 w-full max-w-4xl px-4 sm:px-6 justify-center mx-auto"
+          className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-8 lg:gap-16 w-full max-w-4xl px-4 sm:px-6 justify-center mx-auto"
         >
           {facultyData.map((faculty, index) => (
             <div key={index} className="flex flex-col items-center">
