@@ -7,7 +7,7 @@ const StudyWithMe = () => {
   };
 
   return (
-    <section id="study-with-me" className="py-20 px-4 bg-slate-50 relative overflow-hidden border-b border-slate-100">
+    <section id="study-with-me" className="pt-10 pb-20 px-4 bg-slate-50 relative overflow-hidden border-b border-slate-100">
       <div className="max-w-7xl mx-auto relative z-10">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
 

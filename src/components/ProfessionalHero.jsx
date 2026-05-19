@@ -53,14 +53,14 @@ const ProfessionalHero = () => {
 
   const facultyData = [
     {
-      name: "Abhinav Bharati",
-      image: "/images/Abhinav Bharati.jpeg",
-      description: "( Founder and Mentor )",
-    },
-    {
       name: "Amit Kumar",
       image: "/images/Amit Kumar.jpeg",
       description: "Mentor (Ex-IRS)",
+    },
+    {
+      name: "Abhinav Bharati",
+      image: "/images/Abhinav Bharati.jpeg",
+      description: "( Founder and Mentor )",
     },
   ];
 
@@ -171,7 +171,7 @@ const ProfessionalHero = () => {
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.5, ease: "easeOut" }}
-          className="w-full max-w-6xl px-4 sm:px-6 mt-16 sm:mt-20"
+          className="w-full max-w-6xl px-1 sm:px-6 mt-8 sm:mt-16"
         >
           <div className="relative rounded-2xl overflow-hidden shadow-2xl border-4 border-[#0a2968]/20 bg-white group hover:scale-[1.01] transition-all duration-300">
             <img

@@ -17,6 +17,7 @@ import CTA from "./components/CTA";
 import Footer from "./components/Footer";
 import ChromaGrid from "./components/ChromaGrid";
 import Courses from "./components/Courses";
+import CoreValues from "./components/CoreValues";
 import MeetOurFaculty from "./components/MeetOurFaculty";
 import PopupModal from "./components/PopupModal";
 import StudyWithMe from "./components/StudyWithMe";
@@ -108,9 +109,10 @@ function App() {
                   {/* Landing page has its own layout */}
                   {/* <NewHero /> */}
                   <ProfessionalHero />
-                  <About />
+                  {/* <About /> */}
                   {/* <MeetOurFaculty /> */}
                   <Courses />
+                  <CoreValues />
                   <StudyWithMe />
                   <BlogsSection />
                   <ContactSection />

@@ -67,7 +67,7 @@ const Courses = () => {
   };
 
   return (
-    <section id="courses" className="py-20 px-4 bg-white relative overflow-hidden border-b border-slate-100">
+    <section id="courses" className="pt-20 pb-10 px-4 bg-white relative overflow-hidden border-b border-slate-100">
       <div className="max-w-7xl mx-auto relative z-10">
 
         {/* Title Block */}
