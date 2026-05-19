@@ -38,7 +38,7 @@ const Footer = () => {
       <div className="relative container mx-auto px-6 py-5 md:py-16 grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-8 z-10">
         {/* Company Info */}
         <div className="col-span-2 sm:col-span-1">
-          <img className="w-32 md:w-40 h-auto rounded-lg" src="/images/itopper.jpeg" alt="" />
+          <img className="w-32 md:w-40 h-auto rounded-lg" src="/images/itopper.png" alt="" />
           <p className="text-gray-400 mt-4 mb-6 leading-relaxed">
             Empowering aspirants with comprehensive guidance and strategic preparation to conquer the UPSC Civil Services Examination.
           </p>
@@ -78,7 +78,7 @@ const Footer = () => {
           </h3>
           <ul className="space-y-3 text-gray-400">
             <li>
-            210, Dhan Trident
+              210, Dhan Trident
               <br />
               Indore, Madhya Pradesh, India
             </li>

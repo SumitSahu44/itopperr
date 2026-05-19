@@ -34,7 +34,7 @@ const ContactSection = () => {
   return (
     <section id="contact" className="py-20 px-4 bg-slate-50 relative overflow-hidden border-b border-slate-100">
       <div className="max-w-7xl mx-auto relative z-10">
-        
+
         {/* Section Header */}
         <div className="mb-16 text-center">
           <span className="text-xs sm:text-sm font-extrabold tracking-widest text-[#EF961D] uppercase mb-3 block">
@@ -47,7 +47,7 @@ const ContactSection = () => {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-stretch max-w-6xl mx-auto">
-          
+
           {/* Left Column: Contact Information Cards */}
           <div className="lg:col-span-5 flex flex-col justify-between text-left space-y-6">
             <div className="flex flex-col items-start">
@@ -97,7 +97,7 @@ const ContactSection = () => {
           <div className="lg:col-span-7 w-full">
             <div className="bg-white rounded-[20px] p-8 sm:p-10 border border-slate-200/80 shadow-lg h-full">
               <h3 className="text-2xl font-black text-[#163F66] mb-6 text-left">Send Us A Message</h3>
-              
+
               <form onSubmit={handleSubmit} className="space-y-5 text-left">
                 {/* Name */}
                 <div className="flex flex-col gap-1.5">

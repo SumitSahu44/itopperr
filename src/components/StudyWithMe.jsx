@@ -10,10 +10,10 @@ const StudyWithMe = () => {
     <section id="study-with-me" className="py-20 px-4 bg-slate-50 relative overflow-hidden border-b border-slate-100">
       <div className="max-w-7xl mx-auto relative z-10">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
-          
+
           {/* Left Column: Interactive Study Library Visual Mockup */}
           <div className="lg:col-span-5 order-2 lg:order-1 relative">
-            
+
             {/* Dashboard Card */}
             <div className="bg-[#0b1329] text-white rounded-[24px] p-6 sm:p-8 border border-slate-800 shadow-xl relative overflow-hidden">
               {/* Virtual Header */}
@@ -29,7 +29,7 @@ const StudyWithMe = () => {
                     <p className="text-[10px] text-slate-400 font-bold">120+ Active Aspirants Live</p>
                   </div>
                 </div>
-                
+
                 <span className="text-[9px] font-black bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2 py-0.5 rounded-md uppercase tracking-wider">
                   Live Room
                 </span>
@@ -45,7 +45,7 @@ const StudyWithMe = () => {
               {/* Simulated active toppers list */}
               <div className="space-y-3">
                 <p className="text-[10px] text-slate-400 font-extrabold uppercase tracking-wider mb-1">Co-Studying With Toppers:</p>
-                
+
                 <div className="flex items-center justify-between bg-white/5 p-3 rounded-xl border border-white/5">
                   <div className="flex items-center gap-3 text-left">
                     <div className="w-8 h-8 rounded-full overflow-hidden border border-[#EF961D]/40">
@@ -85,7 +85,7 @@ const StudyWithMe = () => {
               <span className="text-slate-800">Your Virtual 24/7 Library.</span>
             </h2>
             <div className="w-16 h-[3px] bg-[#EF961D] rounded-full mb-8"></div>
-            
+
             <p className="text-base sm:text-lg text-slate-600 leading-relaxed mb-8 font-bold">
               UPSC preparation can be an isolating journey. iTopper's premium **Study With Me** rooms provide a dynamic, highly focused virtual workspace where you can study alongside UPSC toppers and serious aspirants in real-time peer groups.
             </p>

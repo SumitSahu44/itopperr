@@ -40,7 +40,7 @@ const BlogsSection = () => {
   return (
     <section id="blogs" className="py-20 px-4 bg-white relative overflow-hidden border-b border-slate-100">
       <div className="max-w-7xl mx-auto relative z-10">
-        
+
         {/* Section Header */}
         <div className="mb-16 text-center">
           <span className="text-xs sm:text-sm font-extrabold tracking-widest text-[#EF961D] uppercase mb-3 block">
@@ -68,7 +68,7 @@ const BlogsSection = () => {
                   alt={blog.title}
                   className="w-full h-full object-cover group-hover:scale-102 transition-transform duration-500"
                 />
-                
+
                 {/* Category badge */}
                 <span className="absolute top-4 left-4 bg-white border border-slate-200 px-3 py-1 rounded-md text-[10px] font-black text-[#163F66] tracking-wider uppercase shadow-sm">
                   {blog.category}

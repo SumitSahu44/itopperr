@@ -28,7 +28,7 @@ const ProfessionalHero = () => {
         spread: 360,
         ticks: 60,
         origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 },
-        colors: ['#163F66', '#EF961D', '#3b82f6', '#fbbf24']
+        colors: ['#0a2968', '#1e40af', '#3b82f6', '#93c5fd', '#ffffff']
       });
       confetti({
         particleCount,
@@ -36,7 +36,7 @@ const ProfessionalHero = () => {
         spread: 360,
         ticks: 60,
         origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 },
-        colors: ['#163F66', '#EF961D', '#3b82f6', '#fbbf24']
+        colors: ['#0a2968', '#1e40af', '#3b82f6', '#93c5fd', '#ffffff']
       });
     }, 250);
     
@@ -45,7 +45,7 @@ const ProfessionalHero = () => {
       spread: 100,
       startVelocity: 60,
       origin: { y: 1, x: 0.5 },
-      colors: ['#163F66', '#EF961D', '#3b82f6', '#fbbf24', '#ffffff']
+      colors: ['#0a2968', '#1e40af', '#3b82f6', '#93c5fd', '#ffffff']
     });
     
     return () => clearInterval(interval);
@@ -63,11 +63,6 @@ const ProfessionalHero = () => {
       image: "https://randomuser.me/api/portraits/men/32.jpg",
       description: "AIR 297, UPSC CSE 2022",
     },
-    {
-      name: "Sajal Singh",
-      image: "https://randomuser.me/api/portraits/men/46.jpg",
-      description: "Mentor to 450+ successful rankers, 3 UPSC Interviews",
-    },
   ];
 
   return (
@@ -75,7 +70,7 @@ const ProfessionalHero = () => {
       {/* Decorative Subtle Background Gradients */}
       <div className="absolute top-0 right-0 w-full h-full overflow-hidden z-0 pointer-events-none">
         <div className="absolute -top-[10%] -right-[5%] w-[450px] h-[450px] rounded-full bg-blue-100/30 blur-[100px]" />
-        <div className="absolute top-[30%] -left-[10%] w-[350px] h-[350px] rounded-full bg-[#EF961D]/5 blur-[100px]" />
+        <div className="absolute top-[30%] -left-[10%] w-[350px] h-[350px] rounded-full bg-[#0a2968]/5 blur-[100px]" />
       </div>
 
       {/* Navigation Layer */}
@@ -94,8 +89,8 @@ const ProfessionalHero = () => {
           className="text-center mt-6 md:mt-10 mb-4 sm:mb-6 select-none"
         >
           <h1 className="text-6xl sm:text-8xl md:text-9xl font-black tracking-tight flex items-center justify-center font-sans">
-            <span className="text-[#163F66] lowercase">i</span>
-            <span className="text-[#EF961D] uppercase">Topper</span>
+            <span className="text-[#0a2968] lowercase">i</span>
+            <span className="text-[#0a2968] uppercase">Topper</span>
           </h1>
         </motion.div>
 
@@ -108,26 +103,26 @@ const ProfessionalHero = () => {
         >
           {/* Pillar 1 */}
           <div className="flex flex-col items-center group">
-            <span className="text-[15px] sm:text-lg md:text-2xl lg:text-3xl font-black text-slate-800 tracking-tight transition-colors duration-300 group-hover:text-[#163F66] whitespace-nowrap">
+            <span className="text-[15px] sm:text-lg md:text-2xl lg:text-3xl font-black text-slate-800 tracking-tight transition-colors duration-300 group-hover:text-[#0a2968] whitespace-nowrap">
               Credible Faculty
             </span>
-            <div className="w-[85%] h-[3px] bg-[#EF961D] mt-2 rounded-full transition-all duration-300 group-hover:w-full group-hover:scale-105"></div>
+            <div className="w-[85%] h-[3px] bg-[#0a2968] mt-2 rounded-full transition-all duration-300 group-hover:w-full group-hover:scale-105"></div>
           </div>
 
           {/* Pillar 2 */}
           <div className="flex flex-col items-center group">
-            <span className="text-[15px] sm:text-lg md:text-2xl lg:text-3xl font-black text-slate-800 tracking-tight transition-colors duration-300 group-hover:text-[#163F66] whitespace-nowrap">
+            <span className="text-[15px] sm:text-lg md:text-2xl lg:text-3xl font-black text-slate-800 tracking-tight transition-colors duration-300 group-hover:text-[#0a2968] whitespace-nowrap">
               Quality Content
             </span>
-            <div className="w-[85%] h-[3px] bg-[#EF961D] mt-2 rounded-full transition-all duration-300 group-hover:w-full group-hover:scale-105"></div>
+            <div className="w-[85%] h-[3px] bg-[#0a2968] mt-2 rounded-full transition-all duration-300 group-hover:w-full group-hover:scale-105"></div>
           </div>
 
           {/* Pillar 3 */}
           <div className="col-span-2 md:col-span-1 flex flex-col items-center group">
-            <span className="text-[15px] sm:text-lg md:text-2xl lg:text-3xl font-black text-slate-800 tracking-tight transition-colors duration-300 group-hover:text-[#163F66] whitespace-nowrap">
+            <span className="text-[15px] sm:text-lg md:text-2xl lg:text-3xl font-black text-slate-800 tracking-tight transition-colors duration-300 group-hover:text-[#0a2968] whitespace-nowrap">
               Affordable Courses
             </span>
-            <div className="w-[45%] md:w-[85%] h-[3px] bg-[#EF961D] mt-2 rounded-full transition-all duration-300 group-hover:w-full group-hover:scale-105"></div>
+            <div className="w-[45%] md:w-[85%] h-[3px] bg-[#0a2968] mt-2 rounded-full transition-all duration-300 group-hover:w-full group-hover:scale-105"></div>
           </div>
         </motion.div>
 
@@ -136,12 +131,12 @@ const ProfessionalHero = () => {
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.4, ease: "easeOut" }}
-          className="grid grid-cols-1 md:grid-cols-3 gap-16 md:gap-8 lg:gap-16 w-full max-w-6xl px-4 sm:px-6"
+          className="grid grid-cols-1 md:grid-cols-2 gap-16 md:gap-8 lg:gap-16 w-full max-w-4xl px-4 sm:px-6 justify-center mx-auto"
         >
           {facultyData.map((faculty, index) => (
             <div key={index} className="flex flex-col items-center">
               {/* Circular Headshot Container with custom yellow-orange border */}
-              <div className="relative w-44 h-44 sm:w-52 sm:h-52 rounded-full p-1 border border-[#EF961D] bg-white shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02]">
+              <div className="relative w-44 h-44 sm:w-52 sm:h-52 rounded-full p-1 border-2 border-[#0a2968] bg-white shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02]">
                 <div className="w-full h-full rounded-full overflow-hidden bg-slate-50 flex items-center justify-center">
                   <img
                     src={faculty.image}
@@ -154,10 +149,10 @@ const ProfessionalHero = () => {
               {/* Slanted Parallelogram Name Banner */}
               <div className="relative w-full max-w-[200px] sm:max-w-[240px] flex justify-center z-10 mt-[-20px] px-2 select-none">
                 {/* Underlay Ribbon Shadow */}
-                <div className="absolute top-1.5 left-2 w-full h-9 sm:h-10 bg-[#163F66] -skew-x-12 z-0 rounded-[2px]" />
+                <div className="absolute top-1.5 left-2 w-full h-9 sm:h-10 bg-[#0a2968]/30 -skew-x-12 z-0 rounded-[2px]" />
                 
                 {/* Foreground Ribbon */}
-                <div className="bg-[#EF961D] py-1.5 sm:py-2 w-full font-black text-center text-xs sm:text-sm md:text-base text-black -skew-x-12 z-10 shadow-md rounded-[2px] border border-[#EF961D]/10">
+                <div className="bg-[#0a2968] py-1.5 sm:py-2 w-full font-black text-center text-xs sm:text-sm md:text-base text-white -skew-x-12 z-10 shadow-md rounded-[2px] border border-[#0a2968]/10">
                   <div className="skew-x-12 tracking-wide font-extrabold uppercase">
                     {faculty.name}
                   </div>
@@ -172,23 +167,41 @@ const ProfessionalHero = () => {
           ))}
         </motion.div>
 
+        {/* Poster Section */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.5, ease: "easeOut" }}
+          className="w-full max-w-6xl px-4 sm:px-6 mt-16 sm:mt-20"
+        >
+          <div className="relative rounded-2xl overflow-hidden shadow-2xl border-4 border-[#0a2968]/20 bg-white group hover:scale-[1.01] transition-all duration-300">
+            <img
+              src="/images/poster.jpeg"
+              alt="iTopper Poster"
+              className="w-full h-auto object-cover"
+            />
+            {/* Subtle glow / border overlay */}
+            <div className="absolute inset-0 border border-white/10 rounded-2xl pointer-events-none" />
+          </div>
+        </motion.div>
+
         {/* Premium CTA Buttons */}
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.6, ease: "easeOut" }}
-          className="flex flex-col sm:flex-row gap-4 items-center justify-center mt-16 sm:mt-20 w-full max-w-md px-4 relative z-20"
+          className="flex flex-col sm:flex-row gap-4 items-center justify-center mt-12 sm:mt-16 w-full max-w-md px-4 relative z-20"
         >
           <HashLink
             smooth
             to="/#courses"
-            className="w-full sm:w-auto px-8 py-3.5 bg-[#163F66] text-white hover:bg-[#EF961D] hover:text-black transition-all duration-300 font-extrabold rounded-lg shadow-lg hover:shadow-[#EF961D]/20 text-center uppercase tracking-wider text-sm"
+            className="w-full sm:w-auto px-8 py-3.5 bg-[#0a2968] text-white hover:bg-white hover:text-[#0a2968] border-2 border-transparent hover:border-[#0a2968] transition-all duration-300 font-extrabold rounded-lg shadow-lg hover:shadow-[#0a2968]/20 text-center uppercase tracking-wider text-sm"
           >
             Start Preparation
           </HashLink>
           <Link
             to="/register"
-            className="w-full sm:w-auto px-8 py-3.5 border-2 border-[#163F66] text-[#163F66] hover:bg-[#163F66] hover:text-white transition-all duration-300 font-extrabold rounded-lg text-center uppercase tracking-wider text-sm bg-white"
+            className="w-full sm:w-auto px-8 py-3.5 border-2 border-[#0a2968] text-[#0a2968] hover:bg-[#0a2968] hover:text-white transition-all duration-300 font-extrabold rounded-lg text-center uppercase tracking-wider text-sm bg-white"
           >
             Register Now
           </Link>

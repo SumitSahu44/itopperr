@@ -9,7 +9,7 @@ const Navbar = ({ theme }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [hoveredDropdown, setHoveredDropdown] = useState(null);
   const [activeMobileDropdown, setActiveMobileDropdown] = useState(null);
-  
+
   const { user, logout, enrollments } = useContext(AuthContext);
   const navigate = useNavigate();
 
@@ -94,7 +94,7 @@ const Navbar = ({ theme }) => {
             <Link to="/" className="flex items-center space-x-3 relative z-50 shrink-0">
               <div className="w-28 sm:w-32 flex items-center justify-center">
                 <img
-                  src="/images/itopper.jpeg"
+                  src="/images/itopper.png"
                   alt="iTopper Logo"
                   className="w-full object-contain"
                 />
@@ -113,16 +113,14 @@ const Navbar = ({ theme }) => {
                       onMouseLeave={() => setHoveredDropdown(null)}
                     >
                       <button
-                        className={`flex items-center gap-1 font-bold text-sm tracking-wide ${
-                          theme === "light" ? "text-slate-800 hover:text-[#163F66]" : "text-slate-200 hover:text-white"
-                        } transition-colors duration-200 py-1 cursor-pointer`}
+                        className={`flex items-center gap-1 font-bold text-sm tracking-wide ${theme === "light" ? "text-slate-800 hover:text-[#0a2968]" : "text-slate-200 hover:text-white"
+                          } transition-colors duration-200 py-1 cursor-pointer`}
                       >
                         <span>{item.name}</span>
                         <ChevronDown
                           size={14}
-                          className={`transition-transform duration-300 ${
-                            hoveredDropdown === item.name ? "rotate-180 text-[#EF961D]" : ""
-                          }`}
+                          className={`transition-transform duration-300 ${hoveredDropdown === item.name ? "rotate-180 text-[#0a2968]" : ""
+                            }`}
                         />
                       </button>
 
@@ -134,22 +132,20 @@ const Navbar = ({ theme }) => {
                             animate={{ opacity: 1, y: 0 }}
                             exit={{ opacity: 0, y: 15 }}
                             transition={{ duration: 0.2 }}
-                            className={`absolute top-full left-0 mt-2 w-72 rounded-2xl p-2 shadow-2xl border z-50 backdrop-blur-md ${
-                              theme === "light"
+                            className={`absolute top-full left-0 mt-2 w-72 rounded-2xl p-2 shadow-2xl border z-50 backdrop-blur-md ${theme === "light"
                                 ? "bg-white border-slate-100 text-slate-800"
                                 : "bg-[#0b1329] border-slate-800 text-slate-200"
-                            }`}
+                              }`}
                           >
                             {item.subItems.map((sub, idx) => (
                               <HashLink
                                 smooth
                                 key={idx}
                                 to={sub.href}
-                                className={`block px-4 py-3 text-[13px] font-extrabold rounded-xl transition-all duration-200 ${
-                                  theme === "light"
-                                    ? "hover:bg-slate-50 hover:text-[#163F66] text-slate-700"
-                                    : "hover:bg-white/5 hover:text-[#EF961D] text-slate-300"
-                                }`}
+                                className={`block px-4 py-3 text-[13px] font-extrabold rounded-xl transition-all duration-200 ${theme === "light"
+                                    ? "hover:bg-slate-50 hover:text-[#0a2968] text-slate-700"
+                                    : "hover:bg-white/5 hover:text-[#0a2968] text-slate-300"
+                                  }`}
                               >
                                 {sub.name}
                               </HashLink>
@@ -166,12 +162,11 @@ const Navbar = ({ theme }) => {
                     smooth
                     key={item.name}
                     to={item.href}
-                    className={`relative text-sm font-bold tracking-wide ${
-                      theme === "light" ? "text-slate-800 hover:text-[#163F66]" : "text-slate-200 hover:text-white"
-                    } transition-colors duration-300 group`}
+                    className={`relative text-sm font-bold tracking-wide ${theme === "light" ? "text-slate-800 hover:text-[#0a2968]" : "text-slate-200 hover:text-white"
+                      } transition-colors duration-300 group`}
                   >
                     {item.name}
-                    <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-[#EF961D] transition-all duration-300 group-hover:w-full"></span>
+                    <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-[#0a2968] transition-all duration-300 group-hover:w-full"></span>
                   </HashLink>
                 );
               })}
@@ -185,7 +180,7 @@ const Navbar = ({ theme }) => {
                   {enrollments && enrollments.length > 0 ? (
                     <Link
                       to="/my-courses"
-                      className="px-5 py-2.5 bg-[#163F66] hover:bg-[#EF961D] text-white hover:text-black rounded-xl font-extrabold text-sm shadow-md transition-all duration-300"
+                      className="px-5 py-2.5 bg-[#0a2968] hover:bg-white hover:text-[#0a2968] border border-[#0a2968] text-white rounded-xl font-extrabold text-sm shadow-md transition-all duration-300"
                     >
                       Dashboard
                     </Link>
@@ -193,11 +188,10 @@ const Navbar = ({ theme }) => {
                     <HashLink
                       smooth
                       to="/#courses"
-                      className={`px-5 py-2.5 border-2 rounded-xl font-extrabold text-sm transition-all duration-300 ${
-                        theme === "light"
-                          ? "border-[#163F66] text-[#163F66] hover:bg-[#163F66] hover:text-white"
+                      className={`px-5 py-2.5 border-2 rounded-xl font-extrabold text-sm transition-all duration-300 ${theme === "light"
+                          ? "border-[#0a2968] text-[#0a2968] hover:bg-[#0a2968] hover:text-white"
                           : "border-white/20 text-white hover:bg-white/10"
-                      }`}
+                        }`}
                     >
                       Enroll Now
                     </HashLink>
@@ -205,11 +199,10 @@ const Navbar = ({ theme }) => {
 
                   {/* Profile Indicator */}
                   <div
-                    className={`flex items-center gap-2 px-4 py-2 rounded-full border ${
-                      theme === "light"
+                    className={`flex items-center gap-2 px-4 py-2 rounded-full border ${theme === "light"
                         ? "bg-slate-50 border-slate-200/60"
                         : "bg-white/5 border-white/10"
-                    }`}
+                      }`}
                   >
                     <User size={14} className={theme === "light" ? "text-slate-600" : "text-slate-400"} />
                     <span className={`text-xs font-bold capitalize ${theme === "light" ? "text-slate-800" : "text-white"}`}>
@@ -221,9 +214,8 @@ const Navbar = ({ theme }) => {
                   <button
                     onClick={handleLogout}
                     title="Logout"
-                    className={`p-2 transition-colors duration-300 cursor-pointer ${
-                      theme === "light" ? "text-slate-600 hover:text-red-600" : "text-slate-400 hover:text-red-400"
-                    }`}
+                    className={`p-2 transition-colors duration-300 cursor-pointer ${theme === "light" ? "text-slate-600 hover:text-red-600" : "text-slate-400 hover:text-red-400"
+                      }`}
                   >
                     <LogOut size={18} />
                   </button>
@@ -231,7 +223,7 @@ const Navbar = ({ theme }) => {
               ) : (
                 <Link
                   to="/login"
-                  className="px-6 py-2.5 bg-[#163F66] hover:bg-[#EF961D] text-white hover:text-black rounded-xl font-extrabold text-sm shadow-md hover:shadow-lg transition-all duration-300 uppercase tracking-wider flex items-center gap-2"
+                  className="px-6 py-2.5 bg-[#0a2968] hover:bg-white hover:text-[#0a2968] border border-[#0a2968] text-white rounded-xl font-extrabold text-sm shadow-md hover:shadow-lg transition-all duration-300 uppercase tracking-wider flex items-center gap-2"
                 >
                   <LogIn size={16} /> Enroll Now
                 </Link>
@@ -240,9 +232,8 @@ const Navbar = ({ theme }) => {
 
             {/* Mobile Menu Toggle */}
             <button
-              className={`xl:hidden relative z-50 w-10 h-10 flex items-center justify-center ${
-                theme === "light" && !isMenuOpen ? "text-black" : "text-white"
-              } focus:outline-none cursor-pointer`}
+              className={`xl:hidden relative z-50 w-10 h-10 flex items-center justify-center ${theme === "light" && !isMenuOpen ? "text-black" : "text-white"
+                } focus:outline-none cursor-pointer`}
               onClick={() => setIsMenuOpen(!isMenuOpen)}
             >
               {isMenuOpen ? <X size={28} /> : <Menu size={28} />}
@@ -261,8 +252,8 @@ const Navbar = ({ theme }) => {
               className="xl:hidden fixed inset-0 z-40 bg-black/95 backdrop-blur-xl flex flex-col justify-center items-center overflow-y-auto pt-24 pb-8"
             >
               {/* Soft decorative background circles */}
-              <div className="absolute top-0 right-0 w-64 h-64 bg-[#163F66]/30 rounded-full blur-[100px] -z-10" />
-              <div className="absolute bottom-0 left-0 w-64 h-64 bg-[#EF961D]/15 rounded-full blur-[100px] -z-10" />
+              <div className="absolute top-0 right-0 w-64 h-64 bg-[#0a2968]/30 rounded-full blur-[100px] -z-10" />
+              <div className="absolute bottom-0 left-0 w-64 h-64 bg-[#0a2968]/15 rounded-full blur-[100px] -z-10" />
 
               <div className="flex flex-col items-center space-y-6 w-full px-8 max-w-lg">
                 {navItems.map((item) => {
@@ -277,9 +268,8 @@ const Navbar = ({ theme }) => {
                           <span>{item.name}</span>
                           <ChevronDown
                             size={20}
-                            className={`transition-transform duration-300 ${
-                              isDropdownOpen ? "rotate-180 text-[#EF961D]" : ""
-                            }`}
+                            className={`transition-transform duration-300 ${isDropdownOpen ? "rotate-180 text-[#0a2968]" : ""
+                              }`}
                           />
                         </button>
 
@@ -298,7 +288,7 @@ const Navbar = ({ theme }) => {
                                   key={idx}
                                   to={sub.href}
                                   onClick={() => setIsMenuOpen(false)}
-                                  className="block py-2 text-base font-extrabold text-white/60 hover:text-[#EF961D] transition-colors"
+                                  className="block py-2 text-base font-extrabold text-white/60 hover:text-[#0a2968] transition-colors"
                                 >
                                   {sub.name}
                                 </HashLink>
@@ -329,15 +319,15 @@ const Navbar = ({ theme }) => {
                   {user ? (
                     <div className="flex flex-col gap-3 w-full">
                       <div className="flex items-center justify-center gap-2 text-white/70 text-lg font-bold border-b border-white/10 pb-3 mb-2">
-                        <User size={18} className="text-[#EF961D]" />
+                        <User size={18} className="text-[#0a2968]" />
                         Hello, {user.name?.split(" ")[0]}
                       </div>
-                      
+
                       {enrollments && enrollments.length > 0 ? (
                         <Link
                           to="/my-courses"
                           onClick={() => setIsMenuOpen(false)}
-                          className="w-full py-3.5 bg-[#163F66] text-white text-center font-extrabold rounded-xl shadow-md"
+                          className="w-full py-3.5 bg-[#0a2968] text-white text-center font-extrabold rounded-xl shadow-md"
                         >
                           Dashboard
                         </Link>
@@ -363,7 +353,7 @@ const Navbar = ({ theme }) => {
                     <Link
                       to="/login"
                       onClick={() => setIsMenuOpen(false)}
-                      className="w-full py-4 bg-[#163F66] hover:bg-[#EF961D] text-white hover:text-black text-center font-extrabold rounded-xl shadow-md transition-all duration-300 block uppercase tracking-wider text-sm"
+                      className="w-full py-4 bg-[#0a2968] text-white hover:bg-white hover:text-[#0a2968] border border-[#0a2968] text-center font-extrabold rounded-xl shadow-md transition-all duration-300 block uppercase tracking-wider text-sm"
                     >
                       Enroll Now
                     </Link>

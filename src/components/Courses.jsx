@@ -69,7 +69,7 @@ const Courses = () => {
   return (
     <section id="courses" className="py-20 px-4 bg-white relative overflow-hidden border-b border-slate-100">
       <div className="max-w-7xl mx-auto relative z-10">
-        
+
         {/* Title Block */}
         <div className="mb-14 text-center">
           <p className="text-[13px] sm:text-sm font-extrabold tracking-widest text-[#163F66] uppercase mb-3">
@@ -87,11 +87,10 @@ const Courses = () => {
             <button
               key={category}
               onClick={() => setActiveCategory(category)}
-              className={`px-5 py-2.5 rounded-xl text-xs sm:text-sm font-extrabold border transition-all duration-350 cursor-pointer ${
-                activeCategory === category
-                  ? "bg-[#163F66] text-white border-[#163F66] shadow-md scale-105"
-                  : "bg-white text-slate-600 border-slate-200 hover:border-slate-300 hover:bg-slate-50"
-              }`}
+              className={`px-5 py-2.5 rounded-xl text-xs sm:text-sm font-extrabold border transition-all duration-350 cursor-pointer ${activeCategory === category
+                ? "bg-[#163F66] text-white border-[#163F66] shadow-md scale-105"
+                : "bg-white text-slate-600 border-slate-200 hover:border-slate-300 hover:bg-slate-50"
+                }`}
             >
               {category}
             </button>
