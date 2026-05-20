@@ -1,179 +1,466 @@
 import React, { useState } from "react";
-import { Target, PenTool, ClipboardList, ChevronRight, Check } from "lucide-react";
+import {
+  Target,
+  PenTool,
+  ClipboardList,
+  BookOpen,
+  Globe,
+  Leaf,
+  FileText,
+  ChevronRight,
+  Check,
+  Users,
+  Star,
+  Award,
+  TrendingUp,
+  Layers,
+} from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useNavigate } from "react-router-dom";
 
-const Courses = () => {
-  const [activeCategory, setActiveCategory] = useState("All");
+/* ───────────────────────────────────────────────
+   DATA
+─────────────────────────────────────────────── */
+const tabs = [
+  { id: "programs", label: "Programs", icon: Target },
+  { id: "mains", label: "Mains Writing", icon: PenTool },
+  { id: "modules", label: "Modules", icon: Layers },
+];
 
-  const categories = ["All", "Mentorship", "Writing", "Test Series", "Notes"];
 
-  const courseData = [
+const allCourses = {
+  programs: [
     {
-      id: 1,
-      title: "One-on-One Mentorship Program",
+      id: "p1",
+      slug: "mentorship-prelims",
+      title: "Mentorship – Prelims",
       badge: "BESTSELLER",
-      tagline: "Popular",
+      badgeColor: "bg-orange-50 text-orange-600 border-orange-200",
       price: "Premium Plan",
-      category: "Mentorship",
-      bullets: [
-        "1 on 1 Sessions with Toppers",
-        "Holistic Strategy & Scheduling",
-        "Notes Making Guidance"
-      ],
+      priceNote: "Custom Pricing",
       icon: Target,
-      iconColor: "text-[#163F66] bg-[#163F66]/5 border-[#163F66]/10",
-      badgeColor: "bg-orange-50 text-orange-600 border-orange-100"
+      tag: "1-on-1 Guidance",
+      tagColor: "text-[#163F66] bg-[#163F66]/8 border-[#163F66]/15",
+      bullets: [
+        "Dedicated Prelims Strategy",
+        "PYQ Deep Dives with Topper",
+        "Weekly Progress Reviews",
+        "Mock Interview Sessions",
+      ],
+      students: "1,200+",
+      rating: "4.9",
     },
     {
-      id: 2,
-      title: "Daily Answer Writing Program",
-      badge: "MOST ENROLLED",
-      tagline: null,
-      price: "₹9,999/-",
-      category: "Writing",
-      bullets: [
-        "Unlimited Evaluation in 24 hrs",
-        "1 on 1 Doubt Clearance",
-        "GS & Essay Coverage"
-      ],
+      id: "p2",
+      slug: "mentorship-mains",
+      title: "Mentorship – Mains",
+      badge: "MOST POPULAR",
+      badgeColor: "bg-amber-50 text-amber-700 border-amber-200",
+      price: "Premium Plan",
+      priceNote: "Custom Pricing",
       icon: PenTool,
-      iconColor: "text-[#163F66] bg-[#163F66]/5 border-[#163F66]/10",
-      badgeColor: "bg-amber-50 text-amber-700 border-amber-100"
+      tag: "1-on-1 Guidance",
+      tagColor: "text-[#163F66] bg-[#163F66]/8 border-[#163F66]/15",
+      bullets: [
+        "GS Paper Answer Writing",
+        "Optional Subject Mentoring",
+        "Essay Strategy & Reviews",
+        "Unlimited Doubt Sessions",
+      ],
+      students: "980+",
+      rating: "4.8",
     },
     {
-      id: 3,
-      title: "Prelims 2026 Test Series",
-      badge: "NEW BATCH",
-      tagline: null,
-      price: "₹1,999/-",
-      category: "Test Series",
+      id: "p3",
+      slug: "mentorship-comprehensive",
+      title: "Mentorship – Comprehensive",
+      subtitle: "(Pre + Mains)",
+      badge: "ALL-IN-ONE",
+      badgeColor: "bg-violet-50 text-violet-700 border-violet-200",
+      price: "Premium Plan",
+      priceNote: "Custom Pricing",
+      icon: Award,
+      tag: "Complete Package",
+      tagColor: "text-violet-700 bg-violet-50 border-violet-200",
       bullets: [
-        "55 Comprehensive Tests",
-        "PYQ Based Revision",
-        "Holistic CA Coverage"
+        "End-to-End UPSC Coverage",
+        "Prelims + Mains Strategy",
+        "Interview Preparation",
+        "Notes Making Guidance",
       ],
+      students: "650+",
+      rating: "5.0",
+    },
+  ],
+  mains: [
+    {
+      id: "m1",
+      slug: "daily-mains-answer-writing",
+      title: "Daily Mains Answer Writing",
+      badge: "MOST ENROLLED",
+      badgeColor: "bg-rose-50 text-rose-600 border-rose-200",
+      price: "₹9,999/-",
+      priceNote: "Annual Plan",
+      icon: PenTool,
+      tag: "Daily Practice",
+      tagColor: "text-rose-600 bg-rose-50 border-rose-200",
+      bullets: [
+        "Evaluation Within 24 Hours",
+        "1-on-1 Doubt Clearance",
+        "GS 1–4 & Essay Coverage",
+        "Model Answers Provided",
+      ],
+      students: "2,100+",
+      rating: "4.9",
+    },
+    {
+      id: "m2",
+      slug: "answer-writing-test-series",
+      title: "Answer Writing with Test Series",
+      badge: "COMBO OFFER",
+      badgeColor: "bg-teal-50 text-teal-700 border-teal-200",
+      price: "₹14,999/-",
+      priceNote: "Annual Plan",
       icon: ClipboardList,
-      iconColor: "text-[#163F66] bg-[#163F66]/5 border-[#163F66]/10",
-      badgeColor: "bg-rose-50 text-rose-600 border-rose-100"
+      tag: "Writing + Tests",
+      tagColor: "text-teal-700 bg-teal-50 border-teal-200",
+      bullets: [
+        "20 Full-Length Mains Tests",
+        "Answer Evaluation Included",
+        "All GS Papers Covered",
+        "Rank & Percentile Report",
+      ],
+      students: "1,500+",
+      rating: "4.8",
+    },
+    {
+      id: "m3",
+      slug: "answer-evaluation",
+      title: "Answer Evaluation",
+      badge: "FOCUSED",
+      badgeColor: "bg-indigo-50 text-indigo-700 border-indigo-200",
+      price: "₹4,999/-",
+      priceNote: "Per Semester",
+      icon: Star,
+      tag: "Expert Feedback",
+      tagColor: "text-indigo-700 bg-indigo-50 border-indigo-200",
+      bullets: [
+        "Topper-Reviewed Copies",
+        "Detailed Margin Comments",
+        "Score Improvement Tracking",
+        "Strategy Corrections",
+      ],
+      students: "800+",
+      rating: "4.7",
+    },
+  ],
+  modules: [
+    {
+      id: "mod1",
+      slug: "gs-paper-4-ethics",
+      title: "GS Paper IV – Ethics",
+      badge: "HIGH SCORING",
+      badgeColor: "bg-yellow-50 text-yellow-700 border-yellow-200",
+      price: "₹2,999/-",
+      priceNote: "One-Time",
+      icon: BookOpen,
+      tag: "GS Paper 4",
+      tagColor: "text-yellow-700 bg-yellow-50 border-yellow-200",
+      bullets: [
+        "Ethics Theory & Cases",
+        "Case Study Bank (100+)",
+        "Answer Framework Training",
+        "Mock Tests Included",
+      ],
+      students: "1,800+",
+      rating: "4.9",
+    },
+    {
+      id: "mod2",
+      slug: "geography",
+      title: "Geography",
+      badge: "FOUNDATION",
+      badgeColor: "bg-sky-50 text-sky-700 border-sky-200",
+      price: "₹2,499/-",
+      priceNote: "One-Time",
+      icon: Globe,
+      tag: "Physical + Human",
+      tagColor: "text-sky-700 bg-sky-50 border-sky-200",
+      bullets: [
+        "Physical Geography Mastery",
+        "Indian Geography Deep Dive",
+        "Map-Based Questions",
+        "PYQ Analysis Included",
+      ],
+      students: "1,300+",
+      rating: "4.8",
+    },
+    {
+      id: "mod3",
+      slug: "environment",
+      title: "Environment",
+      badge: "TRENDING",
+      badgeColor: "bg-green-50 text-green-700 border-green-200",
+      price: "₹2,499/-",
+      priceNote: "One-Time",
+      icon: Leaf,
+      tag: "Ecology + CA",
+      tagColor: "text-green-700 bg-green-50 border-green-200",
+      bullets: [
+        "Ecology & Biodiversity",
+        "Climate Change & Policies",
+        "Current Affairs Integration",
+        "Environment Acts Covered",
+      ],
+      students: "1,100+",
+      rating: "4.7",
+    },
+    {
+      id: "mod4",
+      slug: "essay",
+      title: "Essay",
+      badge: "SCORE BOOSTER",
+      badgeColor: "bg-pink-50 text-pink-700 border-pink-200",
+      price: "₹2,999/-",
+      priceNote: "One-Time",
+      icon: FileText,
+      tag: "GS Paper 1 Essay",
+      tagColor: "text-pink-700 bg-pink-50 border-pink-200",
+      bullets: [
+        "Essay Structure & Format",
+        "100+ Topic Brainstorming",
+        "Weekly Essay Practice",
+        "Topper Essay Reviews",
+      ],
+      students: "900+",
+      rating: "4.9",
+    },
+  ],
+};
+
+/* ───────────────────────────────────────────────
+   CARD COMPONENT
+─────────────────────────────────────────────── */
+const CourseCard = ({ course, onView }) => {
+  const IconComponent = course.icon;
+  return (
+    <motion.div
+      layout
+      initial={{ opacity: 0, y: 20, scale: 0.97 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      exit={{ opacity: 0, y: 20, scale: 0.97 }}
+      transition={{ duration: 0.35, ease: "easeOut" }}
+      className="flex flex-col bg-white rounded-2xl border border-slate-200/70 hover:border-[#163F66]/30 shadow-sm hover:shadow-xl transition-all duration-500 hover:-translate-y-1 relative overflow-hidden group"
+    >
+      {/* Top accent bar */}
+      <div className="absolute top-0 left-0 w-full h-[4px] bg-gradient-to-r from-[#163F66] to-[#EF961D]" />
+
+      <div className="p-6 sm:p-7 flex flex-col flex-grow">
+        {/* Header row */}
+        <div className="flex justify-between items-start mb-5 mt-1">
+          <div className="flex items-center gap-3">
+            <div className="p-2.5 rounded-xl bg-[#163F66]/5 border border-[#163F66]/10 text-[#163F66] flex items-center justify-center shrink-0">
+              <IconComponent size={19} strokeWidth={2.5} />
+            </div>
+            <span className={`px-2.5 py-1 rounded-full text-[9px] font-extrabold border tracking-wider uppercase ${course.tagColor}`}>
+              {course.tag}
+            </span>
+          </div>
+          <span className={`px-2.5 py-1 rounded-full text-[9px] font-extrabold border tracking-wider uppercase ${course.badgeColor}`}>
+            {course.badge}
+          </span>
+        </div>
+
+        {/* Title */}
+        <h3 className="text-[17px] font-black text-slate-900 leading-snug mb-1 group-hover:text-[#163F66] transition-colors duration-300">
+          {course.title}
+        </h3>
+        {course.subtitle && (
+          <p className="text-xs font-bold text-slate-400 mb-3">{course.subtitle}</p>
+        )}
+
+        {/* Price */}
+        <div className="mb-5 mt-2 flex items-center gap-3">
+          <div className="bg-[#EF961D]/6 text-slate-800 border border-[#EF961D]/20 px-3 py-1.5 rounded-xl font-black text-sm flex items-center gap-2">
+            <span className="text-[9px] uppercase tracking-wider text-slate-400 font-extrabold">Price:</span>
+            <span className="text-[#163F66]">{course.price}</span>
+          </div>
+          <span className="text-[11px] text-slate-400 font-bold">{course.priceNote}</span>
+        </div>
+
+        {/* Stats Row */}
+        <div className="flex items-center gap-4 mb-5 pb-5 border-b border-slate-100">
+          <div className="flex items-center gap-1.5">
+            <Users size={12} className="text-slate-400" strokeWidth={2.5} />
+            <span className="text-xs font-extrabold text-slate-500">{course.students} students</span>
+          </div>
+          <div className="flex items-center gap-1">
+            <Star size={11} className="text-[#EF961D] fill-[#EF961D]" />
+            <span className="text-xs font-extrabold text-slate-700">{course.rating}</span>
+          </div>
+        </div>
+
+        {/* Bullets */}
+        <ul className="space-y-3 mb-7 flex-grow">
+          {course.bullets.map((bullet, idx) => (
+            <li key={idx} className="flex items-start gap-3">
+              <div className="flex items-center justify-center w-4.5 h-4.5 mt-0.5 rounded-full bg-[#EF961D]/12 text-[#EF961D] shrink-0">
+                <Check size={10} strokeWidth={3.5} />
+              </div>
+              <span className="text-[13px] text-slate-600 font-semibold leading-relaxed">{bullet}</span>
+            </li>
+          ))}
+        </ul>
+
+        {/* CTA */}
+        <div className="mt-auto">
+          <button
+            onClick={() => onView(course.slug)}
+            className="w-full py-3.5 rounded-[11px] bg-[#0b1329] hover:bg-[#EF961D] text-white hover:text-black font-extrabold text-[13px] transition-all duration-300 shadow-sm hover:shadow-md flex items-center justify-center gap-2 cursor-pointer group/btn"
+          >
+            <span>View Program Details</span>
+            <ChevronRight size={14} strokeWidth={2.5} className="transition-transform duration-300 group-hover/btn:translate-x-0.5" />
+          </button>
+        </div>
+      </div>
+    </motion.div>
+  );
+};
+
+/* ───────────────────────────────────────────────
+   MAIN COMPONENT
+─────────────────────────────────────────────── */
+const Courses = () => {
+  const [activeTab, setActiveTab] = useState("programs");
+  const navigate = useNavigate();
+
+  const handleView = (slug) => {
+    if (slug) {
+      navigate(`/curriculum/${slug}`);
     }
-  ];
+  };
 
-  const filteredCourses = activeCategory === "All"
-    ? courseData
-    : courseData.filter(course => course.category === activeCategory);
+  const currentCourses = allCourses[activeTab];
 
-  const openCurriculum = (title) => {
-    window.alert(`This program "${title}" is currently under construction. Please check back later!`);
+  const tabMeta = {
+    programs: {
+      heading: "Mentorship Programs",
+      sub: "1-on-1 personalised guidance from UPSC toppers — Prelims, Mains, or both.",
+    },
+    mains: {
+      heading: "Mains Writing Programs",
+      sub: "India's most rigorous answer-writing platform with expert evaluation.",
+    },
+    modules: {
+      heading: "Standalone Modules",
+      sub: "Subject-specific deep-dives crafted for high-scoring GS topics.",
+    },
   };
 
   return (
-    <section id="courses" className="pt-20 pb-10 px-4 bg-white relative overflow-hidden border-b border-slate-100">
+    <section id="courses" className="pt-20 pb-16 px-4 bg-white relative overflow-hidden border-b border-slate-100">
+
+      {/* Subtle BG Pattern */}
+      <div
+        className="absolute inset-0 opacity-[0.025] pointer-events-none"
+        style={{
+          backgroundImage: `radial-gradient(circle at 1px 1px, #163F66 1px, transparent 0)`,
+          backgroundSize: "36px 36px",
+        }}
+      />
+
       <div className="max-w-7xl mx-auto relative z-10">
 
-        {/* Title Block */}
-        <div className="mb-14 text-center">
-          <p className="text-[13px] sm:text-sm font-extrabold tracking-widest text-[#163F66] uppercase mb-3">
+        {/* ─── Section Title ─── */}
+        <div className="mb-12 text-center">
+          <p className="text-[11px] sm:text-[13px] font-extrabold tracking-[0.2em] text-[#163F66] uppercase mb-3 flex items-center justify-center gap-2">
+            <TrendingUp size={13} strokeWidth={3} className="text-[#EF961D]" />
             Choose the right path for your UPSC journey
           </p>
           <h2 className="text-4xl md:text-5xl font-black text-slate-950 tracking-tight mb-4">
             OUR <span className="text-[#EF961D]">PROGRAMS</span>
           </h2>
-          <div className="w-16 h-[3px] bg-[#EF961D] mx-auto rounded-full shadow-sm"></div>
+          <div className="w-16 h-[3px] bg-[#EF961D] mx-auto rounded-full" />
         </div>
 
-        {/* Category Filters */}
-        <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3 mb-16 max-w-2xl mx-auto px-2">
-          {categories.map((category) => (
+        {/* ─── Tab Switcher ─── */}
+        <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3 mb-4 max-w-xl mx-auto">
+          {tabs.map(({ id, label, icon: Icon }) => (
             <button
-              key={category}
-              onClick={() => setActiveCategory(category)}
-              className={`px-5 py-2.5 rounded-xl text-xs sm:text-sm font-extrabold border transition-all duration-350 cursor-pointer ${activeCategory === category
-                ? "bg-[#163F66] text-white border-[#163F66] shadow-md scale-105"
-                : "bg-white text-slate-600 border-slate-200 hover:border-slate-300 hover:bg-slate-50"
-                }`}
+              key={id}
+              onClick={() => setActiveTab(id)}
+              className={`relative flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs sm:text-sm font-extrabold border transition-all duration-300 cursor-pointer overflow-hidden ${
+                activeTab === id
+                  ? "bg-[#163F66] text-white border-[#163F66] shadow-lg shadow-[#163F66]/20 scale-105"
+                  : "bg-white text-slate-600 border-slate-200 hover:border-[#163F66]/40 hover:text-[#163F66] hover:bg-[#163F66]/3"
+              }`}
             >
-              {category}
+              <Icon size={14} strokeWidth={2.5} />
+              {label}
+              {activeTab === id && (
+                <motion.span
+                  layoutId="tab-active-pill"
+                  className="absolute inset-0 bg-[#163F66] -z-10 rounded-xl"
+                  transition={{ type: "spring", stiffness: 500, damping: 40 }}
+                />
+              )}
             </button>
           ))}
         </div>
 
-        {/* Dynamic Card Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 sm:gap-10 max-w-6xl mx-auto items-stretch">
+        {/* ─── Tab Sub-heading ─── */}
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={activeTab}
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+            transition={{ duration: 0.25 }}
+            className="text-center mb-12 px-4"
+          >
+            <h3 className="text-lg font-black text-slate-800 mb-1">{tabMeta[activeTab].heading}</h3>
+            <p className="text-sm text-slate-500 font-medium max-w-xl mx-auto">{tabMeta[activeTab].sub}</p>
+          </motion.div>
+        </AnimatePresence>
+
+        {/* ─── Course Cards Grid ─── */}
+        <div
+          className={`grid grid-cols-1 gap-7 sm:gap-8 items-stretch mx-auto max-w-6xl ${
+            currentCourses.length === 4
+              ? "md:grid-cols-2 lg:grid-cols-4"
+              : "md:grid-cols-2 lg:grid-cols-3"
+          }`}
+        >
           <AnimatePresence mode="popLayout">
-            {filteredCourses.map((course) => {
-              const IconComponent = course.icon;
-              return (
-                <motion.div
-                  layout
-                  initial={{ opacity: 0, scale: 0.95, y: 15 }}
-                  animate={{ opacity: 1, scale: 1, y: 0 }}
-                  exit={{ opacity: 0, scale: 0.95, y: 15 }}
-                  transition={{ duration: 0.35 }}
-                  key={course.id}
-                  className="flex flex-col bg-white rounded-[20px] border border-slate-200/80 hover:border-slate-300/80 shadow-md hover:shadow-xl transition-all duration-500 hover:scale-[1.01] min-h-[460px] relative overflow-hidden group flex-1"
-                >
-                  {/* Premium Solid Top Accent Bar (like high-end academic journals & portals) */}
-                  <div className="absolute top-0 left-0 w-full h-[5px] bg-[#163F66]" />
-
-                  {/* Inner Content Wrapper */}
-                  <div className="p-7 sm:p-8 flex flex-col flex-grow">
-                    {/* Top Badges Row */}
-                    <div className="flex justify-between items-center w-full mb-6 mt-1">
-                      {/* Round Square Icon */}
-                      <div className={`p-2.5 rounded-xl border ${course.iconColor} flex items-center justify-center`}>
-                        <IconComponent size={20} className="stroke-[2.5]" />
-                      </div>
-
-                      {/* Tag pill */}
-                      <span className={`px-2.5 py-1 rounded-full text-[9px] font-extrabold border tracking-wider uppercase ${course.badgeColor}`}>
-                        {course.badge}
-                      </span>
-                    </div>
-
-                    {/* Course Title */}
-                    <h3 className="text-xl font-black text-slate-900 leading-snug mb-3 pr-2 group-hover:text-[#163F66] transition-colors duration-300">
-                      {course.title}
-                    </h3>
-
-                    {/* Pricing Panel */}
-                    <div className="mb-6 flex items-center">
-                      <div className="bg-[#EF961D]/5 text-slate-800 border border-[#EF961D]/15 px-3.5 py-1 rounded-xl font-black text-sm flex items-center gap-2">
-                        <span className="text-[10px] uppercase tracking-wider text-slate-500 font-extrabold">Price:</span>
-                        <span className="text-[#163F66]">{course.price}</span>
-                      </div>
-                    </div>
-
-                    {/* Bullet Points with Checkmark Icons */}
-                    <ul className="space-y-4 mb-8">
-                      {course.bullets.map((bullet, idx) => (
-                        <li key={idx} className="flex items-start gap-3.5">
-                          {/* Checked Icon Badge */}
-                          <div className="flex items-center justify-center w-5 h-5 rounded-full bg-[#EF961D]/10 text-[#EF961D] shrink-0 mt-0.5">
-                            <Check size={11} className="stroke-[3.5]" />
-                          </div>
-                          <span className="text-sm sm:text-base text-slate-600 font-bold leading-relaxed">
-                            {bullet}
-                          </span>
-                        </li>
-                      ))}
-                    </ul>
-
-                    {/* CTA Button */}
-                    <div className="mt-auto pt-4">
-                      <button
-                        onClick={() => openCurriculum(course.title)}
-                        className="w-full py-3.5 rounded-[12px] bg-[#0b1329] hover:bg-[#EF961D] text-white hover:text-black font-extrabold text-sm transition-all duration-300 shadow-sm flex items-center justify-center gap-2 group-hover:shadow-md cursor-pointer"
-                      >
-                        <span>View Program Details</span>
-                        <ChevronRight size={14} className="stroke-[2.5] transition-transform duration-300 group-hover:translate-x-0.5" />
-                      </button>
-                    </div>
-                  </div>
-                </motion.div>
-              );
-            })}
+            {currentCourses.map((course) => (
+              <CourseCard key={course.id} course={course} onView={handleView} />
+            ))}
           </AnimatePresence>
         </div>
+
+        {/* ─── Bottom CTA Banner ─── */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5, delay: 0.2 }}
+          className="mt-16 rounded-2xl bg-gradient-to-r from-[#0b1329] via-[#163F66] to-[#0b1329] p-8 sm:p-10 flex flex-col sm:flex-row items-center justify-between gap-6 shadow-2xl"
+        >
+          <div>
+            <p className="text-[11px] font-extrabold tracking-widest text-[#EF961D] uppercase mb-1">Not sure which program suits you?</p>
+            <h3 className="text-2xl sm:text-3xl font-black text-white leading-tight">
+              Book a <span className="text-[#EF961D]">Free Counselling</span> Session
+            </h3>
+            <p className="text-slate-300 text-sm mt-1 font-medium">Talk to a UPSC topper and choose the perfect path for you.</p>
+          </div>
+          <a
+            href="#contact"
+            className="shrink-0 px-8 py-4 rounded-xl bg-[#EF961D] hover:bg-white text-black font-extrabold text-sm transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105 flex items-center gap-2 whitespace-nowrap"
+          >
+            Book Free Call
+            <ChevronRight size={15} strokeWidth={2.5} />
+          </a>
+        </motion.div>
 
       </div>
     </section>

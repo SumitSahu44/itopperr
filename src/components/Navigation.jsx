@@ -20,32 +20,32 @@ const Navbar = ({ theme }) => {
       name: "Programs",
       isDropdown: true,
       subItems: [
-        { name: "Mentorship - Prelims", href: "/#courses" },
-        { name: "Mentorship - Mains", href: "/#courses" },
-        { name: "Mentorship - Comprehensive (Pre + Mains)", href: "/#courses" }
+        { name: "Mentorship - Prelims", href: "/curriculum/mentorship-prelims" },
+        { name: "Mentorship - Mains", href: "/curriculum/mentorship-mains" },
+        { name: "Mentorship - Comprehensive (Pre + Mains)", href: "/curriculum/mentorship-comprehensive" }
       ]
     },
     {
       name: "Mains Writing",
       isDropdown: true,
       subItems: [
-        { name: "Daily Mains Answer Writing", href: "/#courses" },
-        { name: "Answer Writing with Test Series", href: "/#courses" },
-        { name: "Answer Evaluation", href: "/#courses" }
+        { name: "Daily Mains Answer Writing", href: "/curriculum/daily-mains-answer-writing" },
+        { name: "Answer Writing with Test Series", href: "/curriculum/answer-writing-test-series" },
+        { name: "Answer Evaluation", href: "/curriculum/answer-evaluation" }
       ]
     },
     {
       name: "Modules",
       isDropdown: true,
       subItems: [
-        { name: "GS Paper IV - Ethics", href: "/#courses" },
-        { name: "Geography", href: "/#courses" },
-        { name: "Environment", href: "/#courses" },
-        { name: "Essay", href: "/#courses" }
+        { name: "GS Paper IV - Ethics", href: "/curriculum/gs-paper-4-ethics" },
+        { name: "Geography", href: "/curriculum/geography" },
+        { name: "Environment", href: "/curriculum/environment" },
+        { name: "Essay", href: "/curriculum/essay" }
       ]
     },
-    { name: "Study With Me", href: "/#courses" },
-    { name: "Blogs", href: "/#courses" },
+    { name: "Study With Me", href: "/#study" },
+    { name: "Blogs", href: "/#blogs" },
     { name: "Contact", href: "/#contact" }
   ];
 
