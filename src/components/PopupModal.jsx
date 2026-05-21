@@ -40,7 +40,7 @@ const PopupModal = () => {
 
         {/* Popup Image */}
         <img
-          src="/images/popup-img.jpeg"
+          src="/images/new-popup.jpeg"
           alt="Special Offer"
           className="w-full h-auto object-cover block"
         />

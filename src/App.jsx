@@ -23,6 +23,8 @@ import PopupModal from "./components/PopupModal";
 import StudyWithMe from "./components/StudyWithMe";
 import BlogsSection from "./components/BlogsSection";
 import ContactSection from "./components/ContactSection";
+import Testimonials from "./components/Testimonials";
+import LeadFormSection from "./components/LeadFormSection";
 
 // Course Components
 import CourseCurriculum from "./components/CourseDetails";
@@ -113,8 +115,10 @@ function App() {
                   {/* <MeetOurFaculty /> */}
                   <Courses />
                   <CoreValues />
-                  <StudyWithMe />
+                  {/* <StudyWithMe /> */}
+                  <Testimonials />
                   <BlogsSection />
+                  <LeadFormSection />
                   <ContactSection />
                   {/* <ChromaGrid /> */}
                   {/* <CTA /> */}

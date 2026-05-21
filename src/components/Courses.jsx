@@ -358,7 +358,7 @@ const Courses = () => {
   };
 
   return (
-    <section id="courses" className="pt-20 pb-16 px-4 bg-white relative overflow-hidden border-b border-slate-100">
+    <section id="courses" className="pt-8 pb-16 px-4 bg-white relative overflow-hidden border-b border-slate-100">
 
       {/* Subtle BG Pattern */}
       <div
@@ -372,11 +372,7 @@ const Courses = () => {
       <div className="max-w-7xl mx-auto relative z-10">
 
         {/* ─── Section Title ─── */}
-        <div className="mb-12 text-center">
-          <p className="text-[11px] sm:text-[13px] font-extrabold tracking-[0.2em] text-[#163F66] uppercase mb-3 flex items-center justify-center gap-2">
-            <TrendingUp size={13} strokeWidth={3} className="text-[#EF961D]" />
-            Choose the right path for your UPSC journey
-          </p>
+        <div className="mb-8 text-center">
           <h2 className="text-4xl md:text-5xl font-black text-slate-950 tracking-tight mb-4">
             OUR <span className="text-[#EF961D]">PROGRAMS</span>
           </h2>
@@ -436,6 +432,17 @@ const Courses = () => {
               <CourseCard key={course.id} course={course} onView={handleView} />
             ))}
           </AnimatePresence>
+        </div>
+
+        {/* ─── View All Button ─── */}
+        <div className="flex justify-center mt-10">
+          <button
+            onClick={() => navigate('/courses')}
+            className="px-6 py-2.5 rounded-xl bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-700 font-extrabold text-sm transition-all duration-300 flex items-center gap-2 group shadow-sm hover:shadow"
+          >
+            View All Courses
+            <ChevronRight size={14} strokeWidth={2.5} className="transition-transform group-hover:translate-x-0.5" />
+          </button>
         </div>
 
         {/* ─── Bottom CTA Banner ─── */}
