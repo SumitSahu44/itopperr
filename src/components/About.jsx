@@ -14,7 +14,7 @@ const AboutUs = () => {
           {/* Left Column: Text Content */}
           <div className="lg:col-span-7 flex flex-col items-start text-left">
             <span className="text-xs sm:text-sm font-semibold tracking-widest text-[#EF961D] uppercase mb-3">
-              ABOUT iTOPPER
+              ABOUT iTopper
             </span>
             <h2 className="text-3xl sm:text-5xl lg:text-6xl font-bold text-[#163F66] tracking-tight leading-tight mb-6">
               Empowering Aspirants, <br />

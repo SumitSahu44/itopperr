@@ -358,7 +358,7 @@ const Courses = () => {
   };
 
   return (
-    <section id="courses" className="pt-8 pb-16 px-4 bg-white relative overflow-hidden border-b border-slate-100">
+    <section id="courses" className="pt-8 pb-10 px-4 bg-white relative overflow-hidden border-b border-slate-100">
 
       {/* Subtle BG Pattern */}
       <div
@@ -451,7 +451,7 @@ const Courses = () => {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5, delay: 0.2 }}
-          className="mt-16 rounded-2xl bg-gradient-to-r from-[#0b1329] via-[#163F66] to-[#0b1329] p-8 sm:p-10 flex flex-col sm:flex-row items-center justify-between gap-6 shadow-2xl"
+          className="mt-8 rounded-2xl bg-gradient-to-r from-[#0b1329] via-[#163F66] to-[#0b1329] p-8 sm:p-10 flex flex-col sm:flex-row items-center justify-between gap-6 shadow-2xl"
         >
           <div>
             <p className="text-[11px] font-extrabold tracking-widest text-[#EF961D] uppercase mb-1">Not sure which program suits you?</p>

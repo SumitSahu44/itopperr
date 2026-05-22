@@ -50,9 +50,9 @@ Each placement represented more than a job offer — it represented transformati
     {
       year: 2025,
       image: "/images/dataengineering.png",
-      text: `With a growing alumni base and stronger hiring connections, itopper established itself as a trusted talent partner. Placement support became more structured, and industry collaborations deepened — ensuring students were not just trained, but strategically positioned for success.
+      text: `With a growing alumni base and stronger hiring connections, iTopper established itself as a trusted talent partner. Placement support became more structured, and industry collaborations deepened — ensuring students were not just trained, but strategically positioned for success.
 
-This year, itopper took a major leap by introducing a specialized Agentic AI course, designed to equip learners with the skills to create autonomous, decision-making AI systems. Alongside, itopper continued to strengthen industry partnerships, refine placement support, and expand mentorship networks. Learners were not just trained for current roles — they were prepared for the AI of the future.
+This year, iTopper took a major leap by introducing a specialized Agentic AI course, designed to equip learners with the skills to create autonomous, decision-making AI systems. Alongside, iTopper continued to strengthen industry partnerships, refine placement support, and expand mentorship networks. Learners were not just trained for current roles — they were prepared for the AI of the future.
 
 Top placements continued to rise, with students joining leading organizations as AI Engineers, Machine Learning Researchers, Data Analysts, and Product AI Specialists.`,
     },
@@ -63,7 +63,7 @@ Top placements continued to rise, with students joining leading organizations as
       image: "/images/Ai.png",
       text: `With advanced courses like Agentic AI, expanding industry partnerships, and a growing global community of learners, the Academy continues to push boundaries in AI education. Each year builds on the last, preparing students not just for today’s opportunities, but for the evolving world of AI and data science.
 
-The journey doesn’t stop here. itopper is continuing to innovate, expand, and empower learners, shaping careers and the future of intelligent technologies for years to come.`,
+The journey doesn’t stop here. iTopper is continuing to innovate, expand, and empower learners, shaping careers and the future of intelligent technologies for years to come.`,
     },
   ],
 };
@@ -132,7 +132,7 @@ export default function Journey() {
           <p>
             In 2020, when industries were rapidly awakening to the power of data
             and AI, Shivansh Shukla envisioned an institution that would do more
-            than teach concepts — it would build careers. That vision became itopper — a place where ambition meets direction and
+            than teach concepts — it would build careers. That vision became iTopper — a place where ambition meets direction and
             potential turns into performance.
           </p>
         </div>

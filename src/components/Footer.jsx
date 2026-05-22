@@ -219,7 +219,7 @@ const Footer = () => {
 
       {/* Divider & Copyright */}
       <div className="border-t border-white/10 mt-8 pt-6 text-center text-lg text-gray-500 relative z-10">
-        © {new Date().getFullYear()} itopper. All Rights Reserved. | Design &
+        © {new Date().getFullYear()} iTopper. All Rights Reserved. | Design &
         Developed By{" "}
         <span
           className="text-transparent bg-clip-text"

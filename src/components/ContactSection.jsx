@@ -3,7 +3,7 @@ import { Phone } from "lucide-react";
 
 const ContactSection = () => {
   return (
-    <section id="contact" className="py-20 px-4 bg-[#f8fafc] relative overflow-hidden border-b border-slate-100 flex flex-col items-center justify-center">
+    <section id="contact" className="py-10 px-4 bg-[#f8fafc] relative overflow-hidden border-b border-slate-100 flex flex-col items-center justify-center">
       <div className="max-w-md mx-auto w-full text-center flex flex-col items-center">
         
         {/* Get in Touch Pill */}

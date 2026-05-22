@@ -103,7 +103,7 @@ const WhyChooseUs = () => {
               </span>
             </h2>
             <p className="text-gray-600 text-lg leading-relaxed max-w-sm">
-              itopper is more than just an educational
+              iTopper is more than just an educational
               institution — it's your launchpad for a future-proof career.
             </p>
 
@@ -177,7 +177,7 @@ const WhyChooseUs = () => {
                         <div className="flex items-center space-x-2">
                           <div className="w-8 h-px bg-gray-300" />
                           <span className="text-gray-500 font-black text-[10px] uppercase tracking-[0.2em] opacity-50">
-                            itopper
+                            iTopper
                           </span>
                         </div>
                       </div>

@@ -38,7 +38,7 @@ const BlogsSection = () => {
   ];
 
   return (
-    <section id="blogs" className="py-20 px-4 bg-white relative overflow-hidden border-b border-slate-100">
+    <section id="blogs" className="py-10 px-4 bg-white relative overflow-hidden border-b border-slate-100">
       <div className="max-w-7xl mx-auto relative z-10">
 
         {/* Section Header */}
