@@ -8,7 +8,15 @@ import {
   ArrowRight,
   Zap,
   Calendar,
-  MapPin
+  MapPin,
+  BookOpen,
+  Briefcase,
+  Layers,
+  Star,
+  Users,
+  BarChart,
+  Clock,
+  Compass
 } from "lucide-react";
 import Navigation from "../components/Navigation";
 import Footer from "../components/Footer";
@@ -231,7 +239,7 @@ const Programs = () => {
               </div>
             </motion.div>
 
-            {/* 12 Months (with slight blue accent since it's the main comprehensive program) */}
+            {/* 12 Months */}
             <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeInUp} transition={{ delay: 0.2 }} className="relative group cursor-pointer">
               <div className="absolute -inset-1 bg-gradient-to-r from-[#4A00E0] to-[#8E2DE2] rounded-2xl blur opacity-0 group-hover:opacity-20 transition duration-500"></div>
               <div className="relative bg-blue-50 border border-blue-100 rounded-2xl p-8 h-full flex flex-col items-center text-center transform transition duration-500 group-hover:-translate-y-2 shadow-lg">
@@ -274,76 +282,81 @@ const Programs = () => {
       <section className="py-24 px-4 bg-white border-t border-slate-100">
         <div className="max-w-7xl mx-auto">
           
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeInUp} className="mb-16">
-            <div className="bg-[#163F66] inline-block px-6 py-4 rounded-t-2xl border-b-4 border-[#EF961D]">
-              <h2 className="text-3xl md:text-4xl font-black text-white">20 DAYS PROGRAM</h2>
-              <p className="text-[#EF961D] font-semibold tracking-wide">(Mains Oriented : Ethics & Essay)</p>
-            </div>
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeInUp} className="text-center mb-12">
+            <h2 className="text-4xl md:text-5xl font-black text-[#163F66] mb-4">
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#FF512F] to-[#DD2476]">20 DAYS</span> PROGRAM
+            </h2>
+            <p className="text-xl text-slate-600 font-bold mb-6">Mains Oriented: Ethics & Essay</p>
             
-            {/* Features Bar */}
-            <div className="bg-slate-50 border border-slate-200 rounded-b-2xl rounded-tr-2xl p-6 shadow-md">
-              <div className="flex flex-wrap gap-x-8 gap-y-4">
+            {/* Features Row */}
+            <div className="inline-block bg-slate-50 border border-slate-200 rounded-xl px-6 py-4 shadow-sm mx-auto">
+              <div className="flex flex-wrap justify-center gap-x-6 gap-y-3">
                 {["Assignment during classes", "Detailed evaluation", "Case studies discussion", "One-to-one mentorship", "Topper interaction", "Test Series / PYQ's"].map((item, i) => (
-                  <div key={i} className="flex items-center gap-2">
-                    <div className="w-2 h-2 rounded-full bg-[#EF961D]"></div>
-                    <span className="text-slate-700 font-medium">{item}</span>
+                  <div key={i} className="flex items-center gap-2 text-sm md:text-base text-slate-700 font-medium">
+                    <CheckCircle2 className="w-4 h-4 text-[#EF961D]" /> {item}
                   </div>
                 ))}
               </div>
             </div>
           </motion.div>
 
-          <div className="grid lg:grid-cols-2 gap-12">
-            {/* Essay Foundation */}
-            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeInUp} className="bg-white border border-slate-200 shadow-xl rounded-2xl p-8">
-              <h3 className="text-2xl font-black text-[#163F66] mb-2 uppercase border-b border-slate-100 pb-4">
-                ESSAY FOUNDATION
-              </h3>
-              <p className="text-[#EF961D] font-bold mb-8">iTopper Essay Course By Mr. Amit Kumar <span className="text-slate-500 font-normal italic">(Ex-Civil Servant)</span></p>
-
-              <div className="space-y-8">
-                <div>
-                  <h4 className="bg-blue-50 text-[#163F66] inline-block px-4 py-1.5 rounded-md text-sm font-bold mb-4 uppercase border border-blue-100">Course Objective</h4>
-                  <ul className="space-y-3">
-                    {["Enhance competency across diverse important themes", "Strengthen understanding through well-structured handouts", "Improve writing skills (language, grammar, and flow)", "Provide structured evaluation through a test series"].map((item, i) => (
-                      <li key={i} className="flex items-start gap-3 text-slate-700"><CheckCircle2 className="w-5 h-5 text-[#00A8E8] shrink-0 mt-0.5" /> <span>{item}</span></li>
-                    ))}
-                  </ul>
+          <div className="grid md:grid-cols-2 gap-8 lg:gap-12">
+            {/* Card 1 */}
+            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeInUp} className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow flex flex-col">
+              <div className="bg-[#163F66] text-white py-4 px-6 font-bold text-lg flex items-center gap-3">
+                <BookOpen className="w-6 h-6 text-[#EF961D]" /> ESSAY FOUNDATION
+              </div>
+              <div className="p-8 space-y-6 flex-grow">
+                <div className="mb-2">
+                  <p className="text-[#EF961D] font-bold text-lg">iTopper Essay Course</p>
+                  <p className="text-slate-500 font-medium text-sm">By Mr. Amit Kumar (Ex-Civil Servant)</p>
                 </div>
                 
                 <div>
-                  <h4 className="bg-blue-50 text-[#163F66] inline-block px-4 py-1.5 rounded-md text-sm font-bold mb-4 uppercase border border-blue-100">Why Essay Paper Matters?</h4>
-                  <ul className="space-y-3">
+                  <h4 className="text-[#163F66] font-bold text-lg mb-3">Course Objective</h4>
+                  <ul className="space-y-2">
+                    {["Enhance competency across diverse important themes", "Strengthen understanding through well-structured handouts", "Improve writing skills (language, grammar, and flow)", "Provide structured evaluation through a test series"].map((item, i) => (
+                      <li key={i} className="flex items-start gap-2 text-slate-600"><div className="w-1.5 h-1.5 bg-slate-400 rounded-full mt-2 shrink-0"></div>{item}</li>
+                    ))}
+                  </ul>
+                </div>
+
+                <div>
+                  <h4 className="text-[#163F66] font-bold text-lg mb-3">Why Essay Paper Matters?</h4>
+                  <ul className="space-y-2">
                     {["250 marks (equal to GS / Optional)", "High-scoring paper (150+ achievable)", "First paper in Mains – sets the momentum", "Low input, high output subject", "Game-changer in final selection"].map((item, i) => (
-                      <li key={i} className="flex items-start gap-3 text-slate-700"><CheckCircle2 className="w-5 h-5 text-[#00A8E8] shrink-0 mt-0.5" /> <span>{item}</span></li>
+                      <li key={i} className="flex items-start gap-2 text-slate-600"><div className="w-1.5 h-1.5 bg-slate-400 rounded-full mt-2 shrink-0"></div>{item}</li>
                     ))}
                   </ul>
                 </div>
               </div>
             </motion.div>
 
-            {/* Ethics Foundation */}
-            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeInUp} transition={{ delay: 0.2 }} className="bg-white border border-slate-200 shadow-xl rounded-2xl p-8">
-              <h3 className="text-2xl font-black text-[#163F66] mb-2 uppercase border-b border-slate-100 pb-4">
-                Ethics – Foundation
-              </h3>
-              <p className="text-[#EF961D] font-bold mb-8">(Recommended by Toppers)</p>
+            {/* Card 2 */}
+            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeInUp} transition={{ delay: 0.2 }} className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow flex flex-col">
+              <div className="bg-[#163F66] text-white py-4 px-6 font-bold text-lg flex items-center gap-3">
+                <Compass className="w-6 h-6 text-[#EF961D]" /> ETHICS FOUNDATION
+              </div>
+              <div className="p-8 space-y-6 flex-grow">
+                <div className="mb-2">
+                  <p className="text-[#EF961D] font-bold text-lg">Applied Ethics & Core Concepts</p>
+                  <p className="text-slate-500 font-medium text-sm">(Recommended by Toppers)</p>
+                </div>
 
-              <div className="space-y-8">
                 <div>
-                  <h4 className="bg-blue-50 text-[#163F66] inline-block px-4 py-1.5 rounded-md text-sm font-bold mb-4 uppercase border border-blue-100">Course Objectives</h4>
-                  <ul className="space-y-3">
+                  <h4 className="text-[#163F66] font-bold text-lg mb-3">Course Objectives</h4>
+                  <ul className="space-y-2">
                     {["Develop clear understanding of core ethical concepts", "Build strong ethical reasoning & analytical ability", "Learn structured answer-writing techniques", "Case study solving approach (real-based)", "Interlink current affairs with ethical dimensions"].map((item, i) => (
-                      <li key={i} className="flex items-start gap-3 text-slate-700"><CheckCircle2 className="w-5 h-5 text-[#00A8E8] shrink-0 mt-0.5" /> <span>{item}</span></li>
+                      <li key={i} className="flex items-start gap-2 text-slate-600"><div className="w-1.5 h-1.5 bg-slate-400 rounded-full mt-2 shrink-0"></div>{item}</li>
                     ))}
                   </ul>
                 </div>
-                
+
                 <div>
-                  <h4 className="bg-blue-50 text-[#163F66] inline-block px-4 py-1.5 rounded-md text-sm font-bold mb-4 uppercase border border-blue-100">Why should you join us?</h4>
-                  <ul className="space-y-3">
+                  <h4 className="text-[#163F66] font-bold text-lg mb-3">Why should you join us?</h4>
+                  <ul className="space-y-2">
                     {["Classes conducted by UPSC Topper(s)", "After class – one-on-one meeting with Sir", "High quality content", "PYQs & case study discussion during classes", "Test series practice"].map((item, i) => (
-                      <li key={i} className="flex items-start gap-3 text-slate-700"><CheckCircle2 className="w-5 h-5 text-[#00A8E8] shrink-0 mt-0.5" /> <span>{item}</span></li>
+                      <li key={i} className="flex items-start gap-2 text-slate-600"><div className="w-1.5 h-1.5 bg-slate-400 rounded-full mt-2 shrink-0"></div>{item}</li>
                     ))}
                   </ul>
                 </div>
@@ -357,78 +370,85 @@ const Programs = () => {
       <section className="py-24 px-4 border-t border-slate-100 bg-slate-50">
         <div className="max-w-7xl mx-auto">
           
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeInUp} className="text-center mb-16">
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeInUp} className="text-center mb-12">
             <h2 className="text-4xl md:text-5xl font-black text-[#163F66] mb-4">
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#F2C94C] to-[#F2994A]">3 MONTHS</span> PROGRAM
             </h2>
-            <p className="text-xl text-slate-600 font-bold">Advanced Mains Mentorship Programme – 2026</p>
-            <p className="max-w-2xl mx-auto text-slate-600 mt-4">
+            <p className="text-xl text-slate-600 font-bold mb-6">Advanced Mains Mentorship Programme – 2026</p>
+            <p className="max-w-2xl mx-auto text-slate-600 mb-6">
               End-to-End Solution with a strategic and effective approach to UPSC Mains preparation. A complete, power-packed programme focused on developing answer writing skills and overall performance.
             </p>
+
+            {/* Coverage & Delivery Row */}
+            <div className="flex flex-col md:flex-row justify-center gap-6 max-w-4xl mx-auto">
+              <div className="bg-white border border-slate-200 rounded-xl px-6 py-4 shadow-sm flex-1">
+                <span className="text-[#EF961D] font-bold block mb-2">Coverage</span>
+                <p className="text-slate-700 text-sm font-medium">Essay, Ethics, GS Paper 1, GS Paper 2, GS Paper 3</p>
+              </div>
+              <div className="bg-white border border-slate-200 rounded-xl px-6 py-4 shadow-sm flex-1">
+                <span className="text-[#00A8E8] font-bold block mb-2">Mode of Delivery</span>
+                <p className="text-slate-700 text-sm font-medium">Offline + Online (Hybrid Mode), Two-way communication</p>
+              </div>
+            </div>
           </motion.div>
 
-          <div className="grid md:grid-cols-2 gap-8 mb-16">
-            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeInUp} className="bg-white p-8 rounded-2xl border-l-4 border-l-[#F2994A] border-y border-r border-slate-200 shadow-xl">
-              <h4 className="bg-[#EF961D] text-white inline-block px-6 py-2 rounded-full font-bold mb-6 text-lg">Coverage</h4>
-              <div className="grid grid-cols-2 gap-4">
-                {["Essay", "Ethics", "GS Paper 1", "GS Paper 2", "GS Paper 3"].map((item, i) => (
-                  <div key={i} className="flex items-center gap-2 text-lg font-medium text-slate-800"><CheckCircle2 className="w-5 h-5 text-[#F2C94C]" />{item}</div>
-                ))}
+          {/* 4 Cards Grid to match 12 Months structure */}
+          <div className="grid md:grid-cols-2 gap-8 lg:gap-12">
+            {/* Card 1 */}
+            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeInUp} className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow flex flex-col">
+              <div className="bg-[#163F66] text-white py-4 px-6 font-bold text-lg flex items-center gap-3">
+                <Target className="w-6 h-6 text-[#F2C94C]" /> Core Features
+              </div>
+              <div className="p-8 space-y-4 flex-grow">
+                <ul className="space-y-3">
+                  {["Answer writing sessions with mentor", "Consistent mentorship support", "Real-time evaluation during sessions", "Improving content quality", "Building strong arguments in answers", "Training in time management"].map((item, i) => (
+                    <li key={i} className="flex items-start gap-2 text-slate-600"><div className="w-1.5 h-1.5 bg-slate-400 rounded-full mt-2 shrink-0"></div>{item}</li>
+                  ))}
+                </ul>
               </div>
             </motion.div>
 
-            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeInUp} transition={{ delay: 0.2 }} className="bg-white p-8 rounded-2xl border-l-4 border-l-[#00A8E8] border-y border-r border-slate-200 shadow-xl">
-              <h4 className="bg-[#00A8E8] text-white inline-block px-6 py-2 rounded-full font-bold mb-6 text-lg">Mode of Delivery</h4>
-              <ul className="space-y-4">
-                <li className="flex items-center gap-3 text-lg font-medium text-slate-800"><CheckCircle2 className="w-6 h-6 text-[#00A8E8]" /> Offline + Online (Hybrid Mode)</li>
-                <li className="flex items-center gap-3 text-lg font-medium text-slate-800"><CheckCircle2 className="w-6 h-6 text-[#00A8E8]" /> Two-way communication ensured for better interaction</li>
-              </ul>
+            {/* Card 2 */}
+            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeInUp} transition={{ delay: 0.2 }} className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow flex flex-col">
+              <div className="bg-[#163F66] text-white py-4 px-6 font-bold text-lg flex items-center gap-3">
+                <Layers className="w-6 h-6 text-[#F2C94C]" /> Skill Development
+              </div>
+              <div className="p-8 space-y-4 flex-grow">
+                <ul className="space-y-3">
+                  {["Reading Approach", "Thinking in Questions", "Answer Writing Practice", "Presentation Skills"].map((item, i) => (
+                    <li key={i} className="flex items-start gap-2 text-slate-600"><div className="w-1.5 h-1.5 bg-slate-400 rounded-full mt-2 shrink-0"></div>{item}</li>
+                  ))}
+                </ul>
+              </div>
             </motion.div>
-          </div>
 
-          {/* Timeline style details */}
-          <div className="max-w-4xl mx-auto space-y-6 relative before:absolute before:inset-0 before:ml-5 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-slate-300">
-            
-            {[
-              {
-                step: "01",
-                title: "Core Features",
-                items: ["Answer writing sessions with mentor", "Consistent mentorship support", "Real-time evaluation during sessions"]
-              },
-              {
-                step: "02",
-                title: "Skill Development Framework",
-                items: ["Reading Approach", "Thinking in Questions", "Answer Writing Practice", "Presentation Skills"]
-              },
-              {
-                step: "03",
-                title: "What Will Be Provided",
-                items: ["Full Ethics lectures with notes", "Complete Essay lectures with notes", "Important topics: lectures + notes (One topic = One session)"]
-              },
-              {
-                step: "04",
-                title: "Additional Benefits",
-                items: ["Answer writing skill development", "Evaluation by toppers", "Daily answer writing practice", "Test Series"]
-              }
-            ].map((section, idx) => (
-              <motion.div key={idx} initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeInUp} className="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active">
-                <div className="flex items-center justify-center w-10 h-10 rounded-full border-4 border-slate-50 bg-[#163F66] text-white font-bold shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 shadow-md z-10">
-                  {section.step}
-                </div>
-                <div className="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] p-6 rounded-2xl bg-white border border-slate-200 shadow-md hover:shadow-lg transition-shadow">
-                  <h4 className="bg-blue-50 text-[#163F66] border border-blue-100 inline-block px-4 py-1.5 rounded-md text-sm font-bold mb-4">{section.title}</h4>
-                  <ul className="space-y-2">
-                    {section.items.map((item, i) => (
-                      <li key={i} className="flex items-start gap-2 text-slate-700 text-sm md:text-base">
-                        <div className="w-1.5 h-1.5 rounded-full bg-[#EF961D] mt-2 shrink-0"></div>
-                        <span>{item}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </motion.div>
-            ))}
+            {/* Card 3 */}
+            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeInUp} className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow flex flex-col">
+              <div className="bg-[#163F66] text-white py-4 px-6 font-bold text-lg flex items-center gap-3">
+                <Briefcase className="w-6 h-6 text-[#F2C94C]" /> What Will Be Provided
+              </div>
+              <div className="p-8 space-y-4 flex-grow">
+                <ul className="space-y-3">
+                  {["Complete Coverage", "Full Ethics lectures with notes", "Complete Essay lectures with notes", "Important topics: lectures + notes (One topic = One session)"].map((item, i) => (
+                    <li key={i} className="flex items-start gap-2 text-slate-600"><div className="w-1.5 h-1.5 bg-slate-400 rounded-full mt-2 shrink-0"></div>{item}</li>
+                  ))}
+                </ul>
+              </div>
+            </motion.div>
 
+            {/* Card 4 */}
+            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeInUp} transition={{ delay: 0.2 }} className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow flex flex-col">
+              <div className="bg-[#163F66] text-white py-4 px-6 font-bold text-lg flex items-center gap-3">
+                <Star className="w-6 h-6 text-[#F2C94C]" /> Additional Benefits
+              </div>
+              <div className="p-8 space-y-4 flex-grow">
+                <ul className="space-y-3">
+                  {["Answer writing skill development (Dimension-based & flowchart approach)", "Evaluation by toppers", "Daily answer writing practice", "Test Series"].map((item, i) => (
+                    <li key={i} className="flex items-start gap-2 text-slate-600"><div className="w-1.5 h-1.5 bg-slate-400 rounded-full mt-2 shrink-0"></div>{item}</li>
+                  ))}
+                </ul>
+              </div>
+            </motion.div>
           </div>
         </div>
       </section>
@@ -437,12 +457,12 @@ const Programs = () => {
       <section className="py-24 px-4 bg-white border-t border-slate-100">
         <div className="max-w-7xl mx-auto">
           
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeInUp} className="text-center mb-16">
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeInUp} className="text-center mb-12">
             <h2 className="text-4xl md:text-5xl font-black text-[#163F66] mb-4">
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#4A00E0] to-[#8E2DE2]">12 MONTHS</span> PROGRAM
             </h2>
-            <p className="text-xl text-slate-600 font-bold mb-8">Advanced Mains Mentorship Programme – 2026</p>
-            <div className="inline-block bg-[#00A8E8] text-white px-8 py-3 font-bold text-2xl rounded-lg shadow-lg">
+            <p className="text-xl text-slate-600 font-bold mb-6">Advanced Mains Mentorship Programme – 2026</p>
+            <div className="inline-block bg-[#00A8E8] text-white px-8 py-3 font-bold text-xl rounded-lg shadow-sm">
               COURSE STRUCTURE
             </div>
           </motion.div>
@@ -450,18 +470,18 @@ const Programs = () => {
           <div className="grid md:grid-cols-2 gap-8 lg:gap-12">
             
             {/* Phase 1 */}
-            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeInUp} className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-xl flex flex-col">
-              <div className="bg-[#E53935] text-white py-3 px-6 font-bold text-lg inline-block self-start rounded-br-2xl">
-                Phase 1 (1–4 Months)
+            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeInUp} className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow flex flex-col">
+              <div className="bg-[#163F66] text-white py-4 px-6 font-bold text-lg flex items-center gap-3">
+                <Clock className="w-6 h-6 text-[#8E2DE2]" /> Phase 1 (1–4 Months)
               </div>
-              <div className="p-8 space-y-6">
+              <div className="p-8 space-y-6 flex-grow">
                 <div>
-                  <h4 className="text-[#EF961D] font-bold text-xl mb-2">Focus Area</h4>
-                  <p className="text-slate-700 font-medium">Holistic preparation and building a strong base</p>
-                  <p className="text-slate-800 font-semibold mt-2 flex items-center gap-2"><div className="w-1.5 h-1.5 bg-[#EF961D] rounded-full"></div> One-on-One Personalized Strategy</p>
+                  <h4 className="text-[#163F66] font-bold text-lg mb-2">Focus Area</h4>
+                  <p className="text-slate-600 text-sm mb-2">Holistic preparation and building a strong base</p>
+                  <p className="text-slate-800 font-semibold flex items-center gap-2"><div className="w-1.5 h-1.5 bg-[#EF961D] rounded-full"></div> One-on-One Personalized Strategy</p>
                 </div>
                 <div>
-                  <h4 className="text-[#EF961D] font-bold text-xl mb-3">Key Components</h4>
+                  <h4 className="text-[#163F66] font-bold text-lg mb-3">Key Components</h4>
                   <ul className="space-y-2">
                     {["Reading approach and study style (NCERT to Advanced)", "Interlinking of topics, chapters, and subjects", "Developing a thinking process like rankers", "Enhancing the ability to understand between the lines", "Revision strategy and timetable planning"].map((item, i) => (
                       <li key={i} className="flex items-start gap-2 text-slate-600"><div className="w-1.5 h-1.5 bg-slate-400 rounded-full mt-2 shrink-0"></div>{item}</li>
@@ -472,23 +492,23 @@ const Programs = () => {
             </motion.div>
 
             {/* Phase 2 */}
-            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeInUp} transition={{ delay: 0.2 }} className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-xl flex flex-col">
-              <div className="bg-[#E53935] text-white py-3 px-6 font-bold text-lg inline-block self-start rounded-br-2xl">
-                Phase 2 (5–8 Months)
+            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeInUp} transition={{ delay: 0.2 }} className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow flex flex-col">
+              <div className="bg-[#163F66] text-white py-4 px-6 font-bold text-lg flex items-center gap-3">
+                <BarChart className="w-6 h-6 text-[#8E2DE2]" /> Phase 2 (5–8 Months)
               </div>
-              <div className="p-8 space-y-6">
+              <div className="p-8 space-y-6 flex-grow">
                 <div>
-                  <h4 className="text-[#00A8E8] font-bold text-xl mb-2">Applied Knowledge & Integrated Preparation</h4>
-                  <p className="text-slate-700 font-medium">Focus: Concept to Application</p>
+                  <h4 className="text-[#163F66] font-bold text-lg mb-2">Applied Knowledge & Integrated Preparation</h4>
+                  <p className="text-slate-600 text-sm">Focus: Concept to Application</p>
                 </div>
                 <div>
-                  <h4 className="text-[#EF961D] font-bold text-lg mb-3">Mains answer writing approach</h4>
+                  <h4 className="text-[#163F66] font-bold text-lg mb-3">Mains answer writing approach</h4>
                   <ul className="space-y-2 mb-4">
                     {["Develop critical thinking", "Improve writing approach", "Enhance presentation skills"].map((item, i) => (
                       <li key={i} className="flex items-start gap-2 text-slate-600"><div className="w-1.5 h-1.5 bg-slate-400 rounded-full mt-2 shrink-0"></div>{item}</li>
                     ))}
                   </ul>
-                  <h4 className="text-[#EF961D] font-bold text-lg mb-3">Mentorship Support</h4>
+                  <h4 className="text-[#163F66] font-bold text-lg mb-3">Mentorship Support</h4>
                   <ul className="space-y-2">
                     {["Direct teaching by Amit Sir", "Doubt resolution", "End-to-end preparation guidance"].map((item, i) => (
                       <li key={i} className="flex items-start gap-2 text-slate-600"><div className="w-1.5 h-1.5 bg-slate-400 rounded-full mt-2 shrink-0"></div>{item}</li>
@@ -499,22 +519,22 @@ const Programs = () => {
             </motion.div>
 
             {/* Phase 3 */}
-            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeInUp} className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-xl flex flex-col">
-              <div className="bg-[#E53935] text-white py-3 px-6 font-bold text-lg inline-block self-start rounded-br-2xl">
-                Phase 3 (9–10 Months)
+            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeInUp} className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow flex flex-col">
+              <div className="bg-[#163F66] text-white py-4 px-6 font-bold text-lg flex items-center gap-3">
+                <BookOpen className="w-6 h-6 text-[#8E2DE2]" /> Phase 3 (9–10 Months)
               </div>
-              <div className="p-8 space-y-6">
+              <div className="p-8 space-y-6 flex-grow">
                 <div>
-                  <h4 className="text-[#00A8E8] font-bold text-xl mb-2">Prelims–Mains Bridge</h4>
+                  <h4 className="text-[#163F66] font-bold text-lg mb-2">Prelims–Mains Bridge</h4>
                 </div>
                 <div>
-                  <h4 className="text-[#EF961D] font-bold text-xl mb-3">Exam-Oriented Approach</h4>
+                  <h4 className="text-[#163F66] font-bold text-lg mb-3">Exam-Oriented Approach</h4>
                   <ul className="space-y-2 mb-6">
                     {["PYQs practice along with revision", "CSAT preparation", "Test Series"].map((item, i) => (
                       <li key={i} className="flex items-start gap-2 text-slate-600"><div className="w-1.5 h-1.5 bg-slate-400 rounded-full mt-2 shrink-0"></div>{item}</li>
                     ))}
                   </ul>
-                  <h4 className="text-[#EF961D] font-bold text-xl mb-3">Advanced Practice</h4>
+                  <h4 className="text-[#163F66] font-bold text-lg mb-3">Advanced Practice</h4>
                   <ul className="space-y-2">
                     {["PYQs solving with Amit Sir & mentors", "Strategy building for solving questions", "Development of Analytical skills & Elimination techniques"].map((item, i) => (
                       <li key={i} className="flex items-start gap-2 text-slate-600"><div className="w-1.5 h-1.5 bg-slate-400 rounded-full mt-2 shrink-0"></div>{item}</li>
@@ -525,20 +545,20 @@ const Programs = () => {
             </motion.div>
 
             {/* Phase 4 */}
-            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeInUp} transition={{ delay: 0.2 }} className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-xl flex flex-col">
-              <div className="bg-[#E53935] text-white py-3 px-6 font-bold text-lg inline-block self-start rounded-br-2xl">
-                Phase 4 (11–12 Months)
+            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeInUp} transition={{ delay: 0.2 }} className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow flex flex-col">
+              <div className="bg-[#163F66] text-white py-4 px-6 font-bold text-lg flex items-center gap-3">
+                <Award className="w-6 h-6 text-[#8E2DE2]" /> Phase 4 (11–12 Months)
               </div>
-              <div className="p-8 space-y-6">
+              <div className="p-8 space-y-6 flex-grow">
                 <div>
-                  <h4 className="text-[#163F66] font-black text-xl mb-2">Intensive Simulation</h4>
+                  <h4 className="text-[#163F66] font-black text-lg mb-2">Intensive Simulation</h4>
                 </div>
                 <div>
-                  <h4 className="text-[#EF961D] font-bold text-xl mb-3">Final Transformation Phase</h4>
+                  <h4 className="text-[#163F66] font-bold text-lg mb-3">Final Transformation Phase</h4>
                   <ul className="space-y-2 mb-6">
                     <li className="flex items-start gap-2 text-slate-600"><div className="w-1.5 h-1.5 bg-slate-400 rounded-full mt-2 shrink-0"></div>Transformation into a Ranker</li>
                   </ul>
-                  <h4 className="text-[#EF961D] font-bold text-xl mb-3">Key Features</h4>
+                  <h4 className="text-[#163F66] font-bold text-lg mb-3">Key Features</h4>
                   <ul className="space-y-2">
                     {["Study with mentors", "Regular discussions with mentors", "Immediate doubt resolution", "Strategy refinement and execution"].map((item, i) => (
                       <li key={i} className="flex items-start gap-2 text-slate-600"><div className="w-1.5 h-1.5 bg-slate-400 rounded-full mt-2 shrink-0"></div>{item}</li>
