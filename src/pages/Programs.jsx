@@ -212,43 +212,63 @@ const Programs = () => {
           </motion.div>
 
           {/* Three Program Cards */}
-          <div className="grid md:grid-cols-3 gap-8 lg:gap-12 mb-20">
+          <div className="grid md:grid-cols-3 gap-6 lg:gap-8 mb-20 max-w-6xl mx-auto">
             {/* 20 Days */}
-            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeInUp} className="relative group cursor-pointer">
-              <div className="absolute -inset-1 bg-gradient-to-r from-[#FF512F] to-[#DD2476] rounded-2xl blur opacity-0 group-hover:opacity-20 transition duration-500"></div>
-              <div className="relative bg-white border border-slate-200 rounded-2xl p-8 h-full flex flex-col items-center text-center transform transition duration-500 group-hover:-translate-y-2 shadow-lg">
-                <div className="w-16 h-16 rounded-full bg-[#FF512F]/10 flex items-center justify-center mb-6">
-                  <span className="text-3xl font-black text-[#FF512F]">01</span>
-                </div>
-                <h3 className="text-3xl font-black text-[#163F66] mb-2">20 Days<br/>Program</h3>
-                <p className="text-[#FF512F] font-bold text-lg mb-4">(Mains)</p>
-                <p className="text-slate-600 text-sm mt-auto">Mains Oriented: Ethics & Essay foundation with intensive daily practice.</p>
+            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeInUp} className="relative w-full h-[220px] flex items-center justify-start group cursor-pointer">
+              {/* Colored Background Shape */}
+              <div 
+                className="absolute right-0 md:right-4 h-[190px] w-[75%] flex items-center justify-end pr-5 transition-transform duration-500 shadow-md"
+                style={{ 
+                  backgroundColor: "#E85D22", 
+                  clipPath: "polygon(0 0, 82% 0, 100% 50%, 82% 100%, 0 100%)" 
+                }}
+              >
+                <span className="text-white font-bold text-xl mr-1">01</span>
+              </div>
+              
+              {/* Overlapping White Box */}
+              <div className="relative left-2 md:left-6 w-[70%] h-[150px] bg-white shadow-[0_10px_30px_rgba(0,0,0,0.15)] flex flex-col items-center justify-center z-10 transition-transform duration-500 group-hover:-translate-y-2 border border-slate-50">
+                <h3 className="text-2xl lg:text-3xl font-black text-[#E85D22] leading-tight">20 Days</h3>
+                <h4 className="text-2xl lg:text-3xl font-black text-[#222222] leading-tight">Program</h4>
+                <p className="text-[#222222] font-bold mt-2 text-xs lg:text-sm">(Mains)</p>
               </div>
             </motion.div>
 
             {/* 3 Months */}
-            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeInUp} transition={{ delay: 0.1 }} className="relative group cursor-pointer">
-              <div className="absolute -inset-1 bg-gradient-to-r from-[#F2C94C] to-[#F2994A] rounded-2xl blur opacity-0 group-hover:opacity-30 transition duration-500"></div>
-              <div className="relative bg-white border border-slate-200 rounded-2xl p-8 h-full flex flex-col items-center text-center transform transition duration-500 group-hover:-translate-y-2 shadow-lg">
-                <div className="w-16 h-16 rounded-full bg-[#F2C94C]/10 flex items-center justify-center mb-6">
-                  <span className="text-3xl font-black text-[#F2994A]">02</span>
-                </div>
-                <h3 className="text-3xl font-black text-[#163F66] mb-2">3 Months<br/>Program</h3>
-                <p className="text-[#F2994A] font-bold text-lg mb-4">(Mains)</p>
-                <p className="text-slate-600 text-sm mt-auto">Advanced Mains Mentorship Programme covering GS Papers, Essay & Ethics.</p>
+            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeInUp} transition={{ delay: 0.1 }} className="relative w-full h-[220px] flex items-center justify-start group cursor-pointer">
+              <div 
+                className="absolute right-0 md:right-4 h-[190px] w-[75%] flex items-center justify-end pr-5 transition-transform duration-500 shadow-md"
+                style={{ 
+                  backgroundColor: "#F1B511", 
+                  clipPath: "polygon(0 0, 82% 0, 100% 50%, 82% 100%, 0 100%)" 
+                }}
+              >
+                <span className="text-white font-bold text-xl mr-1">02</span>
+              </div>
+              
+              <div className="relative left-2 md:left-6 w-[70%] h-[150px] bg-white shadow-[0_10px_30px_rgba(0,0,0,0.15)] flex flex-col items-center justify-center z-10 transition-transform duration-500 group-hover:-translate-y-2 border border-slate-50">
+                <h3 className="text-2xl lg:text-3xl font-black text-[#F1B511] leading-tight">3 Months</h3>
+                <h4 className="text-2xl lg:text-3xl font-black text-[#222222] leading-tight">Program</h4>
+                <p className="text-[#222222] font-bold mt-2 text-xs lg:text-sm">(Mains)</p>
               </div>
             </motion.div>
 
             {/* 12 Months */}
-            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeInUp} transition={{ delay: 0.2 }} className="relative group cursor-pointer">
-              <div className="absolute -inset-1 bg-gradient-to-r from-[#4A00E0] to-[#8E2DE2] rounded-2xl blur opacity-0 group-hover:opacity-20 transition duration-500"></div>
-              <div className="relative bg-blue-50 border border-blue-100 rounded-2xl p-8 h-full flex flex-col items-center text-center transform transition duration-500 group-hover:-translate-y-2 shadow-lg">
-                <div className="w-16 h-16 rounded-full bg-[#8E2DE2]/10 flex items-center justify-center mb-6">
-                  <span className="text-3xl font-black text-[#8E2DE2]">03</span>
-                </div>
-                <h3 className="text-3xl font-black text-[#163F66] mb-2">12 Months<br/>Program</h3>
-                <p className="text-[#8E2DE2] font-bold text-lg mb-4">(Prelims + Mains)</p>
-                <p className="text-slate-600 text-sm mt-auto">Comprehensive end-to-end preparation from foundation to intensive simulation.</p>
+            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeInUp} transition={{ delay: 0.2 }} className="relative w-full h-[220px] flex items-center justify-start group cursor-pointer">
+              <div 
+                className="absolute right-0 md:right-4 h-[190px] w-[75%] flex items-center justify-end pr-5 transition-transform duration-500 shadow-md"
+                style={{ 
+                  backgroundColor: "#3F6BB5", 
+                  clipPath: "polygon(0 0, 82% 0, 100% 50%, 82% 100%, 0 100%)" 
+                }}
+              >
+                <span className="text-white font-bold text-xl mr-1">03</span>
+              </div>
+              
+              <div className="relative left-2 md:left-6 w-[70%] h-[150px] bg-white shadow-[0_10px_30px_rgba(0,0,0,0.15)] flex flex-col items-center justify-center z-10 transition-transform duration-500 group-hover:-translate-y-2 border border-slate-50">
+                <h3 className="text-2xl lg:text-3xl font-black text-[#3F6BB5] leading-tight text-center">12 Months</h3>
+                <h4 className="text-2xl lg:text-3xl font-black text-[#222222] leading-tight text-center">Program</h4>
+                <p className="text-[#222222] font-bold mt-2 text-xs lg:text-sm">(Prelims + Mains)</p>
               </div>
             </motion.div>
           </div>
@@ -276,6 +296,20 @@ const Programs = () => {
           </motion.div>
 
         </div>
+      </section>
+
+      {/* ================= POSTER SECTION ================= */}
+      <section className="w-full max-w-6xl mx-auto px-4 py-8 md:py-16">
+        <motion.div 
+          initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeInUp}
+          className="w-full flex justify-center"
+        >
+          <img 
+            src="/images/posterprogram.jpeg" 
+            alt="Programs Poster" 
+            className="w-full h-auto object-contain"
+          />
+        </motion.div>
       </section>
 
       {/* ================= 20 DAYS PROGRAM ================= */}
