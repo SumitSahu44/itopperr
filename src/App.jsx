@@ -30,6 +30,8 @@ import LeadFormSection from "./components/LeadFormSection";
 import CourseCurriculum from "./components/CourseDetails";
 import CourseDetails2 from "./components/CourseDetails2";
 
+// Pages
+import Programs from "./pages/Programs";
 
 // Payment Pages
 import PaymentSuccess from "./pages/PaymentSuccess";
@@ -73,6 +75,8 @@ function App() {
 
   // Check karein ki kya user Home Page ('/') par hai jahan NewHero hai?
   const isLandingPage = location.pathname === "/";
+  const isProgramsPage = location.pathname === "/programs";
+  const isLightModePage = isLandingPage || isProgramsPage;
   const isAdminPage = location.pathname.startsWith("/admin");
   const isFacultyPage = location.pathname === "/faculty/dashboard";
   //  LOCATION CHECK END
@@ -95,9 +99,9 @@ function App() {
         bodyClassName="!text-sm !font-medium"
       />
 
-      <div className={`app min-h-screen overflow-x-hidden flex flex-col ${isLandingPage ? "bg-white text-black" : "bg-navy-900 text-white"}`}>
+      <div className={`app min-h-screen overflow-x-hidden flex flex-col ${isLightModePage ? "bg-white text-black" : "bg-navy-900 text-white"}`}>
         {/* 👇 GLOBAL Navigation: Sirf tab dikhega jab hum Landing Page par NAHI hain */}
-        {!isLandingPage && !isAdminPage && !isFacultyPage && <Navbar />}
+        {!isLightModePage && !isAdminPage && !isFacultyPage && <Navbar />}
         <ScrollToTop />
         {/* Content Area - Flex grow ensures footer sticks to bottom if content is short */}
         <div className="flex-grow">
@@ -127,6 +131,7 @@ function App() {
               }
             />
 
+            <Route path="/programs" element={<Programs />} />
             <Route path="/curriculum/:subject" element={<CourseCurriculum />} />
             <Route path="/course/:id" element={<CourseDetails2 />} />
 
@@ -205,7 +210,7 @@ function App() {
 
         {/* 👇 GLOBAL FOOTER: Ye bhi tabhi dikhega jab hum Landing Page par NAHI hain */}
         {/* Note: Landing Page ka footer upar <Route path="/"> ke andar already included hai */}
-        {!isLandingPage && <Footer />}
+        {!isLightModePage && <Footer />}
       </div>
     </AuthProvider>
   );
