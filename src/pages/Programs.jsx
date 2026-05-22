@@ -9,14 +9,7 @@ import {
   Zap,
   Calendar,
   MapPin,
-  BookOpen,
-  Briefcase,
-  Layers,
-  Star,
   Users,
-  BarChart,
-  Clock,
-  Compass
 } from "lucide-react";
 import { HashLink } from "react-router-hash-link";
 import Navigation from "../components/Navigation";
@@ -75,119 +68,61 @@ const Programs = () => {
           <div className="absolute top-[30%] -right-[10%] w-[40%] h-[60%] rounded-full bg-orange-100 blur-[150px] opacity-50"></div>
         </div>
 
-        <div className="max-w-7xl mx-auto relative z-10 grid lg:grid-cols-2 gap-16 items-center">
+        <div className="max-w-7xl mx-auto relative z-10 flex justify-center">
           
-          {/* Left Content */}
+          {/* Main Hero Content (Centered since form is moved) */}
           <motion.div 
             initial="hidden" 
             animate="visible" 
             variants={staggerContainer}
-            className="space-y-8"
+            className="space-y-8 flex flex-col items-center text-center max-w-4xl"
           >
             <motion.div variants={fadeInUp} className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-50 border border-blue-100">
               <Zap className="w-5 h-5 text-[#EF961D]" />
               <span className="text-sm font-bold tracking-wider text-[#163F66] uppercase">Rank Storm Mentorship</span>
             </motion.div>
             
-            <motion.div variants={fadeInUp} className="space-y-4">
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-[#163F66] leading-[1.1]">
-                Civil Services Preparation <br />
+            <motion.div variants={fadeInUp} className="space-y-4 flex flex-col items-center">
+              <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-[#163F66] leading-[1.1] uppercase">
+                Rank Storm Mentorship <br />
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#EF961D] to-orange-500">
-                  with Graduation
+                  Programme 2026/2027
                 </span>
               </h1>
-              <p className="text-lg md:text-xl text-slate-600 max-w-xl leading-relaxed">
-                Prepare for IAS/PCS in a structured 3-year timeframe with specialized mentorship programs designed to transform aspirants into toppers.
+              <p className="text-lg md:text-xl text-slate-600 max-w-2xl leading-relaxed font-medium">
+                Prepare for UPSC, IAS & States Civil Services with a strategic mentorship programme specially designed for serious aspirants aiming to become future rankers.
               </p>
             </motion.div>
 
-            <motion.div variants={fadeInUp} className="flex flex-wrap gap-4 pt-4">
+            <motion.div variants={fadeInUp} className="flex flex-wrap justify-center gap-4 pt-4">
               <div className="flex items-center gap-3 px-6 py-3 rounded-lg bg-white shadow-md border border-slate-100">
                 <Calendar className="w-5 h-5 text-[#EF961D]" />
-                <div>
+                <div className="text-left">
                   <p className="text-xs text-slate-500 font-medium">Batch Starts</p>
-                  <p className="text-sm font-bold text-slate-800">15th April 2026</p>
+                  <p className="text-sm font-bold text-slate-800">June 2026</p>
                 </div>
               </div>
               <div className="flex items-center gap-3 px-6 py-3 rounded-lg bg-white shadow-md border border-slate-100">
                 <MapPin className="w-5 h-5 text-[#EF961D]" />
-                <div>
+                <div className="text-left">
                   <p className="text-xs text-slate-500 font-medium">Modes Available</p>
                   <p className="text-sm font-bold text-slate-800">Residential | Classroom | Online</p>
                 </div>
               </div>
             </motion.div>
-          </motion.div>
-
-          {/* Right Form */}
-          <motion.div 
-            initial={{ opacity: 0, x: 50 }} 
-            animate={{ opacity: 1, x: 0 }} 
-            transition={{ duration: 0.8, delay: 0.2 }}
-            className="w-full max-w-[480px] mx-auto lg:mx-0 lg:ml-auto"
-          >
-            <div className="bg-white rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.08)] border border-slate-100 p-8 relative overflow-hidden">
-              <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-[#163F66] to-[#EF961D]"></div>
-              
-              <div className="text-center mb-8">
-                <h3 className="text-2xl font-bold text-[#163F66] mb-2">Schedule a Counselling Session</h3>
-                <p className="text-slate-500 text-sm">Get personalized guidance from our expert counsellors</p>
-              </div>
-
-              <form onSubmit={handleSubmit} className="space-y-5">
-                <div>
-                  <label className="block text-slate-700 text-sm font-bold mb-1.5">Student's Name <span className="text-red-500">*</span></label>
-                  <input type="text" name="name" value={formData.name} onChange={handleInputChange} required placeholder="Enter full name" className="w-full px-4 py-3 rounded-lg border border-slate-300 text-slate-800 placeholder-slate-400 focus:outline-none focus:border-[#EF961D] focus:ring-1 focus:ring-[#EF961D] transition-all bg-slate-50 focus:bg-white" />
-                </div>
-                
-                <div>
-                  <label className="block text-slate-700 text-sm font-bold mb-1.5">Phone No (WhatsApp) <span className="text-red-500">*</span></label>
-                  <input type="tel" name="phone" value={formData.phone} onChange={handleInputChange} required placeholder="Enter 10-digit mobile number" className="w-full px-4 py-3 rounded-lg border border-slate-300 text-slate-800 placeholder-slate-400 focus:outline-none focus:border-[#EF961D] focus:ring-1 focus:ring-[#EF961D] transition-all bg-slate-50 focus:bg-white" />
-                </div>
-
-                <div>
-                  <label className="block text-slate-700 text-sm font-bold mb-1.5">City <span className="text-slate-400 font-normal">(Optional)</span></label>
-                  <input type="text" name="city" value={formData.city} onChange={handleInputChange} placeholder="Enter your city" className="w-full px-4 py-3 rounded-lg border border-slate-300 text-slate-800 placeholder-slate-400 focus:outline-none focus:border-[#EF961D] focus:ring-1 focus:ring-[#EF961D] transition-all bg-slate-50 focus:bg-white" />
-                </div>
-
-                {/* Education Radio Buttons */}
-                <div>
-                  <label className="block text-slate-700 text-sm font-bold mb-2">Education <span className="text-red-500">*</span></label>
-                  <div className="grid grid-cols-2 gap-2">
-                    {["12th Appearing", "Entered 11th/12th", "Doing Graduation", "Graduation Completed"].map((level) => (
-                      <label key={level} className={`cursor-pointer border rounded-lg py-2 px-3 text-xs font-medium text-center transition-all ${formData.education === level ? 'bg-[#163F66] text-white border-[#163F66]' : 'bg-white text-slate-600 border-slate-300 hover:border-[#163F66]'}`}>
-                        <input type="radio" name="education" value={level} checked={formData.education === level} onChange={handleInputChange} className="hidden" required />
-                        {level}
-                      </label>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Stream Radio Buttons */}
-                <div>
-                  <label className="block text-slate-700 text-sm font-bold mb-2">Stream <span className="text-slate-400 font-normal">(Optional)</span></label>
-                  <div className="flex gap-4">
-                    {["Arts", "Commerce", "Science/Engineering"].map((stream) => (
-                      <label key={stream} className="flex items-center gap-2 cursor-pointer text-sm text-slate-700">
-                        <input type="radio" name="stream" value={stream} checked={formData.stream === stream} onChange={handleInputChange} className="w-4 h-4 text-[#EF961D] focus:ring-[#EF961D]" />
-                        {stream}
-                      </label>
-                    ))}
-                  </div>
-                </div>
-
-                <button type="submit" className="w-full bg-[#EF961D] hover:bg-[#d88415] text-white font-bold py-4 rounded-lg mt-2 transition-all transform hover:-translate-y-1 shadow-[0_10px_20px_rgba(239,150,29,0.3)] flex items-center justify-center gap-2">
-                  Register Now <ArrowRight className="w-5 h-5" />
-                </button>
-              </form>
-            </div>
+            
+            <motion.div variants={fadeInUp} className="pt-4">
+              <HashLink smooth to="#counselling-form" className="inline-flex items-center gap-2 bg-[#163F66] hover:bg-[#EF961D] text-white font-bold py-3.5 px-8 rounded-full transition-colors text-lg shadow-lg">
+                Schedule a Counselling Session <ArrowRight className="w-5 h-5" />
+              </HashLink>
+            </motion.div>
           </motion.div>
 
         </div>
       </section>
 
       {/* ================= PROGRAMMES OVERVIEW ================= */}
-      <section className="py-12 md:py-16 px-4 relative z-10 bg-slate-50">
+      <section className="pt-12 pb-4 md:pt-16 md:pb-6 px-4 relative z-10 bg-slate-50">
         <div className="max-w-7xl mx-auto">
           
           <motion.div 
@@ -274,33 +209,11 @@ const Programs = () => {
             </motion.div>
           </div>
 
-          {/* Core Pillars */}
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeInUp} className="text-center">
-            <h3 className="inline-block bg-[#00A8E8] text-white px-8 py-3 font-bold text-xl rounded-lg shadow-md mb-10">
-              Core Pillars of the Programme
-            </h3>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-4xl mx-auto">
-              {[
-                { icon: <Target className="w-6 h-6"/>, title: "Holistic Preparation" },
-                { icon: <Lightbulb className="w-6 h-6"/>, title: "Concept to Application" },
-                { icon: <CheckCircle2 className="w-6 h-6"/>, title: "End to End Solutions" },
-                { icon: <Award className="w-6 h-6"/>, title: "Exam-Oriented Approach" }
-              ].map((pillar, i) => (
-                <div key={i} className="flex flex-col items-center gap-3 p-5 bg-white rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition-all">
-                  <div className="w-12 h-12 rounded-full bg-blue-50 text-[#00A8E8] flex items-center justify-center">
-                    {pillar.icon}
-                  </div>
-                  <span className="font-semibold text-slate-700 text-sm">{pillar.title}</span>
-                </div>
-              ))}
-            </div>
-          </motion.div>
-
         </div>
       </section>
 
       {/* ================= POSTER SECTION ================= */}
-      <section className="w-full max-w-6xl mx-auto px-4 py-6 md:py-12">
+      <section className="w-full max-w-6xl mx-auto px-4 pt-2 pb-12 md:pt-4 md:pb-16">
         <motion.div 
           initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeInUp}
           className="w-full flex justify-center"
@@ -348,7 +261,7 @@ const Programs = () => {
                   ))}
                 </ul>
                 <div className="mt-auto pt-4">
-                  <HashLink smooth to="/#courses" className="block w-full bg-[#132A5B] hover:bg-[#EF961D] text-white text-center font-bold py-3.5 rounded-full transition-colors text-lg shadow-md">
+                  <HashLink smooth to="#counselling-form" className="block w-full bg-[#132A5B] hover:bg-[#EF961D] text-white text-center font-bold py-3.5 rounded-full transition-colors text-lg shadow-md">
                     Apply Now
                   </HashLink>
                 </div>
@@ -380,7 +293,7 @@ const Programs = () => {
                   ))}
                 </ul>
                 <div className="mt-auto pt-4">
-                  <HashLink smooth to="/#courses" className="block w-full bg-[#FACC15] hover:bg-white text-[#132A5B] text-center font-black py-3.5 rounded-full transition-colors text-lg shadow-[0_10px_20px_rgba(250,204,21,0.2)]">
+                  <HashLink smooth to="#counselling-form" className="block w-full bg-[#FACC15] hover:bg-white text-[#132A5B] text-center font-black py-3.5 rounded-full transition-colors text-lg shadow-[0_10px_20px_rgba(250,204,21,0.2)]">
                     Apply Now
                   </HashLink>
                 </div>
@@ -409,7 +322,7 @@ const Programs = () => {
                   ))}
                 </ul>
                 <div className="mt-auto pt-4">
-                  <HashLink smooth to="/#courses" className="block w-full bg-[#132A5B] hover:bg-[#8E2DE2] text-white text-center font-bold py-3.5 rounded-full transition-colors text-lg shadow-md">
+                  <HashLink smooth to="#counselling-form" className="block w-full bg-[#132A5B] hover:bg-[#8E2DE2] text-white text-center font-bold py-3.5 rounded-full transition-colors text-lg shadow-md">
                     Apply Now
                   </HashLink>
                 </div>
@@ -417,6 +330,77 @@ const Programs = () => {
             </motion.div>
 
           </div>
+        </div>
+      </section>
+
+      {/* ================= COUNSELLING FORM SECTION ================= */}
+      <section id="counselling-form" className="py-16 md:py-24 px-4 bg-white border-t border-slate-100">
+        <div className="max-w-4xl mx-auto">
+          <motion.div 
+            initial={{ opacity: 0, y: 30 }} 
+            whileInView={{ opacity: 1, y: 0 }} 
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+          >
+            <div className="bg-white rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.08)] border border-slate-100 p-8 md:p-12 relative overflow-hidden">
+              <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-[#163F66] to-[#EF961D]"></div>
+              
+              <div className="text-center mb-10">
+                <h2 className="text-3xl md:text-4xl font-black text-[#163F66] mb-3">Schedule a Counselling Session</h2>
+                <p className="text-slate-500 text-lg">Get personalized guidance from our expert counsellors</p>
+              </div>
+
+              <form onSubmit={handleSubmit} className="space-y-6 max-w-2xl mx-auto">
+                <div className="grid md:grid-cols-2 gap-6">
+                  <div>
+                    <label className="block text-slate-700 text-sm font-bold mb-1.5">Student's Name <span className="text-red-500">*</span></label>
+                    <input type="text" name="name" value={formData.name} onChange={handleInputChange} required placeholder="Enter full name" className="w-full px-4 py-3 rounded-xl border border-slate-300 text-slate-800 placeholder-slate-400 focus:outline-none focus:border-[#EF961D] focus:ring-1 focus:ring-[#EF961D] transition-all bg-slate-50 focus:bg-white" />
+                  </div>
+                  <div>
+                    <label className="block text-slate-700 text-sm font-bold mb-1.5">Phone No (WhatsApp) <span className="text-red-500">*</span></label>
+                    <input type="tel" name="phone" value={formData.phone} onChange={handleInputChange} required placeholder="Enter 10-digit mobile number" className="w-full px-4 py-3 rounded-xl border border-slate-300 text-slate-800 placeholder-slate-400 focus:outline-none focus:border-[#EF961D] focus:ring-1 focus:ring-[#EF961D] transition-all bg-slate-50 focus:bg-white" />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-slate-700 text-sm font-bold mb-1.5">City <span className="text-slate-400 font-normal">(Optional)</span></label>
+                  <input type="text" name="city" value={formData.city} onChange={handleInputChange} placeholder="Enter your city" className="w-full px-4 py-3 rounded-xl border border-slate-300 text-slate-800 placeholder-slate-400 focus:outline-none focus:border-[#EF961D] focus:ring-1 focus:ring-[#EF961D] transition-all bg-slate-50 focus:bg-white" />
+                </div>
+
+                {/* Education Radio Buttons */}
+                <div>
+                  <label className="block text-slate-700 text-sm font-bold mb-2">Education <span className="text-red-500">*</span></label>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                    {["12th Appearing", "Entered 11th/12th", "Doing Graduation", "Graduation Completed"].map((level) => (
+                      <label key={level} className={`cursor-pointer border rounded-xl py-3 px-3 text-xs font-bold text-center transition-all ${formData.education === level ? 'bg-[#163F66] text-white border-[#163F66] shadow-md' : 'bg-white text-slate-600 border-slate-300 hover:border-[#163F66]'}`}>
+                        <input type="radio" name="education" value={level} checked={formData.education === level} onChange={handleInputChange} className="hidden" required />
+                        {level}
+                      </label>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Stream Radio Buttons */}
+                <div>
+                  <label className="block text-slate-700 text-sm font-bold mb-3">Stream <span className="text-slate-400 font-normal">(Optional)</span></label>
+                  <div className="flex flex-wrap gap-6">
+                    {["Arts", "Commerce", "Science/Engineering"].map((stream) => (
+                      <label key={stream} className="flex items-center gap-2 cursor-pointer text-sm font-semibold text-slate-700">
+                        <input type="radio" name="stream" value={stream} checked={formData.stream === stream} onChange={handleInputChange} className="w-5 h-5 text-[#EF961D] focus:ring-[#EF961D] accent-[#EF961D]" />
+                        {stream}
+                      </label>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="pt-4">
+                  <button type="submit" className="w-full bg-[#EF961D] hover:bg-[#d88415] text-white font-black py-4 rounded-xl transition-all transform hover:-translate-y-1 shadow-[0_10px_20px_rgba(239,150,29,0.3)] flex items-center justify-center gap-2 text-lg">
+                    Register Now <ArrowRight className="w-6 h-6" />
+                  </button>
+                </div>
+              </form>
+            </div>
+          </motion.div>
         </div>
       </section>
 
