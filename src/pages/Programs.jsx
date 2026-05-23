@@ -132,9 +132,9 @@ const Programs = () => {
               </div>
             </motion.div>
             
-            <motion.div variants={fadeInUp} className="pt-4">
-              <HashLink smooth to="#counselling-form" className="inline-flex items-center gap-2 bg-[#163F66] hover:bg-[#EF961D] text-white font-bold py-3.5 px-8 rounded-full transition-colors text-lg shadow-lg">
-                Schedule a Counselling Session <ArrowRight className="w-5 h-5" />
+            <motion.div variants={fadeInUp} className="pt-4 w-full flex justify-center md:justify-start">
+              <HashLink smooth to="#counselling-form" className="inline-flex items-center gap-2 bg-[#163F66] hover:bg-[#EF961D] text-white font-bold py-3 sm:py-3.5 px-4 sm:px-8 rounded-full transition-colors text-[13px] sm:text-lg shadow-lg whitespace-nowrap">
+                Schedule a Counselling Session <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5" />
               </HashLink>
             </motion.div>
           </motion.div>
@@ -292,7 +292,10 @@ const Programs = () => {
                     </li>
                   ))}
                 </ul>
-                <div className="mt-auto pt-4">
+                <div className="mt-auto pt-4 flex flex-col items-center gap-3">
+                  <a href="/brochure.pdf" target="_blank" rel="noopener noreferrer" className="text-sm font-bold text-[#132A5B] hover:text-[#EF961D] underline decoration-2 underline-offset-4 transition-colors">
+                    View More Details
+                  </a>
                   <HashLink smooth to="#counselling-form" className="block w-full bg-[#132A5B] hover:bg-[#EF961D] text-white text-center font-bold py-3.5 rounded-full transition-colors text-lg shadow-md">
                     Apply Now
                   </HashLink>
@@ -324,7 +327,10 @@ const Programs = () => {
                     </li>
                   ))}
                 </ul>
-                <div className="mt-auto pt-4">
+                <div className="mt-auto pt-4 flex flex-col items-center gap-3">
+                  <a href="/brochure.pdf" target="_blank" rel="noopener noreferrer" className="text-sm font-bold text-[#FACC15] hover:text-white underline decoration-2 underline-offset-4 transition-colors">
+                    View More Details
+                  </a>
                   <HashLink smooth to="#counselling-form" className="block w-full bg-[#FACC15] hover:bg-white text-[#132A5B] text-center font-black py-3.5 rounded-full transition-colors text-lg shadow-[0_10px_20px_rgba(250,204,21,0.2)]">
                     Apply Now
                   </HashLink>
@@ -353,7 +359,10 @@ const Programs = () => {
                     </li>
                   ))}
                 </ul>
-                <div className="mt-auto pt-4">
+                <div className="mt-auto pt-4 flex flex-col items-center gap-3">
+                  <a href="/brochure.pdf" target="_blank" rel="noopener noreferrer" className="text-sm font-bold text-[#132A5B] hover:text-[#8E2DE2] underline decoration-2 underline-offset-4 transition-colors">
+                    View More Details
+                  </a>
                   <HashLink smooth to="#counselling-form" className="block w-full bg-[#132A5B] hover:bg-[#8E2DE2] text-white text-center font-bold py-3.5 rounded-full transition-colors text-lg shadow-md">
                     Apply Now
                   </HashLink>
@@ -378,8 +387,8 @@ const Programs = () => {
               <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-[#163F66] to-[#EF961D]"></div>
               
               <div className="text-center mb-10">
-                <h2 className="text-3xl md:text-4xl font-black text-[#163F66] mb-3">Schedule a Counselling Session</h2>
-                <p className="text-slate-500 text-lg">Get personalized guidance from our expert counsellors</p>
+                <h2 className="text-[1.35rem] sm:text-3xl md:text-4xl font-black text-[#163F66] mb-3 whitespace-nowrap">Schedule a Counselling Session</h2>
+                <p className="text-slate-500 text-sm sm:text-lg">Get personalized guidance from our expert counsellors</p>
               </div>
 
               <form onSubmit={handleSubmit} className="space-y-6 max-w-2xl mx-auto">
