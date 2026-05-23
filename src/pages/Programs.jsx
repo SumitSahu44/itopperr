@@ -45,11 +45,32 @@ const Programs = () => {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e) => {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Form submitted:", formData);
-    alert("Thank you for registering! Our counsellors will contact you soon.");
-    setFormData({ name: "", phone: "", city: "", education: "", stream: "" });
+    setIsSubmitting(true);
+    
+    try {
+      const response = await fetch("/send_mail.php", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData)
+      });
+      const data = await response.json();
+      
+      if (data.status === "success") {
+        alert("Thank you for registering! Our counsellors will contact you soon.");
+        setFormData({ name: "", phone: "", city: "", education: "", stream: "" });
+      } else {
+        alert("Failed to send your request. Please try again later.");
+      }
+    } catch (error) {
+      console.error("Error sending mail:", error);
+      alert("An error occurred. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -70,19 +91,19 @@ const Programs = () => {
 
         <div className="max-w-7xl mx-auto relative z-10 flex justify-center">
           
-          {/* Main Hero Content (Centered since form is moved) */}
+          {/* Main Hero Content */}
           <motion.div 
             initial="hidden" 
             animate="visible" 
             variants={staggerContainer}
-            className="space-y-8 flex flex-col items-center text-center max-w-4xl"
+            className="space-y-8 flex flex-col items-start text-left max-w-4xl"
           >
             <motion.div variants={fadeInUp} className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-50 border border-blue-100">
               <Zap className="w-5 h-5 text-[#EF961D]" />
               <span className="text-sm font-bold tracking-wider text-[#163F66] uppercase">Rank Storm Mentorship</span>
             </motion.div>
             
-            <motion.div variants={fadeInUp} className="space-y-4 flex flex-col items-center">
+            <motion.div variants={fadeInUp} className="space-y-4 flex flex-col items-start">
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-[#163F66] leading-[1.1] uppercase">
                 Rank Storm Mentorship <br />
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#EF961D] to-orange-500">
@@ -94,7 +115,7 @@ const Programs = () => {
               </p>
             </motion.div>
 
-            <motion.div variants={fadeInUp} className="flex flex-wrap justify-center gap-4 pt-4">
+            <motion.div variants={fadeInUp} className="flex flex-wrap justify-start gap-4 pt-4">
               <div className="flex items-center gap-3 px-6 py-3 rounded-lg bg-white shadow-md border border-slate-100">
                 <Calendar className="w-5 h-5 text-[#EF961D]" />
                 <div className="text-left">
@@ -135,11 +156,11 @@ const Programs = () => {
             
             {/* Aims & Objectives Box */}
             <div className="inline-block relative">
-              <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-[#00A8E8] text-white text-xs font-bold px-4 py-1 rounded-full uppercase tracking-widest z-10 shadow-md whitespace-nowrap">
+              <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-[#163F66] text-white text-xs font-bold px-4 py-1 rounded-full uppercase tracking-widest z-10 shadow-md whitespace-nowrap">
                 Aims & Objectives
               </div>
-              <div className="bg-white rounded-2xl p-6 md:p-8 max-w-3xl mx-auto relative shadow-xl border border-slate-100 border-t-[#00A8E8] border-t-4">
-                <p className="text-lg md:text-xl text-slate-600 font-medium leading-relaxed">
+              <div className="bg-white rounded-2xl p-6 md:p-8 max-w-3xl mx-auto relative shadow-xl border border-slate-100 border-t-[#EF961D] border-t-4">
+                <p className="text-lg md:text-xl text-slate-600 font-medium leading-relaxed text-center">
                   The RankStorm is designed with a clear mission and approach: <br/>
                   <span className="text-[#163F66] font-bold">To transform serious aspirants into UPSC rankers through a structured, exam-oriented evolution.</span>
                 </p>
@@ -148,68 +169,79 @@ const Programs = () => {
           </motion.div>
 
           {/* Three Program Cards */}
-          <div className="grid md:grid-cols-3 gap-6 lg:gap-8 mb-20 max-w-6xl mx-auto">
+          <div className="grid grid-cols-3 gap-2 sm:gap-4 lg:gap-8 mb-12 md:mb-20 max-w-6xl mx-auto px-1 sm:px-4">
             {/* 20 Days */}
-            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeInUp} className="relative w-full h-[150px] md:h-[220px] flex items-center justify-start group cursor-pointer">
+            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeInUp} className="relative w-full h-[80px] sm:h-[130px] md:h-[200px] flex items-center justify-start group cursor-pointer">
               {/* Colored Background Shape */}
               <div 
-                className="absolute right-0 md:right-4 h-[120px] md:h-[190px] w-[75%] flex items-center justify-end pr-5 transition-transform duration-500 shadow-md"
+                className="absolute right-0 h-[60px] sm:h-[100px] md:h-[170px] w-[85%] sm:w-[80%] flex items-center justify-end pr-2 sm:pr-4 md:pr-5 transition-transform duration-500 shadow-sm md:shadow-md"
                 style={{ 
                   backgroundColor: "#E85D22", 
                   clipPath: "polygon(0 0, 82% 0, 100% 50%, 82% 100%, 0 100%)" 
                 }}
               >
-                <span className="text-white font-bold text-lg md:text-xl mr-1">01</span>
+                <span className="text-white font-bold text-[10px] sm:text-lg md:text-xl">01</span>
               </div>
               
               {/* Overlapping White Box */}
-              <div className="relative left-2 md:left-6 w-[70%] h-[100px] md:h-[150px] bg-white shadow-[0_10px_30px_rgba(0,0,0,0.15)] flex flex-col items-center justify-center z-10 transition-transform duration-500 group-hover:-translate-y-2 border border-slate-50">
-                <h3 className="text-lg md:text-2xl lg:text-3xl font-black text-[#E85D22] leading-tight">20 Days</h3>
-                <h4 className="text-lg md:text-2xl lg:text-3xl font-black text-[#222222] leading-tight">Program</h4>
-                <p className="text-[#222222] font-bold mt-1 md:mt-2 text-[10px] md:text-xs lg:text-sm">(Mains)</p>
+              <div className="relative left-1 sm:left-4 md:left-6 w-[75%] h-[50px] sm:h-[80px] md:h-[130px] bg-white shadow-md md:shadow-[0_10px_30px_rgba(0,0,0,0.15)] flex flex-col items-center justify-center z-10 transition-transform duration-500 group-hover:-translate-y-1 sm:group-hover:-translate-y-2 border border-slate-50 py-1">
+                <h3 className="text-[10px] sm:text-xl md:text-2xl lg:text-3xl font-black text-[#E85D22] leading-none sm:leading-tight">20 Days</h3>
+                <h4 className="text-[10px] sm:text-xl md:text-2xl lg:text-3xl font-black text-[#222222] leading-none sm:leading-tight mt-0.5 sm:mt-0">Program</h4>
+                <p className="text-[#222222] font-bold mt-0.5 sm:mt-1 md:mt-2 text-[7px] sm:text-xs lg:text-sm">(Mains)</p>
               </div>
             </motion.div>
 
             {/* 3 Months */}
-            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeInUp} transition={{ delay: 0.1 }} className="relative w-full h-[150px] md:h-[220px] flex items-center justify-start group cursor-pointer">
+            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeInUp} transition={{ delay: 0.1 }} className="relative w-full h-[80px] sm:h-[130px] md:h-[200px] flex items-center justify-start group cursor-pointer">
               <div 
-                className="absolute right-0 md:right-4 h-[120px] md:h-[190px] w-[75%] flex items-center justify-end pr-5 transition-transform duration-500 shadow-md"
+                className="absolute right-0 h-[60px] sm:h-[100px] md:h-[170px] w-[85%] sm:w-[80%] flex items-center justify-end pr-2 sm:pr-4 md:pr-5 transition-transform duration-500 shadow-sm md:shadow-md"
                 style={{ 
                   backgroundColor: "#F1B511", 
                   clipPath: "polygon(0 0, 82% 0, 100% 50%, 82% 100%, 0 100%)" 
                 }}
               >
-                <span className="text-white font-bold text-lg md:text-xl mr-1">02</span>
+                <span className="text-white font-bold text-[10px] sm:text-lg md:text-xl">02</span>
               </div>
               
-              <div className="relative left-2 md:left-6 w-[70%] h-[100px] md:h-[150px] bg-white shadow-[0_10px_30px_rgba(0,0,0,0.15)] flex flex-col items-center justify-center z-10 transition-transform duration-500 group-hover:-translate-y-2 border border-slate-50">
-                <h3 className="text-lg md:text-2xl lg:text-3xl font-black text-[#F1B511] leading-tight">3 Months</h3>
-                <h4 className="text-lg md:text-2xl lg:text-3xl font-black text-[#222222] leading-tight">Program</h4>
-                <p className="text-[#222222] font-bold mt-1 md:mt-2 text-[10px] md:text-xs lg:text-sm">(Mains)</p>
+              <div className="relative left-1 sm:left-4 md:left-6 w-[75%] h-[50px] sm:h-[80px] md:h-[130px] bg-white shadow-md md:shadow-[0_10px_30px_rgba(0,0,0,0.15)] flex flex-col items-center justify-center z-10 transition-transform duration-500 group-hover:-translate-y-1 sm:group-hover:-translate-y-2 border border-slate-50 py-1">
+                <h3 className="text-[10px] sm:text-xl md:text-2xl lg:text-3xl font-black text-[#F1B511] leading-none sm:leading-tight">3 Months</h3>
+                <h4 className="text-[10px] sm:text-xl md:text-2xl lg:text-3xl font-black text-[#222222] leading-none sm:leading-tight mt-0.5 sm:mt-0">Program</h4>
+                <p className="text-[#222222] font-bold mt-0.5 sm:mt-1 md:mt-2 text-[7px] sm:text-xs lg:text-sm">(Mains)</p>
               </div>
             </motion.div>
 
             {/* 12 Months */}
-            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeInUp} transition={{ delay: 0.2 }} className="relative w-full h-[150px] md:h-[220px] flex items-center justify-start group cursor-pointer">
+            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeInUp} transition={{ delay: 0.2 }} className="relative w-full h-[80px] sm:h-[130px] md:h-[200px] flex items-center justify-start group cursor-pointer">
               <div 
-                className="absolute right-0 md:right-4 h-[120px] md:h-[190px] w-[75%] flex items-center justify-end pr-5 transition-transform duration-500 shadow-md"
+                className="absolute right-0 h-[60px] sm:h-[100px] md:h-[170px] w-[85%] sm:w-[80%] flex items-center justify-end pr-2 sm:pr-4 md:pr-5 transition-transform duration-500 shadow-sm md:shadow-md"
                 style={{ 
                   backgroundColor: "#3F6BB5", 
                   clipPath: "polygon(0 0, 82% 0, 100% 50%, 82% 100%, 0 100%)" 
                 }}
               >
-                <span className="text-white font-bold text-lg md:text-xl mr-1">03</span>
+                <span className="text-white font-bold text-[10px] sm:text-lg md:text-xl">03</span>
               </div>
               
-              <div className="relative left-2 md:left-6 w-[70%] h-[100px] md:h-[150px] bg-white shadow-[0_10px_30px_rgba(0,0,0,0.15)] flex flex-col items-center justify-center z-10 transition-transform duration-500 group-hover:-translate-y-2 border border-slate-50">
-                <h3 className="text-lg md:text-2xl lg:text-3xl font-black text-[#3F6BB5] leading-tight text-center">12 Months</h3>
-                <h4 className="text-lg md:text-2xl lg:text-3xl font-black text-[#222222] leading-tight text-center">Program</h4>
-                <p className="text-[#222222] font-bold mt-1 md:mt-2 text-[10px] md:text-xs lg:text-sm">(Prelims+Mains)</p>
+              <div className="relative left-1 sm:left-4 md:left-6 w-[75%] h-[50px] sm:h-[80px] md:h-[130px] bg-white shadow-md md:shadow-[0_10px_30px_rgba(0,0,0,0.15)] flex flex-col items-center justify-center z-10 transition-transform duration-500 group-hover:-translate-y-1 sm:group-hover:-translate-y-2 border border-slate-50 py-1">
+                <h3 className="text-[10px] sm:text-xl md:text-2xl lg:text-3xl font-black text-[#3F6BB5] leading-none sm:leading-tight text-center">12 Months</h3>
+                <h4 className="text-[10px] sm:text-xl md:text-2xl lg:text-3xl font-black text-[#222222] leading-none sm:leading-tight text-center mt-0.5 sm:mt-0">Program</h4>
+                <p className="text-[#222222] font-bold mt-0.5 sm:mt-1 md:mt-2 text-[7px] sm:text-xs lg:text-sm whitespace-nowrap">(Prelims+Mains)</p>
               </div>
             </motion.div>
           </div>
 
         </div>
+        
+        {/* Style for hiding scrollbar but keeping functionality */}
+        <style dangerouslySetInnerHTML={{__html: `
+          .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+          }
+          .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+          }
+        `}} />
       </section>
 
       {/* ================= POSTER SECTION ================= */}
@@ -394,8 +426,8 @@ const Programs = () => {
                 </div>
 
                 <div className="pt-4">
-                  <button type="submit" className="w-full bg-[#EF961D] hover:bg-[#d88415] text-white font-black py-4 rounded-xl transition-all transform hover:-translate-y-1 shadow-[0_10px_20px_rgba(239,150,29,0.3)] flex items-center justify-center gap-2 text-lg">
-                    Register Now <ArrowRight className="w-6 h-6" />
+                  <button type="submit" disabled={isSubmitting} className={`w-full ${isSubmitting ? 'bg-slate-400 cursor-not-allowed' : 'bg-[#EF961D] hover:bg-[#d88415]'} text-white font-black py-4 rounded-xl transition-all transform ${!isSubmitting && 'hover:-translate-y-1'} shadow-[0_10px_20px_rgba(239,150,29,0.3)] flex items-center justify-center gap-2 text-lg`}>
+                    {isSubmitting ? "REGISTERING..." : "Register Now"} {!isSubmitting && <ArrowRight className="w-6 h-6" />}
                   </button>
                 </div>
               </form>

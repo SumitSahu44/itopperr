@@ -11,6 +11,7 @@ const CTA = () => {
     phone: "",
     interest: "",
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     gsap.registerPlugin(ScrollTrigger);
@@ -46,9 +47,28 @@ const CTA = () => {
     );
   }, []);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Form submitted:", formData);
+    setIsSubmitting(true);
+    try {
+      const response = await fetch("/send_mail.php", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData)
+      });
+      const data = await response.json();
+      if (data.status === "success") {
+        alert("Your request has been sent! We will contact you soon.");
+        setFormData({ name: "", phone: "", interest: "" });
+      } else {
+        alert("Failed to send your request. Please try again later.");
+      }
+    } catch (error) {
+      console.error("Error sending mail:", error);
+      alert("An error occurred. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleChange = (e) => {
@@ -165,16 +185,16 @@ const CTA = () => {
               {/* Submit Button */}
               <button
                 type="submit"
-                className="relative w-full py-4 rounded-xl text-white font-semibold text-lg transition-all duration-300 transform hover:-translate-y-1 shadow-lg group overflow-hidden border border-white/15"
+                disabled={isSubmitting}
+                className={`relative w-full py-4 rounded-xl text-white font-semibold text-lg transition-all duration-300 transform ${!isSubmitting && 'hover:-translate-y-1'} shadow-lg group overflow-hidden border border-white/15`}
                 style={{
-                  background:
-                    "linear-gradient(90deg,#1e3a8a 37.08%,#1d4ed8 62.26%,#3b82f6 99.82%)",
+                  background: isSubmitting ? "#475569" : "linear-gradient(90deg,#1e3a8a 37.08%,#1d4ed8 62.26%,#3b82f6 99.82%)",
                 }}
               >
-                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent transform -skew-x-12 translate-x-[-100%] group-hover:translate-x-[100%] transition-all duration-700"></div>
+                {!isSubmitting && <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent transform -skew-x-12 translate-x-[-100%] group-hover:translate-x-[100%] transition-all duration-700"></div>}
                 <span className="relative flex items-center justify-center space-x-2">
-                  <span>Request a doubt session</span>
-                  <FaPaperPlane className="group-hover:translate-x-1 transition-transform duration-300" />
+                  <span>{isSubmitting ? "Sending..." : "Request a doubt session"}</span>
+                  {!isSubmitting && <FaPaperPlane className="group-hover:translate-x-1 transition-transform duration-300" />}
                 </span>
               </button>
             </form>

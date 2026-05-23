@@ -13,7 +13,7 @@ const ProfessionalHero = () => {
 
     const randomInRange = (min, max) => Math.random() * (max - min) + min;
 
-    const interval = setInterval(function() {
+    const interval = setInterval(function () {
       const timeLeft = animationEnd - Date.now();
 
       if (timeLeft <= 0) {
@@ -21,7 +21,7 @@ const ProfessionalHero = () => {
       }
 
       const particleCount = 50 * (timeLeft / duration);
-      
+
       confetti({
         particleCount,
         startVelocity: 40,
@@ -39,7 +39,7 @@ const ProfessionalHero = () => {
         colors: ['#0a2968', '#1e40af', '#3b82f6', '#93c5fd', '#ffffff']
       });
     }, 250);
-    
+
     confetti({
       particleCount: 150,
       spread: 100,
@@ -47,7 +47,7 @@ const ProfessionalHero = () => {
       origin: { y: 1, x: 0.5 },
       colors: ['#0a2968', '#1e40af', '#3b82f6', '#93c5fd', '#ffffff']
     });
-    
+
     return () => clearInterval(interval);
   }, []);
 
@@ -79,9 +79,9 @@ const ProfessionalHero = () => {
 
       {/* Main Hero Container */}
       <div className="flex-1 container mx-auto px-4 sm:px-6 flex flex-col items-center justify-center pt-20 md:pt-28 pb-12 sm:pb-16 relative z-10 max-w-7xl">
-        
+
         {/* Center Logo/Branding Block */}
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, ease: "easeOut" }}
@@ -94,7 +94,7 @@ const ProfessionalHero = () => {
         </motion.div>
 
         {/* Pillars / Key Features Underlined */}
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
@@ -126,7 +126,7 @@ const ProfessionalHero = () => {
         </motion.div>
 
         {/* Faculty Grid */}
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.4, ease: "easeOut" }}
@@ -149,7 +149,7 @@ const ProfessionalHero = () => {
               <div className="relative w-full max-w-[200px] sm:max-w-[240px] flex justify-center z-10 mt-[-20px] px-2 select-none">
                 {/* Underlay Ribbon Shadow */}
                 <div className="absolute top-1.5 left-2 w-full h-9 sm:h-10 bg-[#0a2968]/30 -skew-x-12 z-0 rounded-[2px]" />
-                
+
                 {/* Foreground Ribbon */}
                 <div className="bg-[#0a2968] py-1.5 sm:py-2 w-full font-black text-center text-xs sm:text-sm md:text-base text-white -skew-x-12 z-10 shadow-md rounded-[2px] border border-[#0a2968]/10">
                   <div className="skew-x-12 tracking-wide font-extrabold uppercase">
@@ -185,7 +185,7 @@ const ProfessionalHero = () => {
         </motion.div>
 
         {/* Premium CTA Buttons */}
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.6, ease: "easeOut" }}

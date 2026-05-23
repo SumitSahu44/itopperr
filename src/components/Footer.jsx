@@ -63,11 +63,15 @@ const Footer = () => {
             </li>
             <li>
               <span className="text-slate-800 font-semibold">Email:</span>{" "}
-              support@itopper.com
+              contact@itopper.academy
+            </li>
+            <li>
+              <span className="text-slate-800 font-semibold">Alt Email:</span>{" "}
+              itopperiasacademy@gmail.com
             </li>
             <li>
               <span className="text-slate-800 font-semibold">Phone:</span> +91
-              9755995529
+              8826064806
             </li>
           </ul>
         </div>

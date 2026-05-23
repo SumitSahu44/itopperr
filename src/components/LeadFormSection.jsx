@@ -1,7 +1,43 @@
-import React from "react";
+import React, { useState } from "react";
 import { CheckCircle2 } from "lucide-react";
 
 const LeadFormSection = () => {
+  const [formData, setFormData] = useState({
+    name: "",
+    phone: "",
+    email: ""
+  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    try {
+      const response = await fetch("/send_mail.php", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData)
+      });
+      const data = await response.json();
+      if (data.status === "success") {
+        alert("Thank you for registering! Our counsellors will contact you soon.");
+        setFormData({ name: "", phone: "", email: "" });
+      } else {
+        alert("Failed to send your request. Please try again later.");
+      }
+    } catch (error) {
+      console.error("Error sending mail:", error);
+      alert("An error occurred. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   return (
     <section className="py-12 px-4 bg-[#f8fafc] border-t border-b border-slate-200">
       <div className="max-w-6xl mx-auto flex flex-col lg:flex-row items-center gap-12 lg:gap-20">
@@ -46,11 +82,15 @@ const LeadFormSection = () => {
               Fill the details below and we will contact you shortly.
             </p>
 
-            <form className="space-y-4">
+            <form onSubmit={handleSubmit} className="space-y-4">
               <div>
                 <label className="block text-slate-700 text-sm font-semibold mb-1">Full Name</label>
                 <input
                   type="text"
+                  name="name"
+                  value={formData.name}
+                  onChange={handleInputChange}
+                  required
                   placeholder="Enter your full name"
                   className="w-full px-4 py-3 rounded-md border border-slate-300 text-slate-800 placeholder-slate-400 focus:outline-none focus:border-[#163F66] focus:ring-1 focus:ring-[#163F66] text-sm"
                 />
@@ -59,6 +99,10 @@ const LeadFormSection = () => {
                 <label className="block text-slate-700 text-sm font-semibold mb-1">Mobile Number</label>
                 <input
                   type="tel"
+                  name="phone"
+                  value={formData.phone}
+                  onChange={handleInputChange}
+                  required
                   placeholder="Enter your 10-digit number"
                   className="w-full px-4 py-3 rounded-md border border-slate-300 text-slate-800 placeholder-slate-400 focus:outline-none focus:border-[#163F66] focus:ring-1 focus:ring-[#163F66] text-sm"
                 />
@@ -67,16 +111,21 @@ const LeadFormSection = () => {
                 <label className="block text-slate-700 text-sm font-semibold mb-1">Email Address</label>
                 <input
                   type="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleInputChange}
+                  required
                   placeholder="name@example.com"
                   className="w-full px-4 py-3 rounded-md border border-slate-300 text-slate-800 placeholder-slate-400 focus:outline-none focus:border-[#163F66] focus:ring-1 focus:ring-[#163F66] text-sm"
                 />
               </div>
               
               <button
-                type="button"
-                className="w-full bg-[#163F66] hover:bg-[#0b1329] text-white font-bold py-3.5 rounded-md mt-4 transition-colors text-sm tracking-wide shadow-md"
+                type="submit"
+                disabled={isSubmitting}
+                className={`w-full ${isSubmitting ? 'bg-slate-400 cursor-not-allowed' : 'bg-[#163F66] hover:bg-[#0b1329]'} text-white font-bold py-3.5 rounded-md mt-4 transition-colors text-sm tracking-wide shadow-md`}
               >
-                SCHEDULE NOW
+                {isSubmitting ? "SCHEDULING..." : "SCHEDULE NOW"}
               </button>
             </form>
           </div>
