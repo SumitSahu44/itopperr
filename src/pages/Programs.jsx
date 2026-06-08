@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
-import { 
-  CheckCircle2, 
-  Target, 
-  Award, 
+import {
+  CheckCircle2,
+  Target,
+  Award,
   Lightbulb,
   ArrowRight,
   Zap,
@@ -50,15 +50,15 @@ const Programs = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
-    
+
     try {
-      const response = await fetch("/send_mail.php", {
+      const response = await fetch("https://itopper.academy/php/send_email.php", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData)
       });
       const data = await response.json();
-      
+
       if (data.status === "success") {
         alert("Thank you for registering! Our counsellors will contact you soon.");
         setFormData({ name: "", phone: "", city: "", education: "", stream: "" });
@@ -75,7 +75,7 @@ const Programs = () => {
 
   return (
     <div className="bg-white min-h-screen text-slate-800 font-sans selection:bg-[#EF961D] selection:text-white pb-0 flex flex-col">
-      
+
       {/* Navigation Layer */}
       <div className="absolute top-0 left-0 w-full z-50">
         <Navigation theme="light" />
@@ -90,11 +90,11 @@ const Programs = () => {
         </div>
 
         <div className="max-w-7xl mx-auto relative z-10 flex justify-center">
-          
+
           {/* Main Hero Content */}
-          <motion.div 
-            initial="hidden" 
-            animate="visible" 
+          <motion.div
+            initial="hidden"
+            animate="visible"
             variants={staggerContainer}
             className="space-y-8 flex flex-col items-start text-left max-w-4xl"
           >
@@ -102,7 +102,7 @@ const Programs = () => {
               <Zap className="w-5 h-5 text-[#EF961D]" />
               <span className="text-sm font-bold tracking-wider text-[#163F66] uppercase">Rank Storm Mentorship</span>
             </motion.div>
-            
+
             <motion.div variants={fadeInUp} className="space-y-4 flex flex-col items-start">
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-[#163F66] leading-[1.1] uppercase">
                 Rank Storm Mentorship <br />
@@ -131,7 +131,7 @@ const Programs = () => {
                 </div>
               </div>
             </motion.div>
-            
+
             <motion.div variants={fadeInUp} className="pt-4 w-full flex justify-center md:justify-start">
               <HashLink smooth to="#counselling-form" className="inline-flex items-center gap-2 bg-[#163F66] hover:bg-[#EF961D] text-white font-bold py-3 sm:py-3.5 px-4 sm:px-8 rounded-full transition-colors text-[13px] sm:text-lg shadow-lg whitespace-nowrap">
                 Schedule a Counselling Session <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5" />
@@ -145,15 +145,15 @@ const Programs = () => {
       {/* ================= PROGRAMMES OVERVIEW ================= */}
       <section className="pt-12 pb-4 md:pt-16 md:pb-6 px-4 relative z-10 bg-slate-50">
         <div className="max-w-7xl mx-auto">
-          
-          <motion.div 
+
+          <motion.div
             initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} variants={fadeInUp}
             className="text-center mb-16"
           >
             <h2 className="text-4xl md:text-5xl font-black text-[#163F66] mb-6 uppercase tracking-tight">
               Rank <span className="text-[#EF961D]">Storm</span><br className="md:hidden" /> Programme 26/27
             </h2>
-            
+
             {/* Aims & Objectives Box */}
             <div className="inline-block relative">
               <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-[#163F66] text-white text-xs font-bold px-4 py-1 rounded-full uppercase tracking-widest z-10 shadow-md whitespace-nowrap">
@@ -161,7 +161,7 @@ const Programs = () => {
               </div>
               <div className="bg-white rounded-2xl p-6 md:p-8 max-w-3xl mx-auto relative shadow-xl border border-slate-100 border-t-[#EF961D] border-t-4">
                 <p className="text-lg md:text-xl text-slate-600 font-medium leading-relaxed text-center">
-                  The RankStorm is designed with a clear mission and approach: <br/>
+                  The RankStorm is designed with a clear mission and approach: <br />
                   <span className="text-[#163F66] font-bold">To transform serious aspirants into UPSC rankers through a structured, exam-oriented evolution.</span>
                 </p>
               </div>
@@ -173,16 +173,16 @@ const Programs = () => {
             {/* 20 Days */}
             <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeInUp} className="relative w-full h-[80px] sm:h-[130px] md:h-[200px] flex items-center justify-start group cursor-pointer">
               {/* Colored Background Shape */}
-              <div 
+              <div
                 className="absolute right-0 h-[60px] sm:h-[100px] md:h-[170px] w-[85%] sm:w-[80%] flex items-center justify-end pr-2 sm:pr-4 md:pr-5 transition-transform duration-500 shadow-sm md:shadow-md"
-                style={{ 
-                  backgroundColor: "#E85D22", 
-                  clipPath: "polygon(0 0, 82% 0, 100% 50%, 82% 100%, 0 100%)" 
+                style={{
+                  backgroundColor: "#E85D22",
+                  clipPath: "polygon(0 0, 82% 0, 100% 50%, 82% 100%, 0 100%)"
                 }}
               >
                 <span className="text-white font-bold text-[10px] sm:text-lg md:text-xl">01</span>
               </div>
-              
+
               {/* Overlapping White Box */}
               <div className="relative left-1 sm:left-4 md:left-6 w-[75%] h-[50px] sm:h-[80px] md:h-[130px] bg-white shadow-md md:shadow-[0_10px_30px_rgba(0,0,0,0.15)] flex flex-col items-center justify-center z-10 transition-transform duration-500 group-hover:-translate-y-1 sm:group-hover:-translate-y-2 border border-slate-50 py-1">
                 <h3 className="text-[10px] sm:text-xl md:text-2xl lg:text-3xl font-black text-[#E85D22] leading-none sm:leading-tight">20 Days</h3>
@@ -193,16 +193,16 @@ const Programs = () => {
 
             {/* 3 Months */}
             <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeInUp} transition={{ delay: 0.1 }} className="relative w-full h-[80px] sm:h-[130px] md:h-[200px] flex items-center justify-start group cursor-pointer">
-              <div 
+              <div
                 className="absolute right-0 h-[60px] sm:h-[100px] md:h-[170px] w-[85%] sm:w-[80%] flex items-center justify-end pr-2 sm:pr-4 md:pr-5 transition-transform duration-500 shadow-sm md:shadow-md"
-                style={{ 
-                  backgroundColor: "#F1B511", 
-                  clipPath: "polygon(0 0, 82% 0, 100% 50%, 82% 100%, 0 100%)" 
+                style={{
+                  backgroundColor: "#F1B511",
+                  clipPath: "polygon(0 0, 82% 0, 100% 50%, 82% 100%, 0 100%)"
                 }}
               >
                 <span className="text-white font-bold text-[10px] sm:text-lg md:text-xl">02</span>
               </div>
-              
+
               <div className="relative left-1 sm:left-4 md:left-6 w-[75%] h-[50px] sm:h-[80px] md:h-[130px] bg-white shadow-md md:shadow-[0_10px_30px_rgba(0,0,0,0.15)] flex flex-col items-center justify-center z-10 transition-transform duration-500 group-hover:-translate-y-1 sm:group-hover:-translate-y-2 border border-slate-50 py-1">
                 <h3 className="text-[10px] sm:text-xl md:text-2xl lg:text-3xl font-black text-[#F1B511] leading-none sm:leading-tight">3 Months</h3>
                 <h4 className="text-[10px] sm:text-xl md:text-2xl lg:text-3xl font-black text-[#222222] leading-none sm:leading-tight mt-0.5 sm:mt-0">Program</h4>
@@ -212,16 +212,16 @@ const Programs = () => {
 
             {/* 12 Months */}
             <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeInUp} transition={{ delay: 0.2 }} className="relative w-full h-[80px] sm:h-[130px] md:h-[200px] flex items-center justify-start group cursor-pointer">
-              <div 
+              <div
                 className="absolute right-0 h-[60px] sm:h-[100px] md:h-[170px] w-[85%] sm:w-[80%] flex items-center justify-end pr-2 sm:pr-4 md:pr-5 transition-transform duration-500 shadow-sm md:shadow-md"
-                style={{ 
-                  backgroundColor: "#3F6BB5", 
-                  clipPath: "polygon(0 0, 82% 0, 100% 50%, 82% 100%, 0 100%)" 
+                style={{
+                  backgroundColor: "#3F6BB5",
+                  clipPath: "polygon(0 0, 82% 0, 100% 50%, 82% 100%, 0 100%)"
                 }}
               >
                 <span className="text-white font-bold text-[10px] sm:text-lg md:text-xl">03</span>
               </div>
-              
+
               <div className="relative left-1 sm:left-4 md:left-6 w-[75%] h-[50px] sm:h-[80px] md:h-[130px] bg-white shadow-md md:shadow-[0_10px_30px_rgba(0,0,0,0.15)] flex flex-col items-center justify-center z-10 transition-transform duration-500 group-hover:-translate-y-1 sm:group-hover:-translate-y-2 border border-slate-50 py-1">
                 <h3 className="text-[10px] sm:text-xl md:text-2xl lg:text-3xl font-black text-[#3F6BB5] leading-none sm:leading-tight text-center">12 Months</h3>
                 <h4 className="text-[10px] sm:text-xl md:text-2xl lg:text-3xl font-black text-[#222222] leading-none sm:leading-tight text-center mt-0.5 sm:mt-0">Program</h4>
@@ -231,9 +231,10 @@ const Programs = () => {
           </div>
 
         </div>
-        
+
         {/* Style for hiding scrollbar but keeping functionality */}
-        <style dangerouslySetInnerHTML={{__html: `
+        <style dangerouslySetInnerHTML={{
+          __html: `
           .hide-scrollbar::-webkit-scrollbar {
             display: none;
           }
@@ -246,13 +247,13 @@ const Programs = () => {
 
       {/* ================= POSTER SECTION ================= */}
       <section className="w-full max-w-6xl mx-auto px-4 pt-2 pb-12 md:pt-4 md:pb-16">
-        <motion.div 
+        <motion.div
           initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeInUp}
           className="w-full flex justify-center"
         >
-          <img 
-            src="/images/posterprogram.jpeg" 
-            alt="Programs Poster" 
+          <img
+            src="/images/posterprogram.jpeg"
+            alt="Programs Poster"
             className="w-full h-auto object-contain"
           />
         </motion.div>
@@ -261,7 +262,7 @@ const Programs = () => {
       {/* ================= PROGRAM DETAILS (HIGHLIGHT CARDS) ================= */}
       <section className="py-12 md:py-16 px-4 bg-slate-50 border-t border-slate-100">
         <div className="max-w-7xl mx-auto">
-          
+
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeInUp} className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl lg:text-5xl font-black text-[#163F66] mb-4 uppercase tracking-tight">
               Program <span className="text-[#EF961D]">Highlights</span>
@@ -270,7 +271,7 @@ const Programs = () => {
           </motion.div>
 
           <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-            
+
             {/* CARD 1: 20 Days (White Card) */}
             <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeInUp} className="bg-white rounded-[24px] shadow-xl border border-slate-200 overflow-hidden flex flex-col hover:shadow-2xl transition-all duration-300">
               <div className="p-6 text-center">
@@ -293,12 +294,12 @@ const Programs = () => {
                   ))}
                 </ul>
                 <div className="mt-auto pt-4 flex flex-col items-center gap-3">
-                  <a href="/brochure.pdf" target="_blank" rel="noopener noreferrer" className="text-sm font-bold text-[#132A5B] hover:text-[#EF961D] underline decoration-2 underline-offset-4 transition-colors">
+                  <a href="/programs/20%20Days.pdf" target="_blank" rel="noopener noreferrer" className="text-sm font-bold text-[#132A5B] hover:text-[#EF961D] underline decoration-2 underline-offset-4 transition-colors">
                     View More Details
                   </a>
-                  <HashLink smooth to="#counselling-form" className="block w-full bg-[#132A5B] hover:bg-[#EF961D] text-white text-center font-bold py-3.5 rounded-full transition-colors text-lg shadow-md">
+                  <a href="https://rzp.io/rzp/rankstorm" target="_blank" rel="noopener noreferrer" className="block w-full bg-[#132A5B] hover:bg-[#EF961D] text-white text-center font-bold py-3.5 rounded-full transition-colors text-lg shadow-md">
                     Apply Now
-                  </HashLink>
+                  </a>
                 </div>
               </div>
             </motion.div>
@@ -328,12 +329,12 @@ const Programs = () => {
                   ))}
                 </ul>
                 <div className="mt-auto pt-4 flex flex-col items-center gap-3">
-                  <a href="/brochure.pdf" target="_blank" rel="noopener noreferrer" className="text-sm font-bold text-[#FACC15] hover:text-white underline decoration-2 underline-offset-4 transition-colors">
+                  <a href="/programs/3%20Months%20Program.pdf" target="_blank" rel="noopener noreferrer" className="text-sm font-bold text-[#FACC15] hover:text-white underline decoration-2 underline-offset-4 transition-colors">
                     View More Details
                   </a>
-                  <HashLink smooth to="#counselling-form" className="block w-full bg-[#FACC15] hover:bg-white text-[#132A5B] text-center font-black py-3.5 rounded-full transition-colors text-lg shadow-[0_10px_20px_rgba(250,204,21,0.2)]">
+                  <a href="https://rzp.io/rzp/A5PGbIBp" target="_blank" rel="noopener noreferrer" className="block w-full bg-[#FACC15] hover:bg-white text-[#132A5B] text-center font-black py-3.5 rounded-full transition-colors text-lg shadow-[0_10px_20px_rgba(250,204,21,0.2)]">
                     Apply Now
-                  </HashLink>
+                  </a>
                 </div>
               </div>
             </motion.div>
@@ -360,12 +361,12 @@ const Programs = () => {
                   ))}
                 </ul>
                 <div className="mt-auto pt-4 flex flex-col items-center gap-3">
-                  <a href="/brochure.pdf" target="_blank" rel="noopener noreferrer" className="text-sm font-bold text-[#132A5B] hover:text-[#8E2DE2] underline decoration-2 underline-offset-4 transition-colors">
+                  <a href="/programs/12%20Months%20Program.pdf" target="_blank" rel="noopener noreferrer" className="text-sm font-bold text-[#132A5B] hover:text-[#8E2DE2] underline decoration-2 underline-offset-4 transition-colors">
                     View More Details
                   </a>
-                  <HashLink smooth to="#counselling-form" className="block w-full bg-[#132A5B] hover:bg-[#8E2DE2] text-white text-center font-bold py-3.5 rounded-full transition-colors text-lg shadow-md">
+                  <a href="https://rzp.io/rzp/T5GIzoA" target="_blank" rel="noopener noreferrer" className="block w-full bg-[#132A5B] hover:bg-[#8E2DE2] text-white text-center font-bold py-3.5 rounded-full transition-colors text-lg shadow-md">
                     Apply Now
-                  </HashLink>
+                  </a>
                 </div>
               </div>
             </motion.div>
@@ -377,15 +378,15 @@ const Programs = () => {
       {/* ================= COUNSELLING FORM SECTION ================= */}
       <section id="counselling-form" className="py-16 md:py-24 px-4 bg-white border-t border-slate-100">
         <div className="max-w-4xl mx-auto">
-          <motion.div 
-            initial={{ opacity: 0, y: 30 }} 
-            whileInView={{ opacity: 1, y: 0 }} 
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
           >
             <div className="bg-white rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.08)] border border-slate-100 p-8 md:p-12 relative overflow-hidden">
               <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-[#163F66] to-[#EF961D]"></div>
-              
+
               <div className="text-center mb-10">
                 <h2 className="text-[1.35rem] sm:text-3xl md:text-4xl font-black text-[#163F66] mb-3 whitespace-nowrap">Schedule a Counselling Session</h2>
                 <p className="text-slate-500 text-sm sm:text-lg">Get personalized guidance from our expert counsellors</p>

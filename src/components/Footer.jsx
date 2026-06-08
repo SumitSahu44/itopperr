@@ -57,9 +57,9 @@ const Footer = () => {
           </h3>
           <ul className="space-y-3 text-slate-500">
             <li>
-              210, Dhan Trident
+              SHOP NO 55 2ND F OLD RAJINDER NAGAR MARKET
               <br />
-              Indore, Madhya Pradesh, India
+              NEW DELHI, AC39, 102-N, OLD RAJENDRA NAGAR, RAJENDRA NAGAR, 110008
             </li>
             <li>
               <span className="text-slate-800 font-semibold">Email:</span>{" "}

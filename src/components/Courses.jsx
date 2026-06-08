@@ -25,6 +25,7 @@ const tabs = [
   { id: "programs", label: "Programs", icon: Target },
   { id: "mains", label: "Mains Writing", icon: PenTool },
   { id: "modules", label: "Modules", icon: Layers },
+  { id: "rank", label: "Rank", icon: Award },
 ];
 
 
@@ -236,7 +237,79 @@ const allCourses = {
       rating: "4.9",
     },
   ],
+  rank: [
+    {
+      id: "r1",
+      slug: "rank-20-days",
+      title: "20 Days Program",
+      subtitle: "(Mains)",
+      badge: "RANK STORM",
+      badgeColor: "bg-orange-50 text-orange-600 border-orange-200",
+      price: "Premium Plan",
+      priceNote: "Custom Pricing",
+      icon: Award,
+      tag: "Ethics & Essay",
+      tagColor: "text-orange-600 bg-orange-50 border-orange-200",
+      bullets: [
+        "Essay & Ethics foundation",
+        "Daily assignment during classes",
+        "Detailed evaluation by mentors",
+        "One-to-one mentorship",
+      ],
+      students: "500+",
+      rating: "4.8",
+    },
+    {
+      id: "r2",
+      slug: "rank-3-months",
+      title: "3 Months Program",
+      subtitle: "(Mains)",
+      badge: "ADVANCED",
+      badgeColor: "bg-amber-50 text-amber-700 border-amber-200",
+      price: "Premium Plan",
+      priceNote: "Custom Pricing",
+      icon: Award,
+      tag: "GS Papers + Essay",
+      tagColor: "text-amber-700 bg-amber-50 border-amber-200",
+      bullets: [
+        "Answer writing sessions",
+        "Real-time evaluation",
+        "Complete Ethics & Essay",
+        "Skill: Presentation & Time Mgmt",
+      ],
+      students: "800+",
+      rating: "4.9",
+    },
+    {
+      id: "r3",
+      slug: "rank-12-months",
+      title: "12 Months Program",
+      subtitle: "(Prelims + Mains)",
+      badge: "COMPREHENSIVE",
+      badgeColor: "bg-violet-50 text-violet-700 border-violet-200",
+      price: "Premium Plan",
+      priceNote: "Custom Pricing",
+      icon: Award,
+      tag: "4-Phase Prep",
+      tagColor: "text-violet-700 bg-violet-50 border-violet-200",
+      bullets: [
+        "Holistic prep (NCERT to Adv)",
+        "Prelims–Mains Bridge",
+        "Intensive Simulation & Tests",
+        "Direct teaching by Amit Sir",
+      ],
+      students: "1200+",
+      rating: "5.0",
+    },
+  ],
 };
+
+allCourses.all = [
+  ...allCourses.programs,
+  ...allCourses.mains,
+  ...allCourses.modules,
+  ...allCourses.rank,
+];
 
 /* ───────────────────────────────────────────────
    CARD COMPONENT
@@ -336,7 +409,11 @@ const Courses = () => {
 
   const handleView = (slug) => {
     if (slug) {
-      navigate(`/curriculum/${slug}`);
+      if (slug.startsWith("rank-")) {
+        navigate("/programs");
+      } else {
+        navigate(`/curriculum/${slug}`);
+      }
     }
   };
 
@@ -354,6 +431,14 @@ const Courses = () => {
     modules: {
       heading: "Standalone Modules",
       sub: "Subject-specific deep-dives crafted for high-scoring GS topics.",
+    },
+    rank: {
+      heading: "Rank Storm Mentorship",
+      sub: "Specially designed for serious aspirants aiming to become future rankers.",
+    },
+    all: {
+      heading: "All Courses",
+      sub: "Explore all our programs and modules.",
     },
   };
 
@@ -435,15 +520,17 @@ const Courses = () => {
         </div>
 
         {/* ─── View All Button ─── */}
-        <div className="flex justify-center mt-10">
-          <button
-            onClick={() => navigate('/courses')}
-            className="px-6 py-2.5 rounded-xl bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-700 font-extrabold text-sm transition-all duration-300 flex items-center gap-2 group shadow-sm hover:shadow"
-          >
-            View All Courses
-            <ChevronRight size={14} strokeWidth={2.5} className="transition-transform group-hover:translate-x-0.5" />
-          </button>
-        </div>
+        {activeTab !== "all" && (
+          <div className="flex justify-center mt-10">
+            <button
+              onClick={() => setActiveTab("all")}
+              className="px-6 py-2.5 rounded-xl bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-700 font-extrabold text-sm transition-all duration-300 flex items-center gap-2 group shadow-sm hover:shadow"
+            >
+              View All Courses
+              <ChevronRight size={14} strokeWidth={2.5} className="transition-transform group-hover:translate-x-0.5" />
+            </button>
+          </div>
+        )}
 
         {/* ─── Bottom CTA Banner ─── */}
         <motion.div

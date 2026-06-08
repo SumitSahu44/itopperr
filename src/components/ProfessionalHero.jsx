@@ -55,7 +55,7 @@ const ProfessionalHero = () => {
     {
       name: "Amit Kumar",
       image: "/images/Amit Kumar.jpeg",
-      description: "Mentor (Ex-IRS)",
+      description: "AIR-959, 7+ years experience of teaching/mentoring & taught 50+ Rankers",
     },
     {
       name: "Abhinav Bharati",

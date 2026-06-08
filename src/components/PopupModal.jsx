@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { X } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const PopupModal = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     // Show popup after 3 seconds
@@ -20,6 +22,11 @@ const PopupModal = () => {
     }
   };
 
+  const handleImageClick = () => {
+    setIsOpen(false);
+    navigate("/programs");
+  };
+
   if (!isOpen) return null;
 
   return (
@@ -31,7 +38,10 @@ const PopupModal = () => {
       <div className="relative w-full max-w-md sm:max-w-lg md:max-w-xl bg-white rounded-xl shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-300">
         {/* Close Button */}
         <button
-          onClick={() => setIsOpen(false)}
+          onClick={(e) => {
+            e.stopPropagation();
+            setIsOpen(false);
+          }}
           className="absolute top-3 right-3 z-10 p-2 bg-black/40 hover:bg-black/70 text-white rounded-full transition-all duration-300 backdrop-blur-md"
           aria-label="Close popup"
         >
@@ -42,7 +52,8 @@ const PopupModal = () => {
         <img
           src="/images/new-popup.jpeg"
           alt="Special Offer"
-          className="w-full h-auto object-cover block"
+          className="w-full h-auto object-cover block cursor-pointer"
+          onClick={handleImageClick}
         />
       </div>
     </div>
