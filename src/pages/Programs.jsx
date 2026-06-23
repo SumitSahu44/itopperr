@@ -361,7 +361,7 @@ const Programs = () => {
                   ))}
                 </ul>
                 <div className="mt-auto pt-4 flex flex-col items-center gap-3">
-                  <a href="/programs/12%20Months%20Program.pdf" target="_blank" rel="noopener noreferrer" className="text-sm font-bold text-[#132A5B] hover:text-[#8E2DE2] underline decoration-2 underline-offset-4 transition-colors">
+                  <a href="/programs/12%20months%20program.pdf" target="_blank" rel="noopener noreferrer" className="text-sm font-bold text-[#132A5B] hover:text-[#8E2DE2] underline decoration-2 underline-offset-4 transition-colors">
                     View More Details
                   </a>
                   <a href="https://rzp.io/rzp/T5GIzoA" target="_blank" rel="noopener noreferrer" className="block w-full bg-[#132A5B] hover:bg-[#8E2DE2] text-white text-center font-bold py-3.5 rounded-full transition-colors text-lg shadow-md">

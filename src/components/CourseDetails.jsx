@@ -40,6 +40,8 @@ import {
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 import FAQSection from "./Faq";
+import Navigation from "./Navigation";
+import Footer from "./Footer";
 
 const CourseCurriculum = () => {
   const { subject: urlSlug } = useParams();
@@ -208,9 +210,55 @@ const CourseCurriculum = () => {
             setSelectedLectureId(found.modules[0].lectures[0]._id);
           }
         }
+      } else if (urlSlug === "essay") {
+        // Fallback static course definition for Essay if not found in backend DB
+        const defaultEssayCourse = {
+          _id: "essay-static-id",
+          subject: "Essay Foundation",
+          description: "iTopper Essay Course by Mr. Amit Kumar (Ex-Civil Servant). A meticulously designed course aimed at maximizing your final UPSC mains score.",
+          finalPrice: 2999,
+          mrpPrice: 5999,
+          duration: "1 Month",
+          level: "Mains Special",
+          demoVideo: "",
+          modules: [],
+          mentors: [
+            {
+              name: "Mr. Amit Kumar",
+              designation: "Ex-Civil Servant",
+              photo: ""
+            }
+          ],
+          skillsImages: [],
+          reviews: []
+        };
+        setCourse(defaultEssayCourse);
       }
     } catch (err) {
       console.error(err);
+      if (urlSlug === "essay") {
+        const defaultEssayCourse = {
+          _id: "essay-static-id",
+          subject: "Essay Foundation",
+          description: "iTopper Essay Course by Mr. Amit Kumar (Ex-Civil Servant). A meticulously designed course aimed at maximizing your final UPSC mains score.",
+          finalPrice: 2999,
+          mrpPrice: 5999,
+          duration: "1 Month",
+          level: "Mains Special",
+          demoVideo: "",
+          modules: [],
+          mentors: [
+            {
+              name: "Mr. Amit Kumar",
+              designation: "Ex-Civil Servant",
+              photo: ""
+            }
+          ],
+          skillsImages: [],
+          reviews: []
+        };
+        setCourse(defaultEssayCourse);
+      }
     } finally {
       setLoading(false);
     }
@@ -565,6 +613,476 @@ const CourseCurriculum = () => {
         <span className="relative z-10">Course Not Found</span>
       </div>
     );
+
+  if (urlSlug === "essay") {
+    return (
+      <div className="bg-white min-h-screen text-slate-800 font-sans selection:bg-[#EF961D] selection:text-white pb-0 flex flex-col relative overflow-hidden">
+        {/* Navigation Layer */}
+        <div className="absolute top-0 left-0 w-full z-50">
+          <Navigation theme="light" />
+        </div>
+        
+        {/* Gradients */}
+        <div className="absolute top-0 left-0 w-full h-full overflow-hidden z-0 pointer-events-none">
+          <div className="absolute -top-[20%] -left-[10%] w-[50%] h-[50%] rounded-full bg-blue-100 blur-[120px] opacity-60"></div>
+          <div className="absolute top-[30%] -right-[10%] w-[40%] h-[60%] rounded-full bg-orange-100 blur-[150px] opacity-50"></div>
+        </div>
+
+        {/* HERO SECTION */}
+        <section className="relative pt-28 pb-10 lg:pt-36 lg:pb-16 px-4 z-10 flex-grow max-w-7xl mx-auto w-full">
+          <div className="grid lg:grid-cols-12 gap-12 items-center">
+            {/* LEFT COLUMN */}
+            <div className="lg:col-span-7 space-y-6">
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-50 border border-blue-100">
+                <Zap className="w-5 h-5 text-[#EF961D]" />
+                <span className="text-sm font-bold tracking-wider text-[#163F66] uppercase">Essay Foundation</span>
+              </div>
+              <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-[#163F66] leading-[1.1] uppercase">
+                iTopper Essay Course <br />
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#EF961D] to-orange-500 text-xl md:text-2xl lg:text-3xl block mt-4 normal-case font-bold">
+                  By Amit Kumar ( AIR-959, 7+ years experience of teaching/mentoring & taught 50+ Rankers )
+                </span>
+              </h1>
+              <p className="text-lg text-slate-600 max-w-2xl leading-relaxed font-medium">
+                {course.description}
+              </p>
+              
+              <div className="flex flex-wrap items-center gap-6 pt-2">
+                <div className="flex items-baseline gap-3">
+                  <span className="text-3xl font-bold text-[#163F66]">
+                    ₹{course.finalPrice}
+                  </span>
+                  {course.mrpPrice > course.finalPrice && (
+                    <span className="text-base text-slate-400 line-through">
+                      ₹{course.mrpPrice}
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              <div className="flex flex-col sm:flex-row gap-4 pt-4 max-w-md">
+                {!isEnrolled ? (
+                  <button
+                    onClick={handleEnrollClick}
+                    className="flex-1 py-3.5 px-8 rounded-full bg-[#163F66] hover:bg-[#EF961D] text-white font-bold transition-colors text-base shadow-lg cursor-pointer animate-pulse"
+                  >
+                    Secure Your Spot
+                  </button>
+                ) : (
+                  <Link
+                    to="/my-courses"
+                    className="flex-1 py-3.5 px-8 rounded-full bg-[#163F66] hover:bg-[#EF961D] text-white text-center font-bold transition-colors text-base shadow-lg cursor-pointer"
+                  >
+                    Go to Dashboard
+                  </Link>
+                )}
+                {course.brochure && (
+                  <a
+                    href={course.brochure}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex-1 py-3.5 px-8 rounded-full border-2 border-[#163F66] text-[#163F66] hover:bg-[#163F66] hover:text-white text-center font-bold transition-colors text-base cursor-pointer"
+                  >
+                    View Syllabus
+                  </a>
+                )}
+              </div>
+            </div>
+
+            {/* RIGHT COLUMN */}
+            <div className="lg:col-span-5">
+              <div className="relative rounded-[2rem] overflow-hidden border border-slate-200 shadow-2xl aspect-video bg-slate-900 group">
+                {course.demoVideo ? (
+                  renderDemoVideo(course.demoVideo)
+                ) : (
+                  <div className="w-full h-full flex flex-col items-center justify-center bg-slate-950">
+                    <MonitorPlay size={40} className="text-slate-800 mb-3" />
+                    <span className="text-[10px] text-zinc-700 font-bold tracking-widest uppercase">
+                      Stream Preview
+                    </span>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* DETAILS GRID SECTIONS */}
+        <section className="relative py-16 px-4 bg-slate-50 border-t border-slate-100 z-10">
+          <div className="max-w-7xl mx-auto space-y-16">
+            
+            {/* Course Objective */}
+            <div className="max-w-4xl mx-auto">
+              <div className="text-center mb-8">
+                <h2 className="text-3xl font-black text-[#163F66] mb-2 uppercase tracking-tight">
+                  Course Objective
+                </h2>
+                <div className="w-12 h-[3px] bg-[#EF961D] mx-auto rounded-full mb-6" />
+              </div>
+              <div className="relative">
+                <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-[#163F66] text-white text-xs font-bold px-4 py-1 rounded-full uppercase tracking-widest z-10 shadow-md">
+                  Our Mission
+                </div>
+                <div className="bg-white rounded-2xl p-8 shadow-xl border border-slate-100 border-t-[#EF961D] border-t-4">
+                  <p className="text-lg text-slate-700 font-medium leading-relaxed text-center mb-8">
+                    Our meticulously designed Essay Course aims to:
+                  </p>
+                  <div className="grid md:grid-cols-2 gap-6">
+                    {[
+                      "Enhance competency across diverse important themes",
+                      "Strengthen understanding through well-structured handouts",
+                      "Improve writing skills (language, grammar, and flow)",
+                      "Provide structured evaluation through a test series"
+                    ].map((point, i) => (
+                      <div key={i} className="flex items-start gap-3 text-slate-700 font-bold text-base">
+                        <CheckCircle2 className="w-6 h-6 text-[#EF961D] shrink-0" />
+                        <span>{point}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Strategic Insights Cards */}
+            <div>
+              <div className="text-center mb-12">
+                <h2 className="text-3xl font-black text-[#163F66] mb-2 uppercase tracking-tight">
+                  Strategic Insights
+                </h2>
+                <div className="w-12 h-[3px] bg-[#EF961D] mx-auto rounded-full" />
+              </div>
+              
+              <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto items-stretch">
+                {/* Why Essay Paper Matters */}
+                <div className="bg-white rounded-2xl shadow-md border-t-4 border-t-[#3F6BB5] border-x border-b border-slate-150 p-6 flex flex-col">
+                  <h3 className="text-xl font-bold text-[#132A5B] mb-4">Why Essay Paper Matters?</h3>
+                  <ul className="space-y-3 flex-grow">
+                    {[
+                      "250 marks (equal to GS / Optional)",
+                      "High-scoring paper (150+ achievable)",
+                      "First paper in Mains – sets the momentum",
+                      "Low input, high output subject",
+                      "Game-changer in final selection"
+                    ].map((item, idx) => (
+                      <li key={idx} className="flex items-start gap-3 text-slate-700 font-semibold text-sm">
+                        <CheckCircle2 className="w-5 h-5 text-[#3F6BB5] shrink-0" />
+                        <span>{item}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                {/* Common Mistakes */}
+                <div className="bg-white rounded-2xl shadow-md border-t-4 border-t-[#E85D22] border-x border-b border-slate-150 p-6 flex flex-col">
+                  <h3 className="text-xl font-bold text-[#132A5B] mb-4">Common Mistakes by Aspirants</h3>
+                  <ul className="space-y-3 flex-grow">
+                    {[
+                      "Lack of focused essay preparation",
+                      "Repetitive content with poor depth",
+                      "No distinction between GS answers and essays",
+                      "Lack of writing practice",
+                      "No proper evaluation and feedback"
+                    ].map((item, idx) => (
+                      <li key={idx} className="flex items-start gap-3 text-slate-700 font-semibold text-sm">
+                        <CheckCircle2 className="w-5 h-5 text-[#E85D22] shrink-0" />
+                        <span>{item}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                {/* How to Score High */}
+                <div className="bg-white rounded-2xl shadow-md border-t-4 border-t-[#F1B511] border-x border-b border-slate-150 p-6 flex flex-col">
+                  <h3 className="text-xl font-bold text-[#132A5B] mb-4">How to Score High in Essay?</h3>
+                  <ul className="space-y-3 flex-grow">
+                    {[
+                      "Correct interpretation of the topic",
+                      "Develop multi-dimensional content",
+                      "Build a unique essay writing style",
+                      "Practice regularly on exam relevant topics",
+                      "Get proper evaluation & feedback"
+                    ].map((item, idx) => (
+                      <li key={idx} className="flex items-start gap-3 text-slate-700 font-semibold text-sm">
+                        <CheckCircle2 className="w-5 h-5 text-[#F1B511] shrink-0" />
+                        <span>{item}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+
+              {/* What You Will Learn & Helps You */}
+              <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto mt-8 items-stretch">
+                {/* What you will learn */}
+                <div className="bg-white rounded-2xl shadow-md border-t-4 border-t-[#132A5B] border-x border-b border-slate-150 p-6 flex flex-col">
+                  <h3 className="text-xl font-bold text-[#132A5B] mb-4">What you will learn -</h3>
+                  <p className="text-sm text-red-500 font-bold mb-3">Through this course, you will -</p>
+                  <ul className="space-y-3 flex-grow">
+                    {[
+                      "Organize and present ideas clearly",
+                      "Develop critical thinking & analysis",
+                      "Use diverse examples & perspectives",
+                      "Write structured, impactful essays"
+                    ].map((item, idx) => (
+                      <li key={idx} className="flex items-start gap-3 text-slate-700 font-semibold text-sm">
+                        <CheckCircle2 className="w-5 h-5 text-[#132A5B] shrink-0" />
+                        <span>{item}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                {/* This course helps you */}
+                <div className="bg-white rounded-2xl shadow-md border-t-4 border-t-[#EF961D] border-x border-b border-slate-150 p-6 flex flex-col">
+                  <h3 className="text-xl font-bold text-[#132A5B] mb-4">This course helps you:</h3>
+                  <ul className="space-y-3 flex-grow mt-8">
+                    {[
+                      "Build a structured approach to essay writing",
+                      "Develop clarity, depth & originality",
+                      "Maximize your final UPSC mains score"
+                    ].map((item, idx) => (
+                      <li key={idx} className="flex items-start gap-3 text-slate-700 font-semibold text-sm">
+                        <CheckCircle2 className="w-5 h-5 text-[#EF961D] shrink-0" />
+                        <span>{item}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            {/* Course Features */}
+            <div className="max-w-5xl mx-auto">
+              <div className="text-center mb-12">
+                <h2 className="text-3xl font-black text-[#163F66] mb-2 uppercase tracking-tight">
+                  Course Features
+                </h2>
+                <div className="w-12 h-[3px] bg-[#EF961D] mx-auto rounded-full" />
+              </div>
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {[
+                  { title: "10 Lectures", desc: "10 comprehensive lectures covering all major themes." },
+                  { title: "Concise Handout", desc: "Exam-ready content with high-yield concepts." },
+                  { title: "Philosophical Essays", desc: "Special focus on philosophical and quote-based essays." },
+                  { title: "Class Assignments", desc: "Regular assignments during classes for practice." },
+                  { title: "Detailed Evaluation", desc: "Personalized evaluation with detailed feedback." },
+                  { title: "1-on-1 Sessions", desc: "One-to-one mentorship sessions after class to clear doubts." }
+                ].map((item, i) => (
+                  <div key={i} className="bg-white rounded-2xl p-6 shadow-md border border-slate-100 hover:shadow-lg transition-shadow">
+                    <div className="w-12 h-12 rounded-xl bg-orange-50 border border-orange-100 flex items-center justify-center mb-4">
+                      <Zap className="w-6 h-6 text-[#EF961D]" />
+                    </div>
+                    <h3 className="text-lg font-bold text-[#163F66] mb-2">{item.title}</h3>
+                    <p className="text-sm text-slate-600 font-medium">{item.desc}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+          </div>
+        </section>
+
+        {/* MODALS RENDERING */}
+        {showEnrollForm && (
+          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[100] p-4 md:p-6 animate-in fade-in duration-300">
+            <div className="w-full max-w-5xl bg-white border border-slate-200 rounded-3xl overflow-hidden shadow-2xl flex flex-col md:flex-row relative">
+              <button
+                onClick={() => setShowEnrollForm(false)}
+                className="absolute top-6 right-6 p-2 bg-slate-100 hover:bg-slate-200 rounded-full text-slate-500 hover:text-black transition-all z-10"
+              >
+                <X size={20} />
+              </button>
+
+              {/* LEFT SUMMARY */}
+              <div className="w-full md:w-5/12 bg-slate-50 p-8 md:p-12 border-b md:border-b-0 md:border-r border-slate-200 flex flex-col justify-between">
+                <div>
+                  <h4 className="text-slate-400 font-bold text-xs uppercase tracking-widest mb-8">Order Summary</h4>
+                  <div className="flex gap-4 mb-10">
+                    <div className="w-auto h-20 bg-white relative rounded-xl overflow-hidden shrink-0 border border-slate-200">
+                      <img
+                        src={course.thumbnail || "https://images.unsplash.com/photo-1620712943543-bcc4628c71d5?q=80&w=200&auto=format&fit=crop"}
+                        alt={course.subject}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                    <div>
+                      <h3 className="text-[#163F66] font-bold text-lg leading-tight mb-1">{course.subject}</h3>
+                      <p className="text-slate-500 text-xs">Professional Certification Program</p>
+                    </div>
+                  </div>
+                  <div className="space-y-4 pt-6 border-t border-slate-200">
+                    <div className="flex justify-between text-sm">
+                      <span className="text-slate-500">Course Price</span>
+                      <span className="text-slate-800 font-medium">₹{course.finalPrice}</span>
+                    </div>
+                    {discountPercent > 0 && (
+                      <div className="flex justify-between text-sm text-green-600">
+                        <span>Discount ({discountPercent}%)</span>
+                        <span>-₹{course.finalPrice - calculateDiscountedPrice()}</span>
+                      </div>
+                    )}
+                    <div className="flex justify-between text-lg font-bold pt-4 border-t border-slate-200">
+                      <span className="text-[#163F66]">Total Amount</span>
+                      <span className="text-[#163F66]">₹{calculateDiscountedPrice()}</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="mt-12 space-y-6">
+                  <div className="flex items-center gap-3 text-slate-500 text-[10px] font-bold uppercase tracking-widest">
+                    <ShieldCheck size={16} className="text-[#EF961D]" /> Secure Checkout
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="p-3 border border-slate-200 rounded-xl bg-white flex flex-col gap-1 shadow-sm">
+                      <Award size={14} className="text-[#EF961D]" />
+                      <span className="text-[10px] text-slate-700 font-bold uppercase">Verified Certificate</span>
+                    </div>
+                    <div className="p-3 border border-slate-200 rounded-xl bg-white flex flex-col gap-1 shadow-sm">
+                      <Globe size={14} className="text-[#EF961D]" />
+                      <span className="text-[10px] text-slate-700 font-bold uppercase">Lifetime Access</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* RIGHT CHECKOUT FORM */}
+              <div className="flex-1 p-8 md:p-12 flex flex-col justify-center">
+                <div className="max-w-md mx-auto w-full">
+                  <div className="mb-10">
+                    <h2 className="text-2xl md:text-3xl font-bold text-[#163F66] mb-2">Checkout</h2>
+                    <p className="text-slate-500 text-sm">Fill in your details to complete the enrollment.</p>
+                  </div>
+                  <form onSubmit={handleEnrollSubmit} className="space-y-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="space-y-1.5">
+                        <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest ml-1">Name</label>
+                        <input type="text" disabled value={formData.name} className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-500 cursor-not-allowed text-sm" />
+                      </div>
+                      <div className="space-y-1.5">
+                        <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest ml-1">Email</label>
+                        <input type="email" disabled value={formData.email} className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-500 cursor-not-allowed text-sm" />
+                      </div>
+                    </div>
+
+                    <div className="space-y-1.5">
+                      <label className="text-[10px] font-bold text-slate-700 uppercase tracking-widest ml-1">WhatsApp Phone *</label>
+                      <input
+                        type="tel"
+                        placeholder="e.g. 9876543210"
+                        required
+                        value={formData.phone}
+                        onChange={(e) => {
+                          const value = e.target.value.replace(/\D/g, "");
+                          if (value.length <= 10) setFormData({ ...formData, phone: value });
+                        }}
+                        className="w-full px-4 py-3 bg-white border border-slate-300 focus:border-[#163F66] transition-all rounded-xl text-slate-800 font-bold outline-none placeholder:text-slate-300"
+                      />
+                    </div>
+
+                    <div className="space-y-1.5">
+                      <label className="text-[10px] font-bold text-slate-700 uppercase tracking-widest ml-1">Coupon Code</label>
+                      <div className="flex gap-2">
+                        <input
+                          type="text"
+                          placeholder="OPTIONAL"
+                          value={couponCode}
+                          onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
+                          className="flex-1 px-4 py-3 bg-white border border-slate-300 focus:border-[#163F66] transition-all rounded-xl text-slate-800 font-medium uppercase outline-none placeholder:text-slate-300"
+                        />
+                        <button
+                          type="button"
+                          onClick={handleApplyCoupon}
+                          disabled={validatingCoupon || !couponCode.trim()}
+                          className="px-6 bg-[#163F66] text-white rounded-xl text-[10px] font-bold uppercase transition-all hover:bg-[#0a2968] disabled:opacity-20 cursor-pointer"
+                        >
+                          {validatingCoupon ? "..." : "Apply"}
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="pt-6">
+                      <button
+                        type="submit"
+                        disabled={submitting}
+                        className="w-full py-4.5 bg-[#163F66] text-white rounded-xl text-sm font-bold uppercase tracking-widest hover:bg-[#0a2968] transition-all flex items-center justify-center gap-3 active:scale-[0.98] disabled:opacity-50 cursor-pointer"
+                      >
+                        {submitting && <Loader2 className="animate-spin" size={18} />}
+                        {submitting ? "Processing..." : "Enroll & Pay Now"}
+                      </button>
+                      <p className="text-center text-[10px] text-slate-400 mt-4 flex items-center justify-center gap-2">
+                        <Lock size={10} /> 256-bit SSL encrypted payment
+                      </p>
+                    </div>
+
+                    {couponStatus.message && (
+                      <p className={`text-center text-xs font-bold ${couponStatus.type === "success" ? "text-green-600" : "text-red-500"}`}>
+                        {couponStatus.message}
+                      </p>
+                    )}
+                    {submitStatus === "error" && (
+                      <p className="text-center text-xs font-bold text-red-500">{errorMessage}</p>
+                    )}
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {showReviewModal && (
+          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex justify-center items-center z-50 p-6">
+            <div className="bg-white rounded-3xl p-10 max-w-md w-full border border-slate-200 relative shadow-2xl">
+              <button
+                onClick={() => {
+                  setShowReviewModal(false);
+                  setReviewData({ name: "", rating: 0, comment: "" });
+                  setHoverStars(0);
+                }}
+                className="absolute top-6 right-6 text-slate-400 hover:text-black transition-colors p-1 bg-slate-100 rounded-full hover:bg-slate-200"
+              >
+                <X size={20} />
+              </button>
+              <h2 className="text-2xl font-bold text-center mb-8 text-[#163F66] leading-tight">Share Your Experience</h2>
+              <form onSubmit={submitReview} className="space-y-6">
+                <input
+                  type="text"
+                  placeholder="Your Name"
+                  value={reviewData.name}
+                  onChange={(e) => setReviewData({ ...reviewData, name: e.target.value })}
+                  className="w-full px-6 py-4 bg-white border border-slate-350 rounded-xl text-slate-800 placeholder:text-slate-400 focus:border-[#163F66] outline-none transition-all text-sm font-medium shadow-inner"
+                  required
+                />
+                <div className="text-center py-4 bg-slate-50 rounded-2xl border border-slate-200">
+                  <p className="mb-3 text-slate-500 text-xs uppercase tracking-widest font-bold">Tap Stars to Rate</p>
+                  <div className="flex justify-center gap-3">
+                    {renderStars(reviewData.rating, true)}
+                  </div>
+                </div>
+                <textarea
+                  placeholder="Write your review here..."
+                  rows="4"
+                  value={reviewData.comment}
+                  onChange={(e) => setReviewData({ ...reviewData, comment: e.target.value })}
+                  className="w-full px-6 py-4 bg-white border border-slate-350 rounded-xl text-slate-800 placeholder:text-slate-400 focus:border-[#163F66] outline-none transition-all text-sm font-medium resize-none shadow-inner"
+                  required
+                />
+                <button
+                  type="submit"
+                  disabled={submittingReview}
+                  className="w-full py-4 bg-[#163F66] text-white hover:bg-[#0a2968] rounded-xl text-lg font-bold transition-all shadow-lg disabled:opacity-50 active:scale-[0.98] cursor-pointer"
+                >
+                  {submittingReview ? "Submitting..." : "Post Review"}
+                </button>
+              </form>
+            </div>
+          </div>
+        )}
+
+        <Footer />
+      </div>
+    );
+  }
 
   const currentModule = course.modules.find((m) => m._id === activeModule);
 

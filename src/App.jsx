@@ -32,6 +32,8 @@ import CourseDetails2 from "./components/CourseDetails2";
 
 // Pages
 import Programs from "./pages/Programs";
+import BlogDetails from "./pages/BlogDetails";
+import AdminBlogsDashboard from "./pages/AdminBlogsDashboard";
 
 // Payment Pages
 import PaymentSuccess from "./pages/PaymentSuccess";
@@ -76,8 +78,16 @@ function App() {
   // Check karein ki kya user Home Page ('/') par hai jahan NewHero hai?
   const isLandingPage = location.pathname === "/";
   const isProgramsPage = location.pathname === "/programs";
-  const isLightModePage = isLandingPage || isProgramsPage;
-  const isAdminPage = location.pathname.startsWith("/admin");
+  const isLightModePage =
+    isLandingPage ||
+    isProgramsPage ||
+    location.pathname === "/curriculum/essay" ||
+    location.pathname.startsWith("/blog/") ||
+    location.pathname === "/adminittopper";
+  const isAdminPage =
+    location.pathname.startsWith("/admin") ||
+    location.pathname === "/adminittopper" ||
+    location.pathname === "/adminitopperblog";
   const isFacultyPage = location.pathname === "/faculty/dashboard";
   //  LOCATION CHECK END
 
@@ -159,11 +169,16 @@ function App() {
               }
             />
             {/* ADMIN ROUTES */}
+            <Route path="/adminitopperblog" element={<AdminBlogsDashboard />} />
+            <Route path="/adminittopper" element={<AdminLogin />} />
             <Route path="/admin/login" element={<AdminLogin />} />
             <Route element={<AdminProtectedRoute />}>
               <Route path="/admin" element={<AdminDashboard />} />
               <Route path="/admin/*" element={<AdminDashboard />} />
             </Route>
+
+            {/* BLOG DETAILS */}
+            <Route path="/blog/:id" element={<BlogDetails />} />
             {/* FACULTY */}
             <Route path="/faculty/login" element={<FacultyLogin />} />
             <Route

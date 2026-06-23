@@ -23,8 +23,9 @@ import {
   MessageSquare,
   Ticket,
 } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import AdminCoupons from "../../pages/AdminCoupons";
+import { getBlogs, addBlog, updateBlog, deleteBlog } from "../../utils/blogStorage";
 
 const AdminDashboard = () => {
   useEffect(() => {
@@ -84,12 +85,95 @@ const AdminDashboard = () => {
   const [editRating, setEditRating] = useState(5);
   const [editComment, setEditComment] = useState("");
 
+  const editorRef = React.useRef(null);
+  const [blogs, setBlogs] = useState([]);
+  const [blogLoading, setBlogLoading] = useState(false);
+  const [showBlogForm, setShowBlogForm] = useState(false);
+  const [editingBlog, setEditingBlog] = useState(null);
+
+  // Blog Form States
+  const [blogTitle, setBlogTitle] = useState("");
+  const [blogCategory, setBlogCategory] = useState("Strategy");
+  const [blogReadTime, setBlogReadTime] = useState("5 min read");
+  const [blogExcerpt, setBlogExcerpt] = useState("");
+  const [blogImage, setBlogImage] = useState("");
+  const [blogContent, setBlogContent] = useState("");
+  const [blogPublished, setBlogPublished] = useState(true);
+
+  const fetchBlogs = async () => {
+    setBlogLoading(true);
+    try {
+      const data = await getBlogs();
+      setBlogs(data);
+    } catch (err) {
+      console.error("Failed to load blogs:", err);
+    } finally {
+      setBlogLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (showBlogForm && editorRef.current) {
+      editorRef.current.innerHTML = editingBlog ? editingBlog.content : "";
+    }
+  }, [showBlogForm, editingBlog]);
+
+  const executeCommand = (command, value = null) => {
+    document.execCommand(command, false, value);
+    if (editorRef.current) {
+      setBlogContent(editorRef.current.innerHTML);
+    }
+  };
+
+  const resetBlogForm = () => {
+    setBlogTitle("");
+    setBlogCategory("Strategy");
+    setBlogReadTime("5 min read");
+    setBlogExcerpt("");
+    setBlogImage("");
+    setBlogContent("");
+    setBlogPublished(true);
+    setEditingBlog(null);
+    if (editorRef.current) {
+      editorRef.current.innerHTML = "";
+    }
+  };
+
+  const handleSaveBlog = async () => {
+    if (!blogTitle.trim() || !blogExcerpt.trim() || !blogContent.trim()) {
+      alert("Please fill in the title, excerpt, and content.");
+      return;
+    }
+    const blogData = {
+      title: blogTitle.trim(),
+      category: blogCategory,
+      readTime: blogReadTime.trim() || "5 min read",
+      excerpt: blogExcerpt.trim(),
+      image: blogImage.trim() || "https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?auto=format&fit=crop&q=80&w=400",
+      content: blogContent,
+      published: blogPublished,
+    };
+
+    try {
+      if (editingBlog) {
+        await updateBlog(editingBlog.id, blogData);
+      } else {
+        await addBlog(blogData);
+      }
+      setShowBlogForm(false);
+      fetchBlogs();
+    } catch (err) {
+      alert("Failed to save article.");
+    }
+  };
+
   useEffect(() => {
     fetchCourses();
     if (activeTab === "courses") fetchAllFaculty();
     if (activeTab === "enrollments") fetchEnrollments();
     if (activeTab === "faculty") fetchFacultyAssignmentsData();
     if (activeTab === "reviews") fetchAdminReviews();
+    if (activeTab === "blogs") fetchBlogs();
   }, [activeTab]);
 
   // ==============================
@@ -628,6 +712,7 @@ const AdminDashboard = () => {
               { id: "results", icon: Trophy, label: "Results" },
               { id: "reviews", icon: MessageSquare, label: "Reviews" },
               { id: "coupons", icon: Ticket, label: "Coupons" },
+              { id: "blogs", icon: FileText, label: "Blogs" },
             ].map((tab) => (
               <button
                 key={tab.id}
@@ -1162,6 +1247,106 @@ const AdminDashboard = () => {
         )}
         {/* --- COUPONS TAB --- */}
         {activeTab === "coupons" && <AdminCoupons />}
+
+        {/* --- BLOGS TAB --- */}
+        {activeTab === "blogs" && (
+          <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+            <div className="flex justify-between items-center mb-10">
+              <h2 className="text-4xl font-bold text-white">Blog Management</h2>
+              <button
+                onClick={() => {
+                  resetBlogForm();
+                  setShowBlogForm(true);
+                }}
+                className="flex items-center gap-2 px-6 py-3 bg-white text-black rounded-full font-bold hover:scale-105 transition-transform cursor-pointer"
+              >
+                <Plus size={20} /> Write Article
+              </button>
+            </div>
+
+            {blogLoading ? (
+              <div className="p-20 flex justify-center">
+                <Loader2 className="animate-spin text-zinc-500 w-8 h-8" />
+              </div>
+            ) : blogs.length === 0 ? (
+              <div className="p-20 text-center text-zinc-500 bg-zinc-900/30 border border-white/5 border-dashed rounded-3xl">
+                No blog posts created yet. Click "Write Article" to publish your first post!
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {blogs.map((b) => (
+                  <div
+                    key={b.id}
+                    className="group bg-zinc-900/40 rounded-3xl border border-white/5 hover:border-white/20 transition-all flex flex-col overflow-hidden hover:shadow-2xl"
+                  >
+                    <div className="relative h-48 bg-zinc-950 overflow-hidden">
+                      <img
+                        src={b.image || "https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?auto=format&fit=crop&q=80&w=400"}
+                        alt={b.title}
+                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                      />
+                      <div className="absolute top-4 right-4 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <button
+                          onClick={() => {
+                            setEditingBlog(b);
+                            setBlogTitle(b.title);
+                            setBlogCategory(b.category);
+                            setBlogReadTime(b.readTime);
+                            setBlogExcerpt(b.excerpt);
+                            setBlogImage(b.image);
+                            setBlogContent(b.content);
+                            setBlogPublished(b.published);
+                            setShowBlogForm(true);
+                          }}
+                          className="p-2 bg-black/60 rounded-full text-white hover:bg-white hover:text-black border border-white/10 cursor-pointer"
+                        >
+                          <Edit2 size={16} />
+                        </button>
+                        <button
+                          onClick={async () => {
+                            if (window.confirm("Are you sure you want to delete this article?")) {
+                              try {
+                                await deleteBlog(b.id);
+                                fetchBlogs();
+                              } catch (err) {
+                                alert("Failed to delete article.");
+                              }
+                            }
+                          }}
+                          className="p-2 bg-black/60 rounded-full text-white hover:bg-red-500 border border-white/10 cursor-pointer"
+                        >
+                          <Trash2 size={16} />
+                        </button>
+                      </div>
+                      <span className={`absolute bottom-4 left-4 px-3 py-1 rounded-full text-[10px] font-black tracking-widest uppercase ${b.published ? 'bg-green-500/20 text-green-400 border border-green-500/30' : 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/30'}`}>
+                        {b.published ? "Published" : "Draft"}
+                      </span>
+                    </div>
+                    <div className="p-6 flex-1 flex flex-col justify-between">
+                      <div>
+                        <span className="text-xs font-bold text-zinc-500 uppercase block mb-1">
+                          {b.category} • {b.readTime}
+                        </span>
+                        <h3 className="text-xl font-bold text-white mb-2 line-clamp-2">
+                          {b.title}
+                        </h3>
+                        <p className="text-zinc-500 text-sm line-clamp-3 mb-4">
+                          {b.excerpt}
+                        </p>
+                      </div>
+                      <div className="pt-4 border-t border-white/5 flex justify-between items-center text-xs text-zinc-500">
+                        <span>{b.date}</span>
+                        <Link to={`/blog/${b.id}`} className="text-white hover:text-[#EF961D] font-bold flex items-center gap-1 transition-colors">
+                          View <ExternalLink size={12} />
+                        </Link>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
       </main>
 
       {/* SIDE FORM (Create/Edit Course) */}
@@ -1788,6 +1973,265 @@ const AdminDashboard = () => {
                   Update
                 </button>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* WRITE / EDIT BLOG FORM SIDE PANEL */}
+      {showBlogForm && (
+        <div className="fixed inset-0 z-50 flex justify-end">
+          <div
+            className="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity"
+            onClick={() => setShowBlogForm(false)}
+          ></div>
+          <div className="relative w-full max-w-5xl bg-[#0a0a0a] h-full shadow-2xl overflow-y-auto border-l border-white/10 animate-in slide-in-from-right duration-300 flex flex-col">
+            <div className="sticky top-0 bg-[#0a0a0a]/90 backdrop-blur-xl z-20 border-b border-white/5 p-6 flex justify-between items-center">
+              <div>
+                <h2 className="text-2xl font-bold text-white">
+                  {editingBlog ? "Edit Article" : "Write New Article"}
+                </h2>
+              </div>
+              <button
+                onClick={() => setShowBlogForm(false)}
+                className="p-2 bg-white/5 rounded-full text-zinc-400 hover:text-white cursor-pointer"
+              >
+                <X size={24} />
+              </button>
+            </div>
+
+            <div className="p-8 space-y-8 flex-grow">
+              <style>{`
+                .rich-editor-content:focus { outline: none; }
+                .rich-editor-content h1 { font-size: 1.75rem; font-weight: 800; margin-top: 1.25rem; margin-bottom: 0.5rem; color: white; }
+                .rich-editor-content h2 { font-size: 1.4rem; font-weight: 700; margin-top: 1rem; margin-bottom: 0.4rem; color: white; }
+                .rich-editor-content h3 { font-size: 1.25rem; font-weight: 700; margin-top: 0.8rem; margin-bottom: 0.3rem; color: white; }
+                .rich-editor-content p { margin-bottom: 0.75rem; color: #d4d4d8; line-height: 1.6; }
+                .rich-editor-content ul { list-style-type: disc; padding-left: 1.5rem; margin-bottom: 0.75rem; color: #d4d4d8; }
+                .rich-editor-content ol { list-style-type: decimal; padding-left: 1.5rem; margin-bottom: 0.75rem; color: #d4d4d8; }
+                .rich-editor-content blockquote { border-left: 4px solid #EF961D; padding-left: 1rem; font-style: italic; margin: 1rem 0; color: #e4e4e7; }
+                .rich-editor-content img { border-radius: 0.5rem; margin: 1rem auto; max-width: 100%; display: block; }
+              `}</style>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="md:col-span-2 space-y-6">
+                  <div>
+                    <label className="block text-sm font-medium text-zinc-400 mb-2">Title</label>
+                    <input
+                      type="text"
+                      value={blogTitle}
+                      onChange={(e) => setBlogTitle(e.target.value)}
+                      placeholder="e.g. Mastering Mains Answer Writing"
+                      className="w-full bg-black border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-violet-500"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-zinc-400 mb-2">Excerpt / Subtitle</label>
+                    <textarea
+                      value={blogExcerpt}
+                      onChange={(e) => setBlogExcerpt(e.target.value)}
+                      placeholder="Short summary displayed on the blog card list..."
+                      rows={3}
+                      className="w-full bg-black border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-violet-500 resize-none"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-zinc-400 mb-2">Article Body Content</label>
+                    <div className="border border-white/10 rounded-2xl overflow-hidden bg-black/40">
+                      <div className="flex flex-wrap items-center gap-1.5 p-2 bg-zinc-900 border-b border-white/5">
+                        <button
+                          type="button"
+                          onClick={() => executeCommand("bold")}
+                          className="p-1.5 hover:bg-white/10 rounded text-zinc-300 font-bold hover:text-white w-8 h-8 flex items-center justify-center text-sm cursor-pointer"
+                          title="Bold"
+                        >
+                          B
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => executeCommand("italic")}
+                          className="p-1.5 hover:bg-white/10 rounded text-zinc-300 italic hover:text-white w-8 h-8 flex items-center justify-center text-sm cursor-pointer"
+                          title="Italic"
+                        >
+                          I
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => executeCommand("underline")}
+                          className="p-1.5 hover:bg-white/10 rounded text-zinc-300 underline hover:text-white w-8 h-8 flex items-center justify-center text-sm cursor-pointer"
+                          title="Underline"
+                        >
+                          U
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => executeCommand("strikeThrough")}
+                          className="p-1.5 hover:bg-white/10 rounded text-zinc-300 line-through hover:text-white w-8 h-8 flex items-center justify-center text-sm cursor-pointer"
+                          title="Strikethrough"
+                        >
+                          S
+                        </button>
+                        <div className="h-6 w-px bg-white/10 mx-1" />
+                        <button
+                          type="button"
+                          onClick={() => executeCommand("formatBlock", "<h1>")}
+                          className="p-1.5 hover:bg-white/10 rounded text-zinc-300 hover:text-white text-xs font-bold cursor-pointer"
+                          title="Heading 1"
+                        >
+                          H1
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => executeCommand("formatBlock", "<h2>")}
+                          className="p-1.5 hover:bg-white/10 rounded text-zinc-300 hover:text-white text-xs font-bold cursor-pointer"
+                          title="Heading 2"
+                        >
+                          H2
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => executeCommand("formatBlock", "<h3>")}
+                          className="p-1.5 hover:bg-white/10 rounded text-zinc-300 hover:text-white text-xs font-bold cursor-pointer"
+                          title="Heading 3"
+                        >
+                          H3
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => executeCommand("formatBlock", "<p>")}
+                          className="p-1.5 hover:bg-white/10 rounded text-zinc-300 hover:text-white text-xs font-bold cursor-pointer"
+                          title="Paragraph"
+                        >
+                          P
+                        </button>
+                        <div className="h-6 w-px bg-white/10 mx-1" />
+                        <button
+                          type="button"
+                          onClick={() => executeCommand("insertUnorderedList")}
+                          className="p-1.5 hover:bg-white/10 rounded text-zinc-300 hover:text-white text-xs font-bold cursor-pointer"
+                          title="Bullet List"
+                        >
+                          • List
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => executeCommand("insertOrderedList")}
+                          className="p-1.5 hover:bg-white/10 rounded text-zinc-300 hover:text-white text-xs font-bold cursor-pointer"
+                          title="Numbered List"
+                        >
+                          1. List
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => executeCommand("formatBlock", "<blockquote>")}
+                          className="p-1.5 hover:bg-white/10 rounded text-zinc-300 hover:text-white text-xs font-bold cursor-pointer"
+                          title="Quote"
+                        >
+                          “ Quote
+                        </button>
+                        <div className="h-6 w-px bg-white/10 mx-1" />
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const url = prompt("Enter image URL:");
+                            if (url) executeCommand("insertImage", url);
+                          }}
+                          className="p-1.5 hover:bg-white/10 rounded text-zinc-300 hover:text-white text-xs font-bold cursor-pointer"
+                          title="Insert Image"
+                        >
+                          Image
+                        </button>
+                      </div>
+
+                      <div
+                        ref={editorRef}
+                        contentEditable
+                        onInput={(e) => setBlogContent(e.currentTarget.innerHTML)}
+                        className="rich-editor-content min-h-[350px] max-h-[500px] overflow-y-auto p-5 text-white bg-black/40 font-mono text-sm leading-relaxed"
+                        placeholder="Write article details here..."
+                        style={{ outline: "none" }}
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div className="space-y-6">
+                  <div>
+                    <label className="block text-sm font-medium text-zinc-400 mb-2">Category</label>
+                    <select
+                      value={blogCategory}
+                      onChange={(e) => setBlogCategory(e.target.value)}
+                      className="w-full bg-black border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-violet-500"
+                    >
+                      <option value="Strategy">Strategy</option>
+                      <option value="Syllabus Guide">Syllabus Guide</option>
+                      <option value="Current Affairs">Current Affairs</option>
+                      <option value="Mentorship">Mentorship</option>
+                      <option value="UPSC GS">UPSC GS</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-zinc-400 mb-2">Read Time</label>
+                    <input
+                      type="text"
+                      value={blogReadTime}
+                      onChange={(e) => setBlogReadTime(e.target.value)}
+                      placeholder="e.g. 5 min read"
+                      className="w-full bg-black border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-violet-500"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-zinc-400 mb-2">Featured Image URL</label>
+                    <input
+                      type="text"
+                      value={blogImage}
+                      onChange={(e) => setBlogImage(e.target.value)}
+                      placeholder="https://images.unsplash.com/..."
+                      className="w-full bg-black border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-violet-500"
+                    />
+                    {blogImage && (
+                      <div className="mt-3 rounded-lg overflow-hidden border border-white/10 aspect-video">
+                        <img src={blogImage} alt="Preview" className="w-full h-full object-cover" />
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="p-4 bg-zinc-900/40 border border-white/5 rounded-2xl flex items-center justify-between">
+                    <div>
+                      <h4 className="font-bold text-sm text-white">Publish Directly</h4>
+                      <p className="text-xs text-zinc-500 mt-1">If disabled, this post will save as a Draft</p>
+                    </div>
+                    <label className="relative inline-flex items-center cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={blogPublished}
+                        onChange={(e) => setBlogPublished(e.target.checked)}
+                        className="sr-only peer"
+                      />
+                      <div className="w-11 h-6 bg-zinc-800 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-zinc-400 after:border-zinc-350 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-500"></div>
+                    </label>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="sticky bottom-0 bg-[#0a0a0a] border-t border-white/10 p-6 flex justify-between items-center z-20">
+              <button
+                onClick={() => setShowBlogForm(false)}
+                className="px-6 py-3 text-zinc-400 font-bold hover:text-white cursor-pointer"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleSaveBlog}
+                className="px-8 py-3 bg-white text-black font-bold rounded-xl hover:bg-zinc-200 transition-all flex items-center gap-2 cursor-pointer"
+              >
+                <Check size={18} /> Save Article
+              </button>
             </div>
           </div>
         </div>
