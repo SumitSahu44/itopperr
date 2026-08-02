@@ -134,8 +134,30 @@ const BlogDetails = () => {
           )}
 
           {/* Article Body */}
+          <style>{`
+            .blog-content-body a {
+              color: #2563eb !important;
+              text-decoration: underline !important;
+              font-weight: 700 !important;
+              transition: color 0.2s ease;
+            }
+            .blog-content-body a:hover {
+              color: #EF961D !important;
+            }
+            .blog-content-body h1 { font-size: 2.2rem; font-weight: 800; color: #163F66; margin-top: 1.5rem; margin-bottom: 0.75rem; }
+            .blog-content-body h2 { font-size: 1.8rem; font-weight: 700; color: #163F66; margin-top: 1.25rem; margin-bottom: 0.5rem; }
+            .blog-content-body h3 { font-size: 1.4rem; font-weight: 700; color: #163F66; margin-top: 1rem; margin-bottom: 0.5rem; }
+            .blog-content-body h4 { font-size: 1.2rem; font-weight: 700; color: #163F66; margin-top: 0.8rem; margin-bottom: 0.4rem; }
+            .blog-content-body p { margin-bottom: 1rem; line-height: 1.7; color: #334155; }
+            .blog-content-body ul { list-style-type: disc; padding-left: 1.5rem; margin-bottom: 1rem; color: #334155; }
+            .blog-content-body ol { list-style-type: decimal; padding-left: 1.5rem; margin-bottom: 1rem; color: #334155; }
+            .blog-content-body blockquote { border-left: 4px solid #EF961D; padding-left: 1.25rem; font-style: italic; margin: 1.5rem 0; color: #475569; background-color: #f8fafc; padding-top: 0.75rem; padding-bottom: 0.75rem; border-radius: 0 0.75rem 0.75rem 0; }
+            .blog-content-body pre { background-color: #0f172a; color: #f8fafc; padding: 1.25rem; border-radius: 0.75rem; font-family: monospace; overflow-x: auto; margin-bottom: 1.5rem; }
+            .blog-content-body img { border-radius: 1rem; margin: 1.5rem auto; max-width: 100%; display: block; box-shadow: 0 4px 12px -2px rgba(0, 0, 0, 0.12); }
+            .blog-content-body hr { border: 0; border-top: 2px solid #e2e8f0; margin: 2rem 0; }
+          `}</style>
           <div
-            className="prose prose-slate max-w-none pt-8 pb-12 leading-relaxed text-slate-700 text-lg space-y-6"
+            className="prose prose-slate max-w-none pt-8 pb-12 leading-relaxed text-slate-700 text-lg space-y-6 blog-content-body"
             dangerouslySetInnerHTML={{ __html: blog.content }}
           />
         </article>

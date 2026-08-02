@@ -33,6 +33,7 @@ import CourseDetails2 from "./components/CourseDetails2";
 // Pages
 import Programs from "./pages/Programs";
 import BlogDetails from "./pages/BlogDetails";
+import BlogsPage from "./pages/BlogsPage";
 import AdminBlogsDashboard from "./pages/AdminBlogsDashboard";
 
 // Payment Pages
@@ -47,9 +48,9 @@ import StudentDashboard from "./pages/StudentDashboard";
 import QuizPlayer from "./pages/QuizPlayer";
 
 // Admin & Faculty Components
-import AdminDashboard from "./components/admin/Dashbaord";
-import AdminLogin from "./components/admin/AdminLogin";
-import AdminProtectedRoute from "./components/admin/AdminProtectedRoute";
+// import AdminDashboard from "./components/admin/Dashbaord";
+// import AdminLogin from "./components/admin/AdminLogin";
+// import AdminProtectedRoute from "./components/admin/AdminProtectedRoute";
 import FacultyLogin from "./components/faculty/FacultyLogin";
 import FacultyForgotPassword from "./components/faculty/FacultyForgotPassword";
 import FacultyRegister from "./components/faculty/FacultyRegister";
@@ -81,13 +82,11 @@ function App() {
   const isLightModePage =
     isLandingPage ||
     isProgramsPage ||
+    location.pathname === "/blogs" ||
     location.pathname === "/curriculum/essay" ||
     location.pathname.startsWith("/blog/") ||
-    location.pathname === "/adminittopper";
-  const isAdminPage =
-    location.pathname.startsWith("/admin") ||
-    location.pathname === "/adminittopper" ||
     location.pathname === "/adminitopperblog";
+  const isAdminPage = location.pathname === "/adminitopperblog";
   const isFacultyPage = location.pathname === "/faculty/dashboard";
   //  LOCATION CHECK END
 
@@ -109,9 +108,9 @@ function App() {
         bodyClassName="!text-sm !font-medium"
       />
 
-      <div className={`app min-h-screen overflow-x-hidden flex flex-col ${isLightModePage ? "bg-white text-black" : "bg-navy-900 text-white"}`}>
+      <div className="app min-h-screen overflow-x-hidden flex flex-col bg-white text-slate-800">
         {/* 👇 GLOBAL Navigation: Sirf tab dikhega jab hum Landing Page par NAHI hain */}
-        {!isLightModePage && !isAdminPage && !isFacultyPage && <Navbar />}
+        {!isLightModePage && !isAdminPage && !isFacultyPage && <Navbar theme="light" />}
         <ScrollToTop />
         {/* Content Area - Flex grow ensures footer sticks to bottom if content is short */}
         <div className="flex-grow">
@@ -142,6 +141,7 @@ function App() {
             />
 
             <Route path="/programs" element={<Programs />} />
+            <Route path="/blogs" element={<BlogsPage />} />
             <Route path="/curriculum/:subject" element={<CourseCurriculum />} />
             <Route path="/course/:id" element={<CourseDetails2 />} />
 
@@ -170,12 +170,12 @@ function App() {
             />
             {/* ADMIN ROUTES */}
             <Route path="/adminitopperblog" element={<AdminBlogsDashboard />} />
-            <Route path="/adminittopper" element={<AdminLogin />} />
-            <Route path="/admin/login" element={<AdminLogin />} />
-            <Route element={<AdminProtectedRoute />}>
+            {/* <Route path="/adminittopper" element={<AdminLogin />} /> */}
+            {/* <Route path="/admin/login" element={<AdminLogin />} /> */}
+            {/* <Route element={<AdminProtectedRoute />}>
               <Route path="/admin" element={<AdminDashboard />} />
               <Route path="/admin/*" element={<AdminDashboard />} />
-            </Route>
+            </Route> */}
 
             {/* BLOG DETAILS */}
             <Route path="/blog/:id" element={<BlogDetails />} />
@@ -204,17 +204,25 @@ function App() {
             <Route
               path="*"
               element={
-                <div className="min-h-screen flex items-center justify-center bg-black text-white">
-                  <div className="text-center">
-                    <h1 className="text-9xl font-black bg-gradient-to-r from-red-500 via-purple-500 to-blue-600 bg-clip-text text-transparent">
+                <div className="min-h-[70vh] flex items-center justify-center bg-white text-slate-800 px-4 py-16">
+                  <div className="text-center max-w-md mx-auto animate-in fade-in zoom-in-95 duration-300">
+                    <div className="w-36 mx-auto mb-6">
+                      <img src="/images/itopper.png" alt="iTopper Logo" className="w-full object-contain" />
+                    </div>
+                    <h1 className="text-8xl md:text-9xl font-black text-[#0a2968] tracking-tight">
                       404
                     </h1>
-                    <p className="text-3xl mt-8">Page Not Found</p>
+                    <h2 className="text-2xl md:text-3xl font-extrabold text-[#0a2968] mt-3">
+                      Page Not Found
+                    </h2>
+                    <p className="text-sm font-semibold text-slate-500 mt-2 leading-relaxed">
+                      The page you are looking for does not exist or has been moved.
+                    </p>
                     <a
                       href="/"
-                      className="mt-8 inline-block px-10 py-5 bg-gradient-to-r from-red-600 to-purple-600 rounded-xl text-xl font-bold"
+                      className="mt-8 inline-flex items-center justify-center px-8 py-3.5 bg-[#0a2968] hover:bg-[#EF961D] text-white rounded-xl text-sm font-extrabold transition-all shadow-md hover:shadow-lg uppercase tracking-wider"
                     >
-                      Back Home
+                      Back to Home
                     </a>
                   </div>
                 </div>
