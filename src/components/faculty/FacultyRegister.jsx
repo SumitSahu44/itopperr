@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import { getApiUrl } from '../../config/api';
 
 const FacultyRegister = () => {
   const [formData, setFormData] = useState({
@@ -25,7 +26,7 @@ const FacultyRegister = () => {
     setLoading(true);
 
     try {
-      await axios.post(`${import.meta.env.VITE_API_URL}/api/faculty/register`, formData);
+      await axios.post(getApiUrl('/api/faculty/register'), formData);
 
       setMessage('Faculty registered successfully! Taking you to login...');
 

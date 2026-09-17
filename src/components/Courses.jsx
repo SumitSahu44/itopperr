@@ -16,7 +16,7 @@ import {
   Layers,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 
 /* ───────────────────────────────────────────────
    DATA
@@ -406,6 +406,15 @@ const CourseCard = ({ course, onView }) => {
 const Courses = () => {
   const [activeTab, setActiveTab] = useState("programs");
   const navigate = useNavigate();
+  const location = useLocation();
+
+  React.useEffect(() => {
+    const searchParams = new URLSearchParams(location.search);
+    const tabParam = searchParams.get("tab");
+    if (tabParam && ["programs", "mains", "modules", "rank", "all"].includes(tabParam)) {
+      setActiveTab(tabParam);
+    }
+  }, [location.search]);
 
   const handleView = (slug) => {
     if (slug) {

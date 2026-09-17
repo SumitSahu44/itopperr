@@ -10,6 +10,7 @@ import {
   ShieldCheck,
 } from "lucide-react";
 import { toast } from "react-toastify";
+import { getApiUrl } from "../../config/api";
 
 const FacultyForgotPassword = () => {
   const navigate = useNavigate();
@@ -27,8 +28,6 @@ const FacultyForgotPassword = () => {
   const [loading, setLoading] = useState(false);
   const [timer, setTimer] = useState(0);
 
-  const API_URL = import.meta.env.VITE_API_URL;
-
   // Timer Logic
   useEffect(() => {
     let interval;
@@ -44,7 +43,7 @@ const FacultyForgotPassword = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      const res = await fetch(`${API_URL}/api/faculty/forgot-password`, {
+      const res = await fetch(getApiUrl('/api/faculty/forgot-password'), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email }),
@@ -67,7 +66,7 @@ const FacultyForgotPassword = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      const res = await fetch(`${API_URL}/api/faculty/verify-otp`, {
+      const res = await fetch(getApiUrl('/api/faculty/verify-otp'), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, otp }),
@@ -95,7 +94,7 @@ const FacultyForgotPassword = () => {
 
     setLoading(true);
     try {
-      const res = await fetch(`${API_URL}/api/faculty/reset-password`, {
+      const res = await fetch(getApiUrl('/api/faculty/reset-password'), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, otp, newPassword }),

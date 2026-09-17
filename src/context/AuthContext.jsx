@@ -1,5 +1,6 @@
 import React, { createContext, useState, useEffect } from "react";
 import axios from "axios";
+import { getApiUrl } from "../config/api";
 
 export const AuthContext = createContext();
 
@@ -11,7 +12,7 @@ export const AuthProvider = ({ children }) => {
   const fetchEnrollments = async (tokenToUse) => {
     try {
       const res = await axios.get(
-        `${import.meta.env.VITE_API_URL}/api/enrollments`,
+        getApiUrl('/api/enrollments'),
         {
           headers: { Authorization: `Bearer ${tokenToUse}` },
         },
@@ -68,7 +69,7 @@ export const AuthProvider = ({ children }) => {
           if (storedRefreshToken) {
             try {
               // Refresh Token call
-              const res = await axios.post(`${import.meta.env.VITE_API_URL}/api/auth/refresh`, {
+              const res = await axios.post(getApiUrl('/api/auth/refresh'), {
                 refreshToken: storedRefreshToken
               });
 

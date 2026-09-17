@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { getApiUrl } from "../../config/api";
 
 const FacultyLogin = () => {
   const [formData, setFormData] = useState({ email: "", password: "" });
@@ -15,7 +16,7 @@ const FacultyLogin = () => {
     e.preventDefault();
     try {
       const res = await axios.post(
-        `${import.meta.env.VITE_API_URL}/api/faculty/login`,
+        getApiUrl('/api/faculty/login'),
         formData,
       );
       localStorage.setItem("facultyToken", res.data.token);

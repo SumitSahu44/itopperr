@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useParams, useNavigate } from 'react-router-dom';
+import { getApiUrl } from '../../config/api';
 
 const EditClass = () => {
   const { id } = useParams();
@@ -15,7 +16,7 @@ const EditClass = () => {
   useEffect(() => {
     const fetchClass = async () => {
       try {
-        const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/faculty/myclasses`, {
+        const res = await axios.get(getApiUrl('/api/faculty/myclasses'), {
           headers: { Authorization: `Bearer ${localStorage.getItem('facultyToken')}` }
         });
         const cls = res.data.find(c => c._id === id);
@@ -43,7 +44,7 @@ const EditClass = () => {
         date: new Date(formData.date)
       };
 
-      await axios.put(`${import.meta.env.VITE_API_URL}/api/faculty/class/${id}`, payload, {
+      await axios.put(getApiUrl(`/api/faculty/class/${id}`), payload, {
         headers: { Authorization: `Bearer ${localStorage.getItem('facultyToken')}` }
       });
 

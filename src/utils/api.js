@@ -1,16 +1,17 @@
 import axios from 'axios';
-
-const API_BASE = `${import.meta.env.VITE_API_URL}/api`;
+import { getApiUrl } from '../config/api';
 
 export const api = {
-  getCourses: () => axios.get(`${API_BASE}/courses`),
-  getCourse: (id) => axios.get(`${API_BASE}/courses/${id}`),
-  createCourse: (data) => axios.post(`${API_BASE}/courses`, data),  // Pure JSON
-  updateCourse: (id, data) => axios.put(`${API_BASE}/courses/${id}`, data),
-  deleteCourse: (id) => axios.delete(`${API_BASE}/courses/${id}`),
+  getCourses: () => axios.get(getApiUrl('/api/courses')),
+  getCourse: (id) => axios.get(getApiUrl(`/api/courses/${id}`)),
+  createCourse: (data) => axios.post(getApiUrl('/api/courses'), data),
+  updateCourse: (id, data) => axios.put(getApiUrl(`/api/courses/${id}`), data),
+  deleteCourse: (id) => axios.delete(getApiUrl(`/api/courses/${id}`)),
 
   // Coupons
-  getCoupons: (token) => axios.get(`${API_BASE}/coupons/all`, { headers: { Authorization: `Bearer ${token}` } }),
-  createCoupon: (data, token) => axios.post(`${API_BASE}/coupons/create`, data, { headers: { Authorization: `Bearer ${token}` } }),
-  deleteCoupon: (id, token) => axios.delete(`${API_BASE}/coupons/${id}`, { headers: { Authorization: `Bearer ${token}` } })
+  getCoupons: (token) => axios.get(getApiUrl('/api/coupons/all'), { headers: { Authorization: `Bearer ${token}` } }),
+  createCoupon: (data, token) => axios.post(getApiUrl('/api/coupons/create'), data, { headers: { Authorization: `Bearer ${token}` } }),
+  deleteCoupon: (id, token) => axios.delete(getApiUrl(`/api/coupons/${id}`), { headers: { Authorization: `Bearer ${token}` } })
 };
+
+export default api;

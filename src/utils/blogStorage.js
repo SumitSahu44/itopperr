@@ -1,6 +1,7 @@
 import axios from 'axios';
+import { getApiUrl } from '../config/api';
 
-const API_BASE = `${import.meta.env.VITE_API_URL}/api/blogs`;
+const API_BASE = getApiUrl('/api/blogs');
 
 // Ensure we have a valid JWT admin token for database operations
 const ensureAdminToken = async () => {
@@ -8,7 +9,7 @@ const ensureAdminToken = async () => {
   if (token) return token;
 
   try {
-    const res = await axios.post(`${import.meta.env.VITE_API_URL}/api/auth/admin-login`, {
+    const res = await axios.post(getApiUrl('/api/auth/admin-login'), {
       email: import.meta.env.VITE_ADMIN_EMAIL || "tds@gmail.com",
       password: import.meta.env.VITE_ADMIN_PASSWORD || "tds@1230"
     });

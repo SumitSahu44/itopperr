@@ -25,6 +25,7 @@ import BlogsSection from "./components/BlogsSection";
 import ContactSection from "./components/ContactSection";
 import Testimonials from "./components/Testimonials";
 import LeadFormSection from "./components/LeadFormSection";
+import EvaluationHowItWorks from "./components/EvaluationHowItWorks";
 
 // Course Components
 import CourseCurriculum from "./components/CourseDetails";
@@ -35,6 +36,8 @@ import Programs from "./pages/Programs";
 import BlogDetails from "./pages/BlogDetails";
 import BlogsPage from "./pages/BlogsPage";
 import AdminBlogsDashboard from "./pages/AdminBlogsDashboard";
+import EvaluationPage from "./pages/EvaluationPage";
+import AdminPortal from "./pages/AdminPortal";
 
 // Payment Pages
 import PaymentSuccess from "./pages/PaymentSuccess";
@@ -45,7 +48,6 @@ import StudentLogin from "./pages/Login";
 import StudentRegister from "./pages/Register";
 import ForgotPassword from "./pages/ForgotPassword";
 import StudentDashboard from "./pages/StudentDashboard";
-import QuizPlayer from "./pages/QuizPlayer";
 
 // Admin & Faculty Components
 // import AdminDashboard from "./components/admin/Dashbaord";
@@ -82,11 +84,17 @@ function App() {
   const isLightModePage =
     isLandingPage ||
     isProgramsPage ||
+    location.pathname === "/login" ||
+    location.pathname === "/register" ||
+    location.pathname === "/forgot-password" ||
     location.pathname === "/blogs" ||
-    location.pathname === "/curriculum/essay" ||
+    location.pathname === "/evaluation" ||
+    location.pathname === "/my-courses" ||
+    location.pathname.startsWith("/curriculum") ||
     location.pathname.startsWith("/blog/") ||
+    location.pathname === "/adminitopper" ||
     location.pathname === "/adminitopperblog";
-  const isAdminPage = location.pathname === "/adminitopperblog";
+  const isAdminPage = location.pathname === "/adminitopper" || location.pathname === "/adminitopperblog";
   const isFacultyPage = location.pathname === "/faculty/dashboard";
   //  LOCATION CHECK END
 
@@ -124,6 +132,7 @@ function App() {
                   {/* Landing page has its own layout */}
                   {/* <NewHero /> */}
                   <ProfessionalHero />
+                  <EvaluationHowItWorks />
                   {/* <About /> */}
                   {/* <MeetOurFaculty /> */}
                   <Courses />
@@ -142,6 +151,7 @@ function App() {
 
             <Route path="/programs" element={<Programs />} />
             <Route path="/blogs" element={<BlogsPage />} />
+            <Route path="/evaluation" element={<EvaluationPage />} />
             <Route path="/curriculum/:subject" element={<CourseCurriculum />} />
             <Route path="/course/:id" element={<CourseDetails2 />} />
 
@@ -159,17 +169,9 @@ function App() {
                 </ProtectedRoute>
               }
             />
-
-            <Route
-              path="/quiz/:id"
-              element={
-                <ProtectedRoute>
-                  <QuizPlayer />
-                </ProtectedRoute>
-              }
-            />
             {/* ADMIN ROUTES */}
-            <Route path="/adminitopperblog" element={<AdminBlogsDashboard />} />
+            <Route path="/adminitopper" element={<AdminPortal />} />
+            <Route path="/adminitopperblog" element={<AdminPortal initialTab="blogs" />} />
             {/* <Route path="/adminittopper" element={<AdminLogin />} /> */}
             {/* <Route path="/admin/login" element={<AdminLogin />} /> */}
             {/* <Route element={<AdminProtectedRoute />}>

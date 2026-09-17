@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {
   Plus,
   Trash2,
@@ -38,6 +38,7 @@ import {
   Eraser,
 } from "lucide-react";
 import { getBlogs, addBlog, updateBlog, deleteBlog } from "../utils/blogStorage";
+import { getApiUrl } from "../config/api";
 
 const AdminBlogsDashboard = () => {
   const editorRef = useRef(null);
@@ -86,7 +87,7 @@ const AdminBlogsDashboard = () => {
     const inputPassword = password.trim();
 
     try {
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/admin-login`, {
+      const res = await fetch(getApiUrl('/api/auth/admin-login'), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: inputEmail, password: inputPassword }),
@@ -115,9 +116,12 @@ const AdminBlogsDashboard = () => {
     setAuthLoading(false);
   };
 
+  const navigate = useNavigate();
+
   const handleLogout = () => {
     localStorage.removeItem("admin_blog_auth");
     setIsAuthenticated(false);
+    navigate("/");
   };
 
   const fetchBlogs = async () => {

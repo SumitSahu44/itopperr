@@ -26,6 +26,7 @@ import {
 import { useNavigate, Link } from "react-router-dom";
 import AdminCoupons from "../../pages/AdminCoupons";
 import { getBlogs, addBlog, updateBlog, deleteBlog } from "../../utils/blogStorage";
+import { getApiUrl } from "../../config/api";
 
 const AdminDashboard = () => {
   useEffect(() => {
@@ -181,7 +182,7 @@ const AdminDashboard = () => {
   // ==============================
   const fetchCourses = async () => {
     try {
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/courses`);
+      const res = await fetch(getApiUrl('/api/courses'));
       const data = await res.json();
       setCourses(Array.isArray(data) ? data : []);
     } catch (err) {
@@ -192,9 +193,7 @@ const AdminDashboard = () => {
   const fetchEnrollments = async () => {
     setLoading(true);
     try {
-      const res = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/enrollments/all`,
-      );
+      const res = await fetch(getApiUrl('/api/enrollments/all'));
       const data = await res.json();
       setEnrollments(Array.isArray(data) ? data : []);
     } catch (err) {
@@ -206,7 +205,7 @@ const AdminDashboard = () => {
 
   const fetchAllFaculty = async () => {
     try {
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/faculty`);
+      const res = await fetch(getApiUrl('/api/faculty'));
       if (res.ok) setAllFaculty(await res.json());
     } catch (err) {
       console.error(err);
@@ -216,9 +215,7 @@ const AdminDashboard = () => {
   const fetchFacultyAssignmentsData = async () => {
     setLoading(true);
     try {
-      const res = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/faculty/assignments`,
-      );
+      const res = await fetch(getApiUrl('/api/faculty/assignments'));
       if (res.ok) setFacultyAssignments(await res.json());
     } catch (err) {
       console.error(err);
@@ -230,9 +227,7 @@ const AdminDashboard = () => {
   const fetchAdminReviews = async () => {
     setReviewLoading(true);
     try {
-      const res = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/reviews/admin/all`,
-      );
+      const res = await fetch(getApiUrl('/api/reviews/admin/all'));
       const data = await res.json();
       setAdminReviews(Array.isArray(data) ? data : []);
     } catch (err) {
@@ -250,7 +245,7 @@ const AdminDashboard = () => {
       return;
     try {
       const res = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/enrollments/${id}`,
+        getApiUrl(`/api/enrollments/${id}`),
         {
           method: "DELETE",
         },
@@ -271,7 +266,7 @@ const AdminDashboard = () => {
 
     try {
       const res = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/enrollments/all`,
+        getApiUrl('/api/enrollments/all'),
         {
           method: "DELETE",
         },
@@ -290,7 +285,7 @@ const AdminDashboard = () => {
       return;
     try {
       const res = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/faculty/${id}`,
+        getApiUrl(`/api/faculty/${id}`),
         {
           method: "DELETE",
         },
@@ -309,7 +304,7 @@ const AdminDashboard = () => {
     if (!window.confirm("Delete this review?")) return;
     try {
       const res = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/reviews/admin/${id}`,
+        getApiUrl(`/api/reviews/admin/${id}`),
         {
           method: "DELETE",
         },
@@ -325,7 +320,7 @@ const AdminDashboard = () => {
     if (!editingReview) return;
     try {
       const res = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/reviews/admin/${editingReview._id}`,
+        getApiUrl(`/api/reviews/admin/${editingReview._id}`),
         {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
@@ -355,7 +350,7 @@ const AdminDashboard = () => {
 
     try {
       const res = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/courses/${courseId}/quizzes`,
+        getApiUrl(`/api/courses/${courseId}/quizzes`),
       );
       if (res.ok) setResultQuizzes(await res.json());
     } catch (err) {
@@ -373,7 +368,7 @@ const AdminDashboard = () => {
     setResultsLoading(true);
     try {
       const res = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/courses/results/${quizId}`,
+        getApiUrl(`/api/courses/results/${quizId}`),
       );
       if (res.ok) setStudentResults(await res.json());
     } catch (err) {
@@ -409,7 +404,7 @@ const AdminDashboard = () => {
     setSendingCert(resultId);
     try {
       const res = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/certificate/send`,
+        getApiUrl('/api/certificate/send'),
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -494,8 +489,12 @@ const AdminDashboard = () => {
 
     try {
       const url = editingCourse
-        ? `${import.meta.env.VITE_API_URL}/api/courses/${editingCourse._id}`
-        : `${import.meta.env.VITE_API_URL}/api/courses`;
+        ? getApiUrl(`/api/courses/${editingCourse._id}`)
+        : getApiUrl('/api/courses');
+      const res = await fetch(url, {
+        method: editingCourse ? "PUT" : "POST",
+        body: formData,
+      });
       const res = await fetch(url, {
         method: editingCourse ? "PUT" : "POST",
         body: formData,
@@ -795,7 +794,7 @@ const AdminDashboard = () => {
                         onClick={async () => {
                           if (window.confirm("Delete this course?")) {
                             await fetch(
-                              `${import.meta.env.VITE_API_URL}/api/courses/${course._id}`,
+                              getApiUrl(`/api/courses/${course._id}`),
                               { method: "DELETE" },
                             );
                             fetchCourses();

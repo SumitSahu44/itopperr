@@ -4,8 +4,9 @@ import {
     MoreVertical, FileCheck, AlertCircle
 } from "lucide-react";
 import QuizForm from "./QuizForm"; // Ensure this path is correct
+import { getApiUrl } from "../../config/api";
 
-const API_BASE = `${import.meta.env.VITE_API_URL}/api`;
+const API_BASE = getApiUrl('/api');
 
 const Quizzes = ({ authToken, assignedCourses, quizzes, fetchQuizzes, allQuizResults = {} }) => {
     const [showQuizForm, setShowQuizForm] = useState(false);

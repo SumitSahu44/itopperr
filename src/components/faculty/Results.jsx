@@ -6,8 +6,9 @@ import {
   CheckCircle,
   XCircle,
 } from "lucide-react";
+import { getApiUrl } from "../../config/api";
 
-const API_BASE = `${import.meta.env.VITE_API_URL}/api`;
+const API_BASE = getApiUrl('/api');
 
 const Results = ({ authToken, quizzes }) => {
   const [selectedQuizId, setSelectedQuizId] = useState("");

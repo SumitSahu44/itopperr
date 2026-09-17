@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { Plus, Trash2, X, Check, HelpCircle, FileCheck } from "lucide-react"; // Added FileCheck icon
+import { Plus, Trash2, X, Check, HelpCircle, FileCheck } from "lucide-react";
+import { getApiUrl } from "../../config/api";
 
-const API_BASE = `${import.meta.env.VITE_API_URL}/api`;
+const API_BASE = getApiUrl('/api');
 
 const QuizForm = ({
   authToken,

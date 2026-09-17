@@ -1,116 +1,208 @@
-import React, { useState, useContext } from 'react';
-import { useNavigate, useLocation, Link } from 'react-router-dom';
-import { AuthContext } from '../context/AuthContext';
-import { User, Mail, Lock, ArrowRight, Loader2 } from 'lucide-react';
+import React, { useState, useContext } from "react";
+import { useNavigate, useLocation, Link } from "react-router-dom";
+import { AuthContext } from "../context/AuthContext";
+import { User, Mail, Lock, ArrowRight, Loader2, ShieldCheck, AlertCircle } from "lucide-react";
+import Navigation from "../components/Navigation";
+import Footer from "../components/Footer";
+import { getApiUrl } from "../config/api";
 
 const Register = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { login } = useContext(AuthContext);
 
-  // Check redirects
-  const from = location.state?.from?.pathname || '/my-courses';
+  const from = location.state?.from?.pathname || "/my-courses";
   const queryParams = new URLSearchParams(location.search);
-  const redirectPath = queryParams.get('redirect');
+  const redirectPath = queryParams.get("redirect");
 
-  const [formData, setFormData] = useState({ name: '', email: '', password: '' });
-  const [error, setError] = useState('');
+  const [formData, setFormData] = useState({ name: "", email: "", password: "" });
+  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    setError('');
+    setError("");
+
+    if (!formData.name.trim()) {
+      setError("Please enter your full name.");
+      setLoading(false);
+      return;
+    }
+    if (!formData.email.trim()) {
+      setError("Please enter your email address.");
+      setLoading(false);
+      return;
+    }
+    if (!formData.password || formData.password.length < 4) {
+      setError("Password must be at least 4 characters long.");
+      setLoading(false);
+      return;
+    }
 
     try {
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/register`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData)
-      });
+      const res = await fetch(
+        getApiUrl('/api/auth/register'),
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(formData),
+        }
+      );
 
       const data = await res.json();
 
-      if (!res.ok) throw new Error(data.message || 'Registration failed');
+      if (res.ok && data.user) {
+        if (data.refreshToken) localStorage.setItem("refreshToken", data.refreshToken);
+        login(data.user, data.token || "mock_token");
 
-      // Store refreshToken in localStorage
-      localStorage.setItem("refreshToken", data.refreshToken);
-
-      // Auto Login after Register
-      login(data.user, data.token);
-
-      // Agar kisi specific URL par bhejna hai (jaise enroll karte waqt)
-      if (redirectPath) {
-        navigate(redirectPath);
+        if (redirectPath) {
+          navigate(redirectPath);
+        } else {
+          navigate(from, { replace: true });
+        }
+        return;
       } else {
-        navigate(from, { replace: true });
+        setError(data.message || "Registration failed. Please check your details.");
+        setLoading(false);
+        return;
       }
-
     } catch (err) {
-      setError(err.message);
-    } finally {
+      console.warn("Backend register network error:", err.message);
+      setError("Server connection error. Please check your internet connection.");
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-zinc-950 flex items-center justify-center p-4">
-      <div className="bg-zinc-900 border border-zinc-700 p-8 rounded-2xl shadow-2xl max-w-md w-full">
-        <h2 className="text-3xl font-bold text-center mb-2 text-white">Create Account</h2>
-        <p className="text-zinc-400 text-center mb-8">Join us and start learning</p>
+    <div className="min-h-screen bg-slate-50 text-slate-800 font-sans selection:bg-[#EF961D]/20 flex flex-col justify-between relative overflow-hidden">
+      {/* GLOBAL NAVBAR */}
+      <Navigation theme="light" />
 
-        {error && <div className="bg-red-500/10 border border-red-500 text-red-500 p-3 rounded mb-4 text-center">{error}</div>}
-
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <div className="relative">
-            <User className="absolute left-3 top-3.5 text-zinc-400" size={20} />
-            <input
-              type="text"
-              placeholder="Full Name"
-              required
-              className="w-full pl-10 pr-4 py-3 bg-zinc-700 border border-zinc-600 rounded-xl text-white focus:border-purple-500 focus:outline-none"
-              value={formData.name}
-              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-            />
-          </div>
-
-          <div className="relative">
-            <Mail className="absolute left-3 top-3.5 text-zinc-400" size={20} />
-            <input
-              type="email"
-              placeholder="Email Address"
-              required
-              className="w-full pl-10 pr-4 py-3 bg-zinc-700 border border-zinc-600 rounded-xl text-white focus:border-purple-500 focus:outline-none"
-              value={formData.email}
-              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-            />
-          </div>
-
-          <div className="relative">
-            <Lock className="absolute left-3 top-3.5 text-zinc-400" size={20} />
-            <input
-              type="password"
-              placeholder="Password"
-              required
-              className="w-full pl-10 pr-4 py-3 bg-zinc-700 border border-zinc-600 rounded-xl text-white focus:border-purple-500 focus:outline-none"
-              value={formData.password}
-              onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-            />
-          </div>
-
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full py-3 bg-gradient-to-r from-red-600 to-purple-600 rounded-xl text-white font-bold hover:scale-105 transition flex justify-center items-center gap-2"
-          >
-            {loading ? <Loader2 className="animate-spin" /> : <>Sign Up <ArrowRight size={20} /></>}
-          </button>
-        </form>
-
-        <p className="mt-6 text-center text-zinc-400">
-          Already have an account? <Link to="/login" className="text-purple-400 hover:text-white font-bold">Login</Link>
-        </p>
+      {/* SOFT BACKGROUND GLOWS */}
+      <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none z-0">
+        <div className="absolute top-[10%] -left-[10%] w-[45%] h-[45%] rounded-full bg-blue-100/60 blur-[130px]" />
+        <div className="absolute top-[30%] -right-[10%] w-[45%] h-[45%] rounded-full bg-orange-100/50 blur-[130px]" />
       </div>
+
+      {/* MAIN CONTAINER */}
+      <div className="relative z-10 pt-20 sm:pt-22 pb-6 px-4 flex items-center justify-center flex-grow">
+        <div className="w-full max-w-md bg-white rounded-3xl border border-slate-200 shadow-2xl p-6 sm:p-8 animate-in fade-in duration-300">
+          
+          {/* Header */}
+          <div className="text-center mb-6">
+            <div className="w-12 h-12 rounded-2xl bg-blue-50 text-[#0a2968] flex items-center justify-center mx-auto mb-3 shadow-xs">
+              <ShieldCheck size={26} className="text-[#0a2968]" />
+            </div>
+            <span className="inline-block px-3 py-1 bg-blue-50 text-[#0a2968] text-xs font-bold rounded-full uppercase tracking-wider mb-2 border border-blue-100">
+              Join iTopper IAS Academy
+            </span>
+            <h2 className="text-2xl sm:text-3xl font-black text-[#0a2968] tracking-tight">
+              Create New Account
+            </h2>
+            <p className="text-xs sm:text-sm text-slate-500 font-semibold mt-1">
+              Start your UPSC Mains preparation with top rankers
+            </p>
+          </div>
+
+          {/* Error Message */}
+          {error && (
+            <div className="mb-6 p-3.5 bg-red-50 border border-red-200 rounded-2xl text-xs font-bold text-red-600 flex items-center gap-2">
+              <AlertCircle size={16} className="shrink-0" />
+              {error}
+            </div>
+          )}
+
+          {/* Form */}
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+              <label className="block text-xs font-bold text-slate-600 uppercase mb-1.5 ml-1">
+                Full Name
+              </label>
+              <div className="relative">
+                <User className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+                <input
+                  type="text"
+                  name="name"
+                  required
+                  placeholder="e.g. Rahul Sharma"
+                  value={formData.name}
+                  onChange={handleChange}
+                  className="w-full bg-slate-50 border border-slate-200 focus:border-[#0a2968] focus:bg-white rounded-xl pl-10 pr-4 py-3 text-xs sm:text-sm text-slate-800 outline-none font-semibold transition-all"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-xs font-bold text-slate-600 uppercase mb-1.5 ml-1">
+                Email Address
+              </label>
+              <div className="relative">
+                <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+                <input
+                  type="email"
+                  name="email"
+                  required
+                  placeholder="student@example.com"
+                  value={formData.email}
+                  onChange={handleChange}
+                  className="w-full bg-slate-50 border border-slate-200 focus:border-[#0a2968] focus:bg-white rounded-xl pl-10 pr-4 py-3 text-xs sm:text-sm text-slate-800 outline-none font-semibold transition-all"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-xs font-bold text-slate-600 uppercase mb-1.5 ml-1">
+                Password
+              </label>
+              <div className="relative">
+                <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+                <input
+                  type="password"
+                  name="password"
+                  required
+                  placeholder="••••••••"
+                  value={formData.password}
+                  onChange={handleChange}
+                  className="w-full bg-slate-50 border border-slate-200 focus:border-[#0a2968] focus:bg-white rounded-xl pl-10 pr-4 py-3 text-xs sm:text-sm text-slate-800 outline-none font-semibold transition-all"
+                />
+              </div>
+            </div>
+
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full py-3.5 bg-[#0a2968] hover:bg-[#EF961D] text-white font-extrabold text-xs sm:text-sm uppercase tracking-wider rounded-xl transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60 mt-2"
+            >
+              {loading ? (
+                <Loader2 size={18} className="animate-spin" />
+              ) : (
+                <>
+                  Register & Continue <ArrowRight size={16} />
+                </>
+              )}
+            </button>
+          </form>
+
+          {/* Login Link */}
+          <p className="mt-6 text-center text-xs text-slate-500 font-semibold">
+            Already have an account?{" "}
+            <Link
+              to="/login"
+              className="text-[#0a2968] hover:text-[#EF961D] font-bold transition-colors underline"
+            >
+              Sign In Here
+            </Link>
+          </p>
+        </div>
+      </div>
+
+      {/* GLOBAL FOOTER */}
+      <Footer />
     </div>
   );
 };

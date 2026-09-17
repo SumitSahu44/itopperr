@@ -7,6 +7,7 @@ import {
 } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import { HashLink } from "react-router-hash-link";
+import { getApiUrl } from "../config/api";
 
 const Footer = () => {
   const [courses, setCourses] = useState([]);
@@ -14,9 +15,7 @@ const Footer = () => {
   useEffect(() => {
     const fetchCourses = async () => {
       try {
-        const response = await fetch(
-          `${import.meta.env.VITE_API_URL}/api/courses`,
-        );
+        const response = await fetch(getApiUrl('/api/courses'));
         const data = await response.json();
         if (Array.isArray(data)) {
           setCourses(data);

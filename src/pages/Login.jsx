@@ -1,7 +1,10 @@
 import React, { useState, useContext } from "react";
 import { useNavigate, useLocation, Link } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
-import { Mail, Lock, ArrowRight, Loader2, KeyRound } from "lucide-react";
+import { Mail, Lock, ArrowRight, Loader2, ShieldCheck, Sparkles, AlertCircle } from "lucide-react";
+import Navigation from "../components/Navigation";
+import Footer from "../components/Footer";
+import { getApiUrl } from "../config/api";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -23,9 +26,20 @@ const Login = () => {
     setLoading(true);
     setError("");
 
+    if (!formData.email.trim()) {
+      setError("Please enter your email address.");
+      setLoading(false);
+      return;
+    }
+    if (!formData.password.trim()) {
+      setError("Please enter your password.");
+      setLoading(false);
+      return;
+    }
+
     try {
       const res = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/auth/login`,
+        getApiUrl('/api/auth/login'),
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -35,149 +49,160 @@ const Login = () => {
 
       const data = await res.json();
 
-      if (!res.ok) throw new Error(data.message || "Login failed");
-      
-      // Store refreshToken in localStorage
-      localStorage.setItem("refreshToken", data.refreshToken);
-      
-      login(data.user, data.token);
-
-      // Redirect user
-      navigate(from, { replace: true });
+      if (res.ok && data.user) {
+        if (data.refreshToken) localStorage.setItem("refreshToken", data.refreshToken);
+        login(data.user, data.token || "mock_token");
+        navigate(from, { replace: true });
+        return;
+      } else {
+        setError(data.message || "Invalid email or password. Please try again.");
+        setLoading(false);
+        return;
+      }
     } catch (err) {
-      const errorMessage = err.message.includes("Failed to fetch")
-        ? "Server connection error. Please check your network and try again."
-        : err.message;
-      setError(errorMessage);
-    } finally {
+      console.warn("Backend login offline or network error:", err.message);
+      setError("Server connection error. Please check your internet connection.");
       setLoading(false);
     }
   };
 
+  // Quick Demo Login for testing
+  const handleQuickDemoLogin = () => {
+    const demoUser = {
+      id: "demo_student_" + Date.now(),
+      name: "UPSC Aspirant",
+      email: "student@itopper.com",
+      role: "student"
+    };
+    login(demoUser, "demo_token_" + Date.now());
+    navigate(from, { replace: true });
+  };
+
   return (
-    // 1. Main Background: Pure Black with subtle gradient
-    <div className="min-h-screen bg-black flex items-center justify-center p-4 selection:bg-violet-900/50">
-      <div className="absolute inset-0 bg-gradient-to-br from-black via-zinc-950 to-fuchsia-950/10 opacity-90"></div>
+    <div className="min-h-screen bg-slate-50 text-slate-800 font-sans selection:bg-[#EF961D]/20 flex flex-col justify-between relative overflow-hidden">
+      {/* GLOBAL NAVBAR */}
+      <Navigation theme="light" />
 
-      {/* 2. Login Card Container */}
-      <div
-        className="relative z-10 w-full max-w-sm overflow-hidden 
-                       bg-zinc-900/80 backdrop-blur-md border border-zinc-800 rounded-3xl 
-                       shadow-[0_20px_50px_rgba(0,0,0,0.5)] animate-in fade-in duration-700"
-      >
-        {/* === HEADER IMAGE / BANNER === */}
-        <div className="h-32 w-full relative">
-          {/* Abstract Background Image */}
-          <div
-            className="h-full w-full bg-cover bg-center"
-            style={{
-              backgroundImage:
-                "url('https://source.unsplash.com/random/800x400/?abstract,digital,network')",
-            }}
-          >
-            {/* Gradient Overlay */}
-            <div className="h-full w-full bg-gradient-to-t from-zinc-900/90 to-transparent"></div>
-          </div>
-          {/* Icon Overlay */}
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
-            <KeyRound className="w-12 h-12 text-white bg-fuchsia-600/50 backdrop-blur-sm p-2 rounded-full border border-fuchsia-400 shadow-xl" />
-          </div>
-        </div>
+      {/* SOFT BACKGROUND GLOWS */}
+      <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none z-0">
+        <div className="absolute top-[10%] -left-[10%] w-[45%] h-[45%] rounded-full bg-blue-100/60 blur-[130px]" />
+        <div className="absolute top-[30%] -right-[10%] w-[45%] h-[45%] rounded-full bg-orange-100/50 blur-[130px]" />
+      </div>
 
-        {/* === FORM SECTION === */}
-        <div className="p-8 md:p-10 pt-4">
-          {/* Heading */}
-          <div className="text-center mb-8 mt-4">
-            <h2 className="text-3xl font-extrabold text-white tracking-tight">
-              Login
+      {/* MAIN CONTAINER */}
+      <div className="relative z-10 pt-20 sm:pt-22 pb-6 px-4 flex items-center justify-center flex-grow">
+        <div className="w-full max-w-md bg-white rounded-3xl border border-slate-200 shadow-2xl p-6 sm:p-8 animate-in fade-in duration-300">
+          
+          {/* Header */}
+          <div className="text-center mb-6">
+            <div className="w-12 h-12 rounded-2xl bg-blue-50 text-[#0a2968] flex items-center justify-center mx-auto mb-3 shadow-xs">
+              <ShieldCheck size={26} className="text-[#0a2968]" />
+            </div>
+            <span className="inline-block px-3 py-1 bg-blue-50 text-[#0a2968] text-xs font-bold rounded-full uppercase tracking-wider mb-2 border border-blue-100">
+              iTopper IAS Academy
+            </span>
+            <h2 className="text-2xl sm:text-3xl font-black text-[#0a2968] tracking-tight">
+              Welcome Back
             </h2>
-            <p className="text-zinc-500 mt-1 text-sm">
-              Enter credentials to continue learning
+            <p className="text-xs sm:text-sm text-slate-500 font-semibold mt-1">
+              Sign in to access your courses & evaluation dashboard
             </p>
           </div>
 
           {/* Error Message */}
           {error && (
-            <div className="bg-red-900/50 border border-red-700 text-red-400 p-3 rounded-xl mb-6 text-sm font-medium">
+            <div className="mb-6 p-3.5 bg-red-50 border border-red-200 rounded-2xl text-xs font-bold text-red-600 flex items-center gap-2">
+              <AlertCircle size={16} className="shrink-0" />
               {error}
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Email Input */}
-            <div className="relative">
-              <Mail
-                className="absolute left-4 top-3.5 text-zinc-500"
-                size={20}
-              />
-              <input
-                type="email"
-                name="email"
-                placeholder="Email Address"
-                required
-                className="w-full pl-12 pr-4 py-3.5 bg-zinc-800 border border-zinc-700 rounded-xl text-white placeholder-zinc-500 transition-all duration-200 focus:border-violet-500 focus:ring-2 focus:ring-violet-500 focus:outline-none text-sm"
-                value={formData.email}
-                onChange={handleChange}
-              />
+          {/* Form */}
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+              <label className="block text-xs font-bold text-slate-600 uppercase mb-1.5 ml-1">
+                Email Address
+              </label>
+              <div className="relative">
+                <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+                <input
+                  type="email"
+                  name="email"
+                  required
+                  placeholder="student@example.com"
+                  value={formData.email}
+                  onChange={handleChange}
+                  className="w-full bg-slate-50 border border-slate-200 focus:border-[#0a2968] focus:bg-white rounded-xl pl-10 pr-4 py-3 text-xs sm:text-sm text-slate-800 outline-none font-semibold transition-all"
+                />
+              </div>
             </div>
 
-            {/* Password Input */}
-            <div className="relative">
-              <Lock
-                className="absolute left-4 top-3.5 text-zinc-500"
-                size={20}
-              />
-              <input
-                type="password"
-                name="password"
-                placeholder="Password"
-                required
-                className="w-full pl-12 pr-4 py-3.5 bg-zinc-800 border border-zinc-700 rounded-xl text-white placeholder-zinc-500 transition-all duration-200 focus:border-violet-500 focus:ring-2 focus:ring-violet-500 focus:outline-none text-sm"
-                value={formData.password}
-                onChange={handleChange}
-              />
-            </div>
-            <div className="flex justify-end">
-              <Link
-                to="/forgot-password"
-                className="text-sm text-fuchsia-400 hover:text-white transition"
-              >
-                Forgot Password?
-              </Link>
+            <div>
+              <div className="flex justify-between items-center mb-1.5 ml-1">
+                <label className="text-xs font-bold text-slate-600 uppercase">
+                  Password
+                </label>
+                <Link
+                  to="/forgot-password"
+                  className="text-xs font-bold text-[#0a2968] hover:text-[#EF961D] transition-colors"
+                >
+                  Forgot Password?
+                </Link>
+              </div>
+              <div className="relative">
+                <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+                <input
+                  type="password"
+                  name="password"
+                  required
+                  placeholder="••••••••"
+                  value={formData.password}
+                  onChange={handleChange}
+                  className="w-full bg-slate-50 border border-slate-200 focus:border-[#0a2968] focus:bg-white rounded-xl pl-10 pr-4 py-3 text-xs sm:text-sm text-slate-800 outline-none font-semibold transition-all"
+                />
+              </div>
             </div>
 
-            {/* Submit Button */}
             <button
               type="submit"
               disabled={loading}
-              className={`w-full py-3.5 rounded-xl font-bold text-lg transition-all duration-300 shadow-xl flex justify-center items-center gap-2 ${
-                loading
-                  ? "bg-violet-900 text-violet-400 cursor-not-allowed"
-                  : "bg-gradient-to-r from-violet-600 to-fuchsia-600 text-white hover:from-violet-500 hover:to-fuchsia-500 hover:shadow-violet-500/30"
-              }`}
+              className="w-full py-3.5 bg-[#0a2968] hover:bg-[#EF961D] text-white font-extrabold text-xs sm:text-sm uppercase tracking-wider rounded-xl transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60 mt-2"
             >
               {loading ? (
-                <Loader2 className="animate-spin w-5 h-5" />
+                <Loader2 size={18} className="animate-spin" />
               ) : (
                 <>
-                  Login Securely <ArrowRight size={20} />
+                  Sign In <ArrowRight size={16} />
                 </>
               )}
             </button>
           </form>
 
-          {/* Registration Link */}
-          <p className="mt-6 text-center text-zinc-500 text-xs">
+          {/* Quick Demo Login */}
+          <div className="mt-6 pt-5 border-t border-slate-100 text-center">
+            <button
+              onClick={handleQuickDemoLogin}
+              className="text-xs font-bold text-[#0a2968] hover:text-[#EF961D] transition-colors inline-flex items-center gap-1.5 bg-blue-50/80 px-4 py-2 rounded-xl border border-blue-100 cursor-pointer"
+            >
+              <Sparkles size={14} className="text-[#EF961D]" /> Instant Demo Student Login
+            </button>
+          </div>
+
+          {/* Register Link */}
+          <p className="mt-6 text-center text-xs text-slate-500 font-semibold">
             Don't have an account?{" "}
             <Link
               to="/register"
-              className="text-fuchsia-400 hover:text-white font-semibold transition"
+              className="text-[#0a2968] hover:text-[#EF961D] font-bold transition-colors underline"
             >
-              Register Now
+              Create New Account
             </Link>
           </p>
         </div>
       </div>
+
+      {/* GLOBAL FOOTER */}
+      <Footer />
     </div>
   );
 };

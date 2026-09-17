@@ -42,6 +42,7 @@ import { AuthContext } from "../context/AuthContext";
 import FAQSection from "./Faq";
 import Navigation from "./Navigation";
 import Footer from "./Footer";
+import { loadRazorpayScript, launchRazorpayCheckout } from "../utils/razorpay";
 
 const CourseCurriculum = () => {
   const { subject: urlSlug } = useParams();
@@ -317,7 +318,16 @@ const CourseCurriculum = () => {
       navigate("/login");
       return;
     }
-    setShowEnrollForm(true);
+    // Launch Razorpay Payment Gateway directly for registered/logged-in user
+    launchRazorpayCheckout({
+      item: { ...course, title: course.subject },
+      user: user,
+      amount: course.finalPrice,
+      onSuccess: (paymentId) => {
+        setIsEnrolled(true);
+        navigate(`/payment-success?txnid=${paymentId}`);
+      }
+    });
   };
 
   const handleEnrollSubmit = async (e) => {
@@ -362,64 +372,108 @@ const CourseCurriculum = () => {
           setErrorMessage(data.message || "Enrollment failed.");
         }
       } else {
-        // PAID COURSE - Call PayU Integration
-        const finalAmount = calculateDiscountedPrice();
-        const res = await fetch(
-          `${import.meta.env.VITE_API_URL}/api/create-payment`,
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-            body: JSON.stringify({
-              amount: finalAmount,
-              productinfo: course.subject,
-              firstname: user.name.split(" ")[0],
-              email: user.email,
-              phone: formData.phone,
-              courseId: course._id,
-              userId: user._id,
-              couponCode: discountPercent > 0 ? couponCode : null,
-            }),
-          },
-        );
-
-        const payuData = await res.json();
-
-        if (res.ok) {
-          // Create a dynamic form and submit to PayU
-          const form = document.createElement("form");
-          form.method = "POST";
-          form.action = "https://secure.payu.in/_payment";
-
-          const fields = {
-            key: payuData.key,
-            txnid: payuData.txnid,
-            amount: payuData.amount,
-            productinfo: payuData.productinfo,
-            firstname: payuData.firstname,
-            email: payuData.email,
-            phone: payuData.phone,
-            hash: payuData.hash,
-            surl: payuData.surl,
-            furl: payuData.furl,
-          };
-
-          for (const key in fields) {
-            const input = document.createElement("input");
-            input.type = "hidden";
-            input.name = key;
-            input.value = fields[key];
-            form.appendChild(input);
-          }
-
-          document.body.appendChild(form);
-          form.submit();
-        } else {
+        // PAID COURSE - Call Razorpay Integration
+        const isScriptLoaded = await loadRazorpayScript();
+        if (!isScriptLoaded) {
           setSubmitStatus("error");
-          setErrorMessage(payuData.message || "Payment initiation failed.");
+          setErrorMessage("Failed to load Razorpay Payment Gateway SDK.");
+          return;
         }
+
+        const finalAmount = calculateDiscountedPrice();
+        const apiBaseUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+
+        // 1. Create Razorpay order on backend
+        const orderRes = await fetch(`${apiBaseUrl}/api/payment/create-order`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            amount: finalAmount,
+            currency: "INR",
+            receipt: `course_${course._id.substring(0, 8)}_${Date.now()}`,
+            notes: {
+              courseId: course._id,
+              courseName: course.subject,
+              studentEmail: user?.email || formData.email
+            }
+          }),
+        });
+
+        const orderData = await orderRes.json();
+        if (!orderRes.ok || !orderData.orderId) {
+          setSubmitStatus("error");
+          setErrorMessage(orderData.message || "Could not initiate payment order.");
+          return;
+        }
+
+        // 2. Configure Razorpay modal options
+        const razorpayKey = orderData.key || import.meta.env.VITE_RAZORPAY_KEY_ID || "rzp_live_TbVfSTdE3of9kw";
+
+        const options = {
+          key: razorpayKey,
+          amount: orderData.amount,
+          currency: orderData.currency || "INR",
+          name: "iTopper IAS Academy",
+          description: course.subject,
+          image: "https://images.unsplash.com/photo-1434030216411-0b793f4b4173?auto=format&fit=crop&q=80&w=200",
+          order_id: orderData.orderId,
+          handler: async function (response) {
+            try {
+              // 3. Verify payment signature on backend
+              const verifyRes = await fetch(`${apiBaseUrl}/api/payment/verify`, {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                  Authorization: `Bearer ${token}`,
+                },
+                body: JSON.stringify({
+                  razorpay_order_id: response.razorpay_order_id,
+                  razorpay_payment_id: response.razorpay_payment_id,
+                  razorpay_signature: response.razorpay_signature,
+                  courseId: course._id,
+                  studentId: user?._id,
+                  studentName: user?.name || formData.name,
+                  studentEmail: user?.email || formData.email,
+                  pricePaid: finalAmount,
+                }),
+              });
+
+              const verifyData = await verifyRes.json();
+              if (verifyRes.ok && verifyData.success) {
+                setIsEnrolled(true);
+                setShowEnrollForm(false);
+                navigate(`/payment-success?txnid=${response.razorpay_payment_id}`);
+              } else {
+                setSubmitStatus("error");
+                setErrorMessage(verifyData.message || "Payment verification failed.");
+              }
+            } catch (err) {
+              console.error("Verification error:", err);
+              setSubmitStatus("error");
+              setErrorMessage("Error verifying payment with server.");
+            }
+          },
+          prefill: {
+            name: user?.name || formData.name || "",
+            email: user?.email || formData.email || "",
+            contact: formData.phone || ""
+          },
+          theme: {
+            color: "#0a2968"
+          }
+        };
+
+        const razorpayInstance = new window.Razorpay(options);
+        razorpayInstance.on("payment.failed", function (response) {
+          console.error("Payment failed:", response.error);
+          setSubmitStatus("error");
+          setErrorMessage(response.error.description || "Payment failed or cancelled.");
+        });
+
+        razorpayInstance.open();
       }
     } catch (err) {
       setSubmitStatus("error");

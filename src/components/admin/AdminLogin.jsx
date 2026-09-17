@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { Lock, Mail, ArrowRight } from "lucide-react";
 import { motion } from "framer-motion";
+import { getApiUrl } from "../../config/api";
 
 const AdminLogin = () => {
   const [email, setEmail] = useState("");
@@ -15,7 +16,7 @@ const AdminLogin = () => {
     setIsLoading(true);
 
     try {
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/admin-login`, {
+      const res = await fetch(getApiUrl('/api/auth/admin-login'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password })

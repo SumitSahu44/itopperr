@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useContext, useRef, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
+import { getApiUrl } from '../config/api';
 import {
     Loader2, CheckCircle, AlertTriangle, ShieldAlert,
     Maximize, Lock, EyeOff, Menu, SquareCheckBig,
@@ -180,7 +181,7 @@ const QuizPlayer = () => {
     const fetchQuizData = async () => {
         try {
             setLoading(true);
-            const res = await fetch(`${import.meta.env.VITE_API_URL}/api/student/quiz/${id}`, {
+            const res = await fetch(getApiUrl(`/api/student/quiz/${id}`), {
                 headers: { Authorization: `Bearer ${token}` }
             });
             if (!res.ok) throw new Error("Failed to load quiz.");
@@ -264,7 +265,7 @@ const QuizPlayer = () => {
                 formData.append('answerSheet', pdfFile);
             }
 
-            const res = await fetch(`${import.meta.env.VITE_API_URL}/api/student/quizzes/${id}/submit`, {
+            const res = await fetch(getApiUrl(`/api/student/quizzes/${id}/submit`), {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${token}`

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import { getApiUrl } from '../../config/api';
 
 const AddClass = () => {
   const [formData, setFormData] = useState({
@@ -29,7 +30,7 @@ const AddClass = () => {
         date: new Date(formData.date)
       };
 
-      await axios.post(`${import.meta.env.VITE_API_URL}/api/faculty/class`, payload, {
+      await axios.post(getApiUrl('/api/faculty/class'), payload, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('facultyToken')}`,
           'Content-Type': 'application/json'

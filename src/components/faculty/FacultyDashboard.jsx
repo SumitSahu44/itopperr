@@ -2,9 +2,10 @@ import React, { useState, useEffect } from "react";
 import { BookA, Briefcase, CandlestickChart, LogOut, LucidePictureInPicture, User } from "lucide-react";
 import LectureLinks from "./LectureLinks";
 import Quizzes from "./Quizzes";
-import Results from "./Results"; // ✅ Ensure Results.js is imported
+import Results from "./Results";
+import { getApiUrl } from "../../config/api";
 
-const API_BASE = `${import.meta.env.VITE_API_URL}/api`;
+const API_BASE = getApiUrl('/api');
 
 const FacultyDashboard = () => {
     // --- Auth & Profile States ---
