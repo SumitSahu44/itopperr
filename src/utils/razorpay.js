@@ -15,6 +15,16 @@ export const loadRazorpayScript = () => {
   });
 };
 
+export const checkOrderStatus = async (orderId) => {
+  try {
+    const res = await fetch(getApiUrl(`/api/payment/status/${orderId}`));
+    return await res.json();
+  } catch (err) {
+    console.error("Failed to check order status:", err);
+    return { success: false, error: err.message };
+  }
+};
+
 export const launchRazorpayCheckout = async ({ item, user, amount, onSuccess, onError, onCancel }) => {
   const isScriptLoaded = await loadRazorpayScript();
   if (!isScriptLoaded) {
@@ -24,6 +34,8 @@ export const launchRazorpayCheckout = async ({ item, user, amount, onSuccess, on
   }
 
   const finalPayable = amount !== undefined && amount !== null ? amount : (item.finalPrice || 4999);
+  const itemName = item.title || item.subject || "UPSC Plan";
+  const itemType = item.category || (item.title ? "Evaluation" : "Course");
 
   try {
     const orderRes = await fetch(getApiUrl('/api/payment/create-order'), {
@@ -33,9 +45,18 @@ export const launchRazorpayCheckout = async ({ item, user, amount, onSuccess, on
         amount: finalPayable,
         currency: "INR",
         receipt: `pay_${((item._id || item.id || 'item')).toString().substring(0, 8)}_${Date.now()}`,
+        courseId: item._id || item.id,
+        studentId: user?.id || user?._id,
+        studentName: user?.name || "Student",
+        studentEmail: user?.email || "guest@itopper.com",
+        itemType,
+        itemName,
         notes: {
-          title: item.title || item.subject || "UPSC Plan",
-          studentEmail: user?.email || "guest@itopper.com"
+          title: itemName,
+          studentName: user?.name || "Student",
+          studentEmail: user?.email || "guest@itopper.com",
+          itemType,
+          courseId: item._id || item.id
         }
       }),
     });
@@ -54,7 +75,7 @@ export const launchRazorpayCheckout = async ({ item, user, amount, onSuccess, on
       amount: orderData.amount,
       currency: orderData.currency || "INR",
       name: "iTopper IAS Academy",
-      description: item.title || item.subject || "UPSC Course",
+      description: itemName,
       image: "https://images.unsplash.com/photo-1434030216411-0b793f4b4173?auto=format&fit=crop&q=80&w=200",
       order_id: orderData.orderId,
       handler: async function (response) {
@@ -71,6 +92,8 @@ export const launchRazorpayCheckout = async ({ item, user, amount, onSuccess, on
               studentName: user?.name,
               studentEmail: user?.email,
               pricePaid: finalPayable,
+              itemName,
+              itemType
             }),
           });
 
@@ -78,12 +101,13 @@ export const launchRazorpayCheckout = async ({ item, user, amount, onSuccess, on
           if (verifyRes.ok && verifyData.success) {
             if (onSuccess) onSuccess(response.razorpay_payment_id, finalPayable);
           } else {
-            alert(verifyData.message || "Payment verification failed.");
-            if (onError) onError(verifyData.message);
+            const failMsg = verifyData.message || "Payment verification failed.";
+            alert(failMsg);
+            if (onError) onError(failMsg);
           }
         } catch (err) {
           console.error("Verification error:", err);
-          alert("Error verifying payment signature.");
+          alert("Error verifying payment signature. System will re-check order status.");
           if (onError) onError(err.message);
         }
       },
@@ -100,14 +124,15 @@ export const launchRazorpayCheckout = async ({ item, user, amount, onSuccess, on
     const razorpayInstance = new window.Razorpay(options);
     razorpayInstance.on("payment.failed", function (response) {
       console.error("Payment failed:", response.error);
-      alert(response.error.description || "Payment cancelled or failed.");
+      const errReason = response.error.description || "Payment cancelled or failed.";
+      alert(`Payment Warning: ${errReason}`);
       if (onCancel) onCancel(response.error);
     });
 
     razorpayInstance.open();
   } catch (err) {
     console.error("Payment error:", err);
-    alert("Something went wrong with the payment gateway.");
+    alert("Something went wrong with the payment gateway. Please try again.");
     if (onError) onError(err.message);
   }
 };

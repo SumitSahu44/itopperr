@@ -55,10 +55,8 @@ const Footer = () => {
             Address
           </h3>
           <ul className="space-y-3 text-slate-500">
-            <li>
-              SHOP NO 55 2ND F OLD RAJINDER NAGAR MARKET
-              <br />
-              NEW DELHI, AC39, 102-N, OLD RAJENDRA NAGAR, RAJENDRA NAGAR, 110008
+            <li className="leading-relaxed">
+              iTopper, shop no 55, 2nd floor old Rajinder Nagar Delhi 110060 sub door
             </li>
             <li>
               <span className="text-slate-800 font-semibold">Email:</span>{" "}

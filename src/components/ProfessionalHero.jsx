@@ -184,27 +184,7 @@ const ProfessionalHero = () => {
           </div>
         </motion.div>
 
-        {/* Premium CTA Buttons */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.6, ease: "easeOut" }}
-          className="flex flex-col sm:flex-row gap-4 items-center justify-center mt-12 sm:mt-16 w-full max-w-md px-4 relative z-20"
-        >
-          <HashLink
-            smooth
-            to="/#courses"
-            className="w-full sm:w-auto px-8 py-3.5 bg-[#0a2968] text-white hover:bg-white hover:text-[#0a2968] border-2 border-transparent hover:border-[#0a2968] transition-all duration-300 font-extrabold rounded-lg shadow-lg hover:shadow-[#0a2968]/20 text-center uppercase tracking-wider text-sm"
-          >
-            Start Preparation
-          </HashLink>
-          <Link
-            to="/register"
-            className="w-full sm:w-auto px-8 py-3.5 border-2 border-[#0a2968] text-[#0a2968] hover:bg-[#0a2968] hover:text-white transition-all duration-300 font-extrabold rounded-lg text-center uppercase tracking-wider text-sm bg-white"
-          >
-            Register Now
-          </Link>
-        </motion.div>
+        {/* Premium CTA Buttons Removed as requested */}
 
       </div>
     </section>

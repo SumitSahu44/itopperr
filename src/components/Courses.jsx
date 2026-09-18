@@ -479,11 +479,10 @@ const Courses = () => {
             <button
               key={id}
               onClick={() => setActiveTab(id)}
-              className={`relative flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs sm:text-sm font-extrabold border transition-all duration-300 cursor-pointer overflow-hidden ${
-                activeTab === id
+              className={`relative flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs sm:text-sm font-extrabold border transition-all duration-300 cursor-pointer overflow-hidden ${activeTab === id
                   ? "bg-[#163F66] text-white border-[#163F66] shadow-lg shadow-[#163F66]/20 scale-105"
                   : "bg-white text-slate-600 border-slate-200 hover:border-[#163F66]/40 hover:text-[#163F66] hover:bg-[#163F66]/3"
-              }`}
+                }`}
             >
               <Icon size={14} strokeWidth={2.5} />
               {label}
@@ -515,11 +514,10 @@ const Courses = () => {
 
         {/* ─── Course Cards Grid ─── */}
         <div
-          className={`grid grid-cols-1 gap-7 sm:gap-8 items-stretch mx-auto max-w-6xl ${
-            currentCourses.length === 4
+          className={`grid grid-cols-1 gap-7 sm:gap-8 items-stretch mx-auto max-w-6xl ${currentCourses.length === 4
               ? "md:grid-cols-2 lg:grid-cols-4"
               : "md:grid-cols-2 lg:grid-cols-3"
-          }`}
+            }`}
         >
           <AnimatePresence mode="popLayout">
             {currentCourses.map((course) => (

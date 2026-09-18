@@ -134,9 +134,8 @@ function App() {
                   <ProfessionalHero />
                   <EvaluationHowItWorks />
                   {/* <About /> */}
-                  {/* <MeetOurFaculty /> */}
                   <Courses />
-                  <CoreValues />
+                  {/* <CoreValues /> */}
                   {/* <StudyWithMe /> */}
                   <Testimonials />
                   <BlogsSection />

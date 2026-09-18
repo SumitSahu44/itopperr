@@ -20,7 +20,7 @@ const SAMPLES = [
     tag: "GS Paper 1",
     score: "112 / 250",
     date: "14 Sept 2026",
-    pdfUrl: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf",
+    pdfUrl: "/uploads/sample1.pdf",
     summary: "Detailed feedback on Modern History & Geography questions with diagram corrections.",
     samplePages: [
       {
@@ -41,7 +41,7 @@ const SAMPLES = [
     tag: "GS Paper 2",
     score: "118 / 250",
     date: "12 Sept 2026",
-    pdfUrl: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf",
+    pdfUrl: "/uploads/sample2.pdf",
     summary: "Evaluation focusing on Constitutional Articles, Supreme Court Landmarking judgments & Policy frameworks.",
     samplePages: [
       {
@@ -62,7 +62,7 @@ const SAMPLES = [
     tag: "GS Paper 4 Ethics",
     score: "126 / 250",
     date: "10 Sept 2026",
-    pdfUrl: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf",
+    pdfUrl: "/uploads/sample3.pdf",
     summary: "Comprehensive line-by-line review of Case Study stakeholder matrices and value frameworks.",
     samplePages: [
       {
@@ -77,8 +77,13 @@ const SAMPLES = [
 const EvaluationHowItWorks = () => {
   const [selectedSample, setSelectedSample] = useState(null);
 
+  const handleOpenPdf = (sample) => {
+    const targetUrl = sample.pdfUrl || "/uploads/sample1.pdf";
+    window.open(targetUrl, "_blank");
+  };
+
   const handlePrintPdf = (pdfUrl) => {
-    const targetUrl = pdfUrl || "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf";
+    const targetUrl = pdfUrl || "/uploads/sample1.pdf";
     const printWindow = window.open(targetUrl, "_blank");
     if (printWindow) {
       printWindow.focus();
@@ -88,7 +93,7 @@ const EvaluationHowItWorks = () => {
   };
 
   const handleDownloadPdf = (pdfUrl, fileName) => {
-    const targetUrl = pdfUrl || "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf";
+    const targetUrl = pdfUrl || "/uploads/sample1.pdf";
     const link = document.createElement("a");
     link.href = targetUrl;
     link.target = "_blank";
@@ -221,7 +226,7 @@ const EvaluationHowItWorks = () => {
                 viewport={{ once: true }}
                 transition={{ duration: 0.5, delay: idx * 0.15 }}
                 className="flex flex-col items-center group cursor-pointer"
-                onClick={() => setSelectedSample(sample)}
+                onClick={() => handleOpenPdf(sample)}
               >
                 {/* PDF Paper Graphic (Matching Screenshot aesthetic in iTopper brand colors) */}
                 <div className="relative w-36 h-44 sm:w-40 sm:h-48 bg-white rounded-2xl shadow-xl group-hover:shadow-2xl group-hover:-translate-y-2 transition-all duration-300 flex flex-col justify-between p-4 overflow-hidden border-2 border-white/20">
@@ -251,7 +256,10 @@ const EvaluationHowItWorks = () => {
                 {/* Sample Button Box below card */}
                 <button
                   type="button"
-                  onClick={() => setSelectedSample(sample)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleOpenPdf(sample);
+                  }}
                   className="mt-6 px-6 py-2.5 bg-white/10 hover:bg-[#EF961D] text-white font-bold text-xs sm:text-sm rounded-xl border border-white/30 transition-all duration-200 shadow-sm uppercase tracking-wider group-hover:bg-[#EF961D] group-hover:border-[#EF961D]"
                 >
                   Sample {sample.id}

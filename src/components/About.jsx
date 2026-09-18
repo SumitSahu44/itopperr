@@ -11,8 +11,8 @@ const AboutUs = () => {
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
 
-          {/* Left Column: Text Content */}
-          <div className="lg:col-span-7 flex flex-col items-start text-left">
+          {/* Text Content */}
+          <div className="lg:col-span-12 flex flex-col items-start text-left">
             <span className="text-xs sm:text-sm font-semibold tracking-widest text-[#EF961D] uppercase mb-3">
               ABOUT iTopper
             </span>
@@ -31,7 +31,7 @@ const AboutUs = () => {
             </p>
 
             {/* Quick Stats Grid */}
-            <div className="grid grid-cols-3 gap-4 sm:gap-6 w-full pt-6 border-t border-slate-200">
+            <div className="grid grid-cols-3 gap-4 sm:gap-6 w-full max-w-2xl pt-6 border-t border-slate-200">
               <div>
                 <h4 className="text-2xl sm:text-3xl font-bold text-[#EF961D]">10K+</h4>
                 <p className="text-xs sm:text-sm text-slate-500 font-semibold mt-1">Students Guided</p>
@@ -43,33 +43,6 @@ const AboutUs = () => {
               <div>
                 <h4 className="text-2xl sm:text-3xl font-bold text-[#EF961D]">24/7</h4>
                 <p className="text-xs sm:text-sm text-slate-500 font-semibold mt-1">Mentorship</p>
-              </div>
-            </div>
-          </div>
-
-          {/* Right Column: Premium Graphical Panel */}
-          <div className="lg:col-span-5 w-full">
-            <div className="bg-white rounded-[20px] p-8 sm:p-10 border border-slate-200/80 shadow-md relative overflow-hidden group">
-              <h3 className="text-xl font-bold text-[#163F66] mb-6">Our Core Vision</h3>
-              <p className="text-slate-600 text-sm sm:text-base leading-relaxed mb-8 font-medium italic border-l-4 border-[#EF961D] pl-4">
-                "To cultivate analytical minds, ethical decision-making, and deep conceptual clarity in the next generation of civil servants, making world-class guidance accessible to every corner of India."
-              </p>
-
-              <div className="space-y-4">
-                <div className="flex items-center gap-3.5 bg-slate-50 p-4 rounded-xl border border-slate-100">
-                  <span className="text-xl">🎯</span>
-                  <div>
-                    <h5 className="font-semibold text-sm text-slate-800">Laser-Focused Syllabus</h5>
-                    <p className="text-[11px] text-slate-500 font-medium">Updated dynamically for CSE changes.</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-3.5 bg-slate-50 p-4 rounded-xl border border-slate-100">
-                  <span className="text-xl">📊</span>
-                  <div>
-                    <h5 className="font-semibold text-sm text-slate-800">Advanced Analytics</h5>
-                    <p className="text-[11px] text-slate-500 font-medium">Detailed feedback on answer writing.</p>
-                  </div>
-                </div>
               </div>
             </div>
           </div>
