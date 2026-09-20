@@ -1,17 +1,14 @@
 import React, { useState, useContext, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { 
   X, 
-  CheckCircle2, 
   ShieldCheck, 
   Lock, 
   Sparkles, 
   ArrowRight, 
   Loader2, 
-  Tag,
   Mail,
   User,
-  Check,
   AlertCircle
 } from "lucide-react";
 import { motion } from "framer-motion";
@@ -23,7 +20,7 @@ const EvaluationCheckoutModal = ({ isOpen, onClose, plan, onPaymentSuccess }) =>
   const { user, login } = useContext(AuthContext);
   const navigate = useNavigate();
 
-  // Modal Step State: 'auth' | 'checkout' | 'processing' | 'success'
+  // Modal Step State: 'auth' | 'checkout' | 'processing'
   const [step, setStep] = useState("auth");
   const [authMode, setAuthMode] = useState("login"); // 'login' | 'register'
 
@@ -34,13 +31,6 @@ const EvaluationCheckoutModal = ({ isOpen, onClose, plan, onPaymentSuccess }) =>
   const [authError, setAuthError] = useState("");
   const [authLoading, setAuthLoading] = useState(false);
 
-  // Coupon State
-  const [couponCode, setCouponCode] = useState("");
-  const [appliedCoupon, setAppliedCoupon] = useState(null);
-  const [couponError, setCouponError] = useState("");
-  const [receiptId, setReceiptId] = useState("");
-  const [redirectCountdown, setRedirectCountdown] = useState(0);
-
   useEffect(() => {
     if (isOpen) {
       if (!user) {
@@ -49,65 +39,47 @@ const EvaluationCheckoutModal = ({ isOpen, onClose, plan, onPaymentSuccess }) =>
         setStep("checkout");
       }
       setAuthError("");
-      setCouponCode("");
-      setAppliedCoupon(null);
-      setCouponError("");
     }
   }, [isOpen, user]);
 
   if (!isOpen || !plan) return null;
 
-  const basePrice = plan.finalPrice || 4999;
-  const discountAmount = appliedCoupon ? appliedCoupon.discountAmount : 0;
-  const finalPayable = Math.max(0, basePrice - discountAmount);
+  const finalPayable = plan.finalPrice || 4999;
 
-  // Function to save purchase and show success screen
+  // Function to save purchase and redirect immediately to Payment Success page
   const handleSuccess = (txnid, pricePaid) => {
-    const paymentReceipt = txnid;
-    setReceiptId(paymentReceipt);
-
     try {
       const currentUser = user || { email: authEmail };
-      const userKey = currentUser?.email ? `itopper_purchased_evals_${currentUser.email}` : 'itopper_purchased_evals_guest';
-      const existingUserEvals = JSON.parse(localStorage.getItem(userKey) || "[]");
-      const globalEvals = JSON.parse(localStorage.getItem("itopper_purchased_evals_all") || "[]");
+      const userEmail = currentUser?.email;
+      if (userEmail) {
+        const userKey = `itopper_purchased_evals_${userEmail}`;
+        const existingUserEvals = JSON.parse(localStorage.getItem(userKey) || "[]");
+        const globalEvals = JSON.parse(localStorage.getItem("itopper_purchased_evals_all") || "[]");
 
-      const newRecord = {
-        ...plan,
-        purchasedAt: new Date().toISOString(),
-        receiptId: paymentReceipt,
-        finalPaid: pricePaid || finalPayable
-      };
+        const newRecord = {
+          ...plan,
+          purchasedAt: new Date().toISOString(),
+          receiptId: txnid,
+          finalPaid: pricePaid || finalPayable
+        };
 
-      if (!existingUserEvals.some(p => (p._id && p._id === plan._id) || (p.id && p.id === plan.id))) {
-        localStorage.setItem(userKey, JSON.stringify([...existingUserEvals, newRecord]));
-      }
-      if (!globalEvals.some(p => (p._id && p._id === plan._id) || (p.id && p.id === plan.id))) {
-        localStorage.setItem("itopper_purchased_evals_all", JSON.stringify([...globalEvals, newRecord]));
+        if (!existingUserEvals.some(p => (p._id && p._id === plan._id) || (p.id && p.id === plan.id))) {
+          localStorage.setItem(userKey, JSON.stringify([...existingUserEvals, newRecord]));
+        }
+        if (!globalEvals.some(p => (p._id && p._id === plan._id) || (p.id && p.id === plan.id))) {
+          localStorage.setItem("itopper_purchased_evals_all", JSON.stringify([...globalEvals, newRecord]));
+        }
       }
     } catch (e) {
       console.error("Failed to save purchased evaluation:", e);
     }
 
-    setStep("success");
-    setRedirectCountdown(3);
-
-    const timer = setInterval(() => {
-      setRedirectCountdown((prev) => {
-        if (prev <= 1) {
-          clearInterval(timer);
-          onClose();
-          navigate("/my-courses");
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
-
     if (onPaymentSuccess) onPaymentSuccess(txnid);
+    onClose();
+    navigate(`/payment-success?txnid=${txnid}`);
   };
 
-  // Auto-launch Razorpay Checkout after authentication or user action
+  // Launch Razorpay Checkout Payment Window
   const startPaymentGateway = (activeUser) => {
     setStep("processing");
     launchRazorpayCheckout({
@@ -180,7 +152,7 @@ const EvaluationCheckoutModal = ({ isOpen, onClose, plan, onPaymentSuccess }) =>
     }
   };
 
-  // Quick Fast Demo Login
+  // Quick Guest Login
   const handleQuickDemoLogin = () => {
     const demoUser = {
       id: "demo_student_" + Date.now(),
@@ -190,23 +162,6 @@ const EvaluationCheckoutModal = ({ isOpen, onClose, plan, onPaymentSuccess }) =>
     };
     login(demoUser, "demo_token_" + Date.now());
     startPaymentGateway(demoUser);
-  };
-
-  // Apply Coupon Code
-  const handleApplyCoupon = () => {
-    setCouponError("");
-    const code = couponCode.trim().toUpperCase();
-    if (!code) return;
-
-    if (code === "ITOPPER10") {
-      setAppliedCoupon({ code, discountPercent: 10, discountAmount: Math.round((plan.finalPrice || 4999) * 0.1) });
-    } else if (code === "TOPPER20" || code === "WELCOME20") {
-      setAppliedCoupon({ code, discountPercent: 20, discountAmount: Math.round((plan.finalPrice || 4999) * 0.2) });
-    } else if (code === "IAS2026") {
-      setAppliedCoupon({ code, discountPercent: 0, discountAmount: 1000 });
-    } else {
-      setCouponError("Invalid coupon code. Try 'ITOPPER10' or 'TOPPER20'");
-    }
   };
 
   return (
@@ -233,7 +188,7 @@ const EvaluationCheckoutModal = ({ isOpen, onClose, plan, onPaymentSuccess }) =>
           <div className="flex items-center gap-2">
             <ShieldCheck className="text-[#EF961D]" size={20} />
             <span className="font-extrabold text-sm sm:text-base tracking-wide">
-              {step === "auth" ? "Sign In to Enroll" : step === "success" ? "Enrollment Successful" : "iTopper Checkout"}
+              {step === "auth" ? "Sign In to Enroll" : "iTopper Checkout"}
             </span>
           </div>
           <button
@@ -342,7 +297,7 @@ const EvaluationCheckoutModal = ({ isOpen, onClose, plan, onPaymentSuccess }) =>
                 </button>
               </form>
 
-              {/* Fast 1-Click Demo Login button for testing */}
+              {/* Fast 1-Click Guest Login button */}
               <div className="mt-5 pt-4 border-t border-slate-100 text-center">
                 <button
                   onClick={handleQuickDemoLogin}
@@ -354,7 +309,7 @@ const EvaluationCheckoutModal = ({ isOpen, onClose, plan, onPaymentSuccess }) =>
             </div>
           )}
 
-          {/* ================= STEP 2: CHECKOUT / RE-TRY STEP ================= */}
+          {/* ================= STEP 2: CHECKOUT STEP ================= */}
           {step === "checkout" && (
             <div className="animate-in fade-in duration-300 space-y-5">
               <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4">
@@ -376,50 +331,8 @@ const EvaluationCheckoutModal = ({ isOpen, onClose, plan, onPaymentSuccess }) =>
                 </div>
               </div>
 
-              {/* Coupon Code Input */}
-              <div>
-                <label className="block text-xs font-bold text-slate-600 uppercase mb-1.5">Have a Coupon Code?</label>
-                <div className="flex gap-2">
-                  <div className="relative flex-grow">
-                    <Tag className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={15} />
-                    <input
-                      type="text"
-                      value={couponCode}
-                      onChange={(e) => setCouponCode(e.target.value)}
-                      placeholder="Try ITOPPER10 or TOPPER20"
-                      className="w-full bg-white border border-slate-200 focus:border-[#0a2968] rounded-xl pl-9 pr-3 py-2 text-xs font-bold text-slate-800 outline-none uppercase"
-                    />
-                  </div>
-                  <button
-                    type="button"
-                    onClick={handleApplyCoupon}
-                    className="px-4 py-2 bg-slate-800 hover:bg-[#0a2968] text-white text-xs font-bold rounded-xl transition-colors cursor-pointer"
-                  >
-                    Apply
-                  </button>
-                </div>
-                {appliedCoupon && (
-                  <p className="text-[11px] font-bold text-emerald-600 mt-1.5 flex items-center gap-1">
-                    <Check size={13} /> Coupon '{appliedCoupon.code}' applied! Saved ₹{appliedCoupon.discountAmount}
-                  </p>
-                )}
-                {couponError && (
-                  <p className="text-[11px] font-bold text-red-500 mt-1.5">{couponError}</p>
-                )}
-              </div>
-
               {/* Price Calculation Summary */}
               <div className="space-y-2 text-xs font-semibold text-slate-600 pt-2 border-t border-slate-100">
-                <div className="flex justify-between">
-                  <span>Plan Price</span>
-                  <span>₹{basePrice.toLocaleString("en-IN")}</span>
-                </div>
-                {appliedCoupon && (
-                  <div className="flex justify-between text-emerald-600 font-bold">
-                    <span>Coupon Discount</span>
-                    <span>- ₹{discountAmount.toLocaleString("en-IN")}</span>
-                  </div>
-                )}
                 <div className="flex justify-between text-sm font-extrabold text-[#0a2968] pt-2 border-t border-slate-200">
                   <span>Total Payable Amount</span>
                   <span className="text-base font-black">₹{finalPayable.toLocaleString("en-IN")}</span>
@@ -446,65 +359,6 @@ const EvaluationCheckoutModal = ({ isOpen, onClose, plan, onPaymentSuccess }) =>
               </div>
               <h3 className="text-lg font-bold text-slate-900">Opening Razorpay Payment Window...</h3>
               <p className="text-xs text-slate-500 font-semibold mt-1">Please complete the payment in the Razorpay popup</p>
-            </div>
-          )}
-
-          {/* ================= STEP 4: SUCCESS MODAL ================= */}
-          {step === "success" && (
-            <div className="text-center py-6 animate-in zoom-in-95 duration-300">
-              <div className="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-4 shadow-inner">
-                <CheckCircle2 size={36} />
-              </div>
-
-              <h3 className="text-2xl font-black text-[#0a2968]">Payment Successful!</h3>
-              <p className="text-xs text-slate-500 font-semibold mt-1">
-                Your evaluation plan is now active for <strong className="text-slate-800">{user?.email || authEmail}</strong>
-              </p>
-
-              {/* Receipt Summary Card */}
-              <div className="my-6 bg-slate-50 border border-slate-200 rounded-2xl p-4 text-left text-xs font-semibold text-slate-700 space-y-2">
-                <div className="flex justify-between border-b border-slate-200/80 pb-2">
-                  <span className="text-slate-400">Receipt No:</span>
-                  <span className="font-bold text-slate-900">{receiptId}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-slate-400">Plan:</span>
-                  <span className="font-bold text-slate-900">{plan.title}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-slate-400">Amount Paid:</span>
-                  <span className="font-bold text-emerald-600">₹{finalPayable.toLocaleString("en-IN")}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-slate-400">Validity:</span>
-                  <span className="font-bold text-slate-900">{plan.duration}</span>
-                </div>
-              </div>
-
-              {redirectCountdown > 0 && (
-                <div className="mb-4 py-2 px-3 bg-blue-50 border border-blue-200 rounded-xl text-xs font-bold text-[#0a2968] flex items-center justify-center gap-2">
-                  <Loader2 size={14} className="animate-spin text-[#EF961D]" />
-                  <span>Redirecting to Student Dashboard in {redirectCountdown}s...</span>
-                </div>
-              )}
-
-              <div className="flex flex-col sm:flex-row gap-3">
-                <button
-                  onClick={() => {
-                    onClose();
-                    navigate("/my-courses");
-                  }}
-                  className="flex-1 py-3 bg-[#0a2968] hover:bg-[#EF961D] text-white font-extrabold text-xs uppercase tracking-wider rounded-xl transition-colors cursor-pointer shadow-md"
-                >
-                  Go to Student Dashboard
-                </button>
-                <button
-                  onClick={onClose}
-                  className="py-3 px-6 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl transition-colors cursor-pointer"
-                >
-                  Close
-                </button>
-              </div>
             </div>
           )}
         </div>

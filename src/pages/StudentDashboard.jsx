@@ -33,48 +33,17 @@ const StudentDashboard = () => {
   // Load purchased evaluation cards for this student
   const loadPurchasedEvaluations = () => {
     try {
-      const userKey = user?.email ? `itopper_purchased_evals_${user.email}` : 'itopper_purchased_evals_guest';
-      const userEvals = JSON.parse(localStorage.getItem(userKey) || "[]");
-      const globalEvals = JSON.parse(localStorage.getItem("itopper_purchased_evals_all") || "[]");
-
-      const combinedMap = new Map();
-      [...userEvals, ...globalEvals].forEach(item => {
-        const idKey = item._id || item.id || item.title;
-        if (!combinedMap.has(idKey)) {
-          combinedMap.set(idKey, item);
-        }
-      });
-
-      let evalList = Array.from(combinedMap.values());
-
-      // If user has not purchased any plan yet, provide a demo purchased plan for testing
-      if (evalList.length === 0) {
-        evalList = [
-          {
-            _id: "eval-demo-gs1",
-            title: "GS Paper 1 Mains Answer Evaluation",
-            category: "GS",
-            paperTag: "GS Paper 1",
-            description: "Comprehensive evaluation covering History, Art & Culture, Geography, Indian Society & World History.",
-            features: [
-              "Detailed Line-by-Line Feedback within 24 Hours",
-              "Model Answer Framework & Structure Map",
-              "Personalized One-on-One Mentor Call"
-            ],
-            mrpPrice: 7999,
-            finalPrice: 4999,
-            duration: "Till Mains 2026",
-            badge: "Enrolled Plan",
-            planPdf: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf",
-            purchasedAt: new Date().toISOString(),
-            receiptId: "REC-381703"
-          }
-        ];
+      const userEmail = user?.email;
+      if (!userEmail) {
+        setPurchasedEvaluations([]);
+        return;
       }
-
-      setPurchasedEvaluations(evalList);
+      const userKey = `itopper_purchased_evals_${userEmail}`;
+      const userEvals = JSON.parse(localStorage.getItem(userKey) || "[]");
+      setPurchasedEvaluations(userEvals);
     } catch (e) {
       console.error("Error loading purchased evaluations:", e);
+      setPurchasedEvaluations([]);
     }
   };
 
@@ -85,6 +54,8 @@ const StudentDashboard = () => {
       const savedSheets = localStorage.getItem(`itopper_answer_sheets_${userEmail}`);
       if (savedSheets) {
         setUploadedAnswerSheets(JSON.parse(savedSheets));
+      } else {
+        setUploadedAnswerSheets({});
       }
     } catch (e) {
       console.error("Error loading answer sheets:", e);
@@ -97,30 +68,20 @@ const StudentDashboard = () => {
       const saved = JSON.parse(localStorage.getItem("itopper_evaluation_results") || "[]");
       const userEmail = user?.email?.toLowerCase();
 
-      let studentResults = saved.filter(item => {
-        if (!item.studentEmail || item.studentEmail.toLowerCase() === "all") return true;
-        return userEmail && item.studentEmail.toLowerCase() === userEmail;
-      });
-
-      // Demo fallback result if none uploaded yet
-      if (studentResults.length === 0) {
-        studentResults = [
-          {
-            id: "res-demo-1",
-            planTitle: "GS Paper 1 Mains Answer Evaluation",
-            paperTag: "GS Paper 1",
-            studentEmail: user?.email || "student@itopper.com",
-            score: "118 / 250",
-            evaluatedAt: new Date().toLocaleDateString("en-IN", { day: 'numeric', month: 'short', year: 'numeric' }),
-            remarks: "Excellent structural clarity in Modern History answers. Enhance Geography section with maps and flowcharts.",
-            resultPdf: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf"
-          }
-        ];
+      if (!userEmail) {
+        setEvaluationResults([]);
+        return;
       }
+
+      const studentResults = saved.filter(item => {
+        if (!item.studentEmail) return false;
+        return item.studentEmail.toLowerCase() === userEmail;
+      });
 
       setEvaluationResults(studentResults);
     } catch (e) {
       console.error("Error loading evaluation results:", e);
+      setEvaluationResults([]);
     }
   };
 
