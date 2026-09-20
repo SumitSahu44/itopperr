@@ -10,8 +10,8 @@ const ensureAdminToken = async () => {
 
   try {
     const res = await axios.post(getApiUrl('/api/auth/admin-login'), {
-      email: import.meta.env.VITE_ADMIN_EMAIL || "tds@gmail.com",
-      password: import.meta.env.VITE_ADMIN_PASSWORD || "tds@1230"
+      email: import.meta.env.VITE_ADMIN_EMAIL || "itopper@gmail.com",
+      password: import.meta.env.VITE_ADMIN_PASSWORD || "itopper@1230"
     });
     if (res.data && res.data.token) {
       localStorage.setItem("token", res.data.token);

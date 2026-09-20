@@ -10,6 +10,9 @@ export const AuthProvider = ({ children }) => {
   const [enrollments, setEnrollments] = useState([]);
 
   const fetchEnrollments = async (tokenToUse) => {
+    if (!tokenToUse || tokenToUse.startsWith('demo_') || tokenToUse.startsWith('mock_')) {
+      return;
+    }
     try {
       const res = await axios.get(
         getApiUrl('/api/enrollments'),
@@ -19,7 +22,10 @@ export const AuthProvider = ({ children }) => {
       );
       setEnrollments(res.data);
     } catch (err) {
-      console.error("Error fetching enrollments:", err);
+      // Suppress non-critical enrollment fetch warnings
+      if (err.response?.status !== 401) {
+        console.warn("Notice fetching enrollments:", err.message);
+      }
     }
   };
 

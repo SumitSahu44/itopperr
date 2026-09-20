@@ -43,6 +43,7 @@ import FAQSection from "./Faq";
 import Navigation from "./Navigation";
 import Footer from "./Footer";
 import { loadRazorpayScript, launchRazorpayCheckout } from "../utils/razorpay";
+import { getApiUrl } from "../config/api";
 
 const CourseCurriculum = () => {
   const { subject: urlSlug } = useParams();
@@ -170,7 +171,7 @@ const CourseCurriculum = () => {
   const checkEnrollmentStatus = async () => {
     try {
       const res = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/enrollments`,
+        getApiUrl('/api/enrollments'),
         {
           headers: { Authorization: `Bearer ${token}` },
         },
@@ -194,7 +195,7 @@ const CourseCurriculum = () => {
 
   const fetchCourse = async () => {
     try {
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/courses`);
+      const res = await fetch(getApiUrl('/api/courses'));
 
       const courses = await res.json();
       // Robust matching: normalize both strings
@@ -274,7 +275,7 @@ const CourseCurriculum = () => {
 
     try {
       const res = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/coupons/validate`,
+        getApiUrl('/api/coupons/validate'),
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -344,7 +345,7 @@ const CourseCurriculum = () => {
       // If course is free (price is 0 or not set), do direct enrollment
       if (!course.finalPrice || course.finalPrice <= 0) {
         const res = await fetch(
-          `${import.meta.env.VITE_API_URL}/api/enrollments`,
+          getApiUrl('/api/enrollments'),
           {
             method: "POST",
             headers: {
@@ -372,108 +373,24 @@ const CourseCurriculum = () => {
           setErrorMessage(data.message || "Enrollment failed.");
         }
       } else {
-        // PAID COURSE - Call Razorpay Integration
-        const isScriptLoaded = await loadRazorpayScript();
-        if (!isScriptLoaded) {
-          setSubmitStatus("error");
-          setErrorMessage("Failed to load Razorpay Payment Gateway SDK.");
-          return;
-        }
-
+        // PAID COURSE - Launch Razorpay Payment Gateway
         const finalAmount = calculateDiscountedPrice();
-        const apiBaseUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+        setShowEnrollForm(false);
+        setSubmitting(false);
 
-        // 1. Create Razorpay order on backend
-        const orderRes = await fetch(`${apiBaseUrl}/api/payment/create-order`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
+        launchRazorpayCheckout({
+          item: { ...course, title: course.subject },
+          user: user || { name: formData.name, email: formData.email },
+          amount: finalAmount,
+          onSuccess: (paymentId) => {
+            setIsEnrolled(true);
+            navigate(`/payment-success?txnid=${paymentId}`);
           },
-          body: JSON.stringify({
-            amount: finalAmount,
-            currency: "INR",
-            receipt: `course_${course._id.substring(0, 8)}_${Date.now()}`,
-            notes: {
-              courseId: course._id,
-              courseName: course.subject,
-              studentEmail: user?.email || formData.email
-            }
-          }),
-        });
-
-        const orderData = await orderRes.json();
-        if (!orderRes.ok || !orderData.orderId) {
-          setSubmitStatus("error");
-          setErrorMessage(orderData.message || "Could not initiate payment order.");
-          return;
-        }
-
-        // 2. Configure Razorpay modal options
-        const razorpayKey = orderData.key || import.meta.env.VITE_RAZORPAY_KEY_ID || "rzp_live_TbVfSTdE3of9kw";
-
-        const options = {
-          key: razorpayKey,
-          amount: orderData.amount,
-          currency: orderData.currency || "INR",
-          name: "iTopper IAS Academy",
-          description: course.subject,
-          image: "https://images.unsplash.com/photo-1434030216411-0b793f4b4173?auto=format&fit=crop&q=80&w=200",
-          order_id: orderData.orderId,
-          handler: async function (response) {
-            try {
-              // 3. Verify payment signature on backend
-              const verifyRes = await fetch(`${apiBaseUrl}/api/payment/verify`, {
-                method: "POST",
-                headers: {
-                  "Content-Type": "application/json",
-                  Authorization: `Bearer ${token}`,
-                },
-                body: JSON.stringify({
-                  razorpay_order_id: response.razorpay_order_id,
-                  razorpay_payment_id: response.razorpay_payment_id,
-                  razorpay_signature: response.razorpay_signature,
-                  courseId: course._id,
-                  studentId: user?._id,
-                  studentName: user?.name || formData.name,
-                  studentEmail: user?.email || formData.email,
-                  pricePaid: finalAmount,
-                }),
-              });
-
-              const verifyData = await verifyRes.json();
-              if (verifyRes.ok && verifyData.success) {
-                setIsEnrolled(true);
-                setShowEnrollForm(false);
-                navigate(`/payment-success?txnid=${response.razorpay_payment_id}`);
-              } else {
-                setSubmitStatus("error");
-                setErrorMessage(verifyData.message || "Payment verification failed.");
-              }
-            } catch (err) {
-              console.error("Verification error:", err);
-              setSubmitStatus("error");
-              setErrorMessage("Error verifying payment with server.");
-            }
-          },
-          prefill: {
-            name: user?.name || formData.name || "",
-            email: user?.email || formData.email || "",
-            contact: formData.phone || ""
-          },
-          theme: {
-            color: "#0a2968"
+          onError: (errReason) => {
+            setSubmitStatus("error");
+            setErrorMessage(errReason || "Payment failed or was cancelled.");
           }
-        };
-
-        const razorpayInstance = new window.Razorpay(options);
-        razorpayInstance.on("payment.failed", function (response) {
-          console.error("Payment failed:", response.error);
-          setSubmitStatus("error");
-          setErrorMessage(response.error.description || "Payment failed or cancelled.");
         });
-
-        razorpayInstance.open();
       }
     } catch (err) {
       setSubmitStatus("error");
@@ -502,7 +419,7 @@ const CourseCurriculum = () => {
     setSubmittingReview(true);
     try {
       const res = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/courses/${course._id}/review`,
+        getApiUrl(`/api/courses/${course._id}/review`),
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },

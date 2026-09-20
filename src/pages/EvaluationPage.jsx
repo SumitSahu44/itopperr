@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { 
   CheckCircle2, 
   Sparkles, 
@@ -27,6 +27,7 @@ import { launchRazorpayCheckout } from "../utils/razorpay";
 
 const EvaluationPage = () => {
   const { user } = useContext(AuthContext);
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("GS");
   const [evaluations, setEvaluations] = useState(DEFAULT_EVALUATIONS);
   const [loading, setLoading] = useState(true);
@@ -38,7 +39,7 @@ const EvaluationPage = () => {
     setSelectedPlanForPurchase(plan);
 
     if (user) {
-      // User is already registered/logged in: DIRECTLY OPEN RAZORPAY PAYMENT GATEWAY
+      // User is already logged in: DIRECTLY OPEN RAZORPAY PAYMENT GATEWAY
       launchRazorpayCheckout({
         item: plan,
         user: user,
@@ -65,7 +66,7 @@ const EvaluationPage = () => {
           } catch (e) {
             console.error("Failed to save purchased evaluation:", e);
           }
-          setIsCheckoutOpen(true);
+          navigate(`/payment-success?txnid=${paymentId}`);
         }
       });
     } else {

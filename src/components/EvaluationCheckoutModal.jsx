@@ -60,6 +60,8 @@ const EvaluationCheckoutModal = ({ isOpen, onClose, plan, onPaymentSuccess }) =>
   const discountAmount = appliedCoupon ? appliedCoupon.discountAmount : 0;
   const finalPayable = Math.max(0, basePrice - discountAmount);
 
+  const [redirectCountdown, setRedirectCountdown] = useState(0);
+
   // Function to save purchase and show success screen
   const handleSuccess = (txnid, pricePaid) => {
     const paymentReceipt = txnid;
@@ -89,6 +91,20 @@ const EvaluationCheckoutModal = ({ isOpen, onClose, plan, onPaymentSuccess }) =>
     }
 
     setStep("success");
+    setRedirectCountdown(3);
+
+    const timer = setInterval(() => {
+      setRedirectCountdown((prev) => {
+        if (prev <= 1) {
+          clearInterval(timer);
+          onClose();
+          navigate("/my-courses");
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
     if (onPaymentSuccess) onPaymentSuccess(txnid);
   };
 
@@ -201,7 +217,7 @@ const EvaluationCheckoutModal = ({ isOpen, onClose, plan, onPaymentSuccess }) =>
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm"
+        className="absolute inset-0 bg-[#0a2968]/40 backdrop-blur-xs"
         onClick={onClose}
       />
 
@@ -465,6 +481,13 @@ const EvaluationCheckoutModal = ({ isOpen, onClose, plan, onPaymentSuccess }) =>
                   <span className="font-bold text-slate-900">{plan.duration}</span>
                 </div>
               </div>
+
+              {redirectCountdown > 0 && (
+                <div className="mb-4 py-2 px-3 bg-blue-50 border border-blue-200 rounded-xl text-xs font-bold text-[#0a2968] flex items-center justify-center gap-2">
+                  <Loader2 size={14} className="animate-spin text-[#EF961D]" />
+                  <span>Redirecting to Student Dashboard in {redirectCountdown}s...</span>
+                </div>
+              )}
 
               <div className="flex flex-col sm:flex-row gap-3">
                 <button

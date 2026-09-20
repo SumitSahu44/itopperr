@@ -80,8 +80,8 @@ const AdminBlogsDashboard = () => {
     setAuthError("");
     setAuthLoading(true);
 
-    const targetEmail = (import.meta.env.VITE_ADMIN_EMAIL || "tds@gmail.com").trim().toLowerCase();
-    const targetPassword = (import.meta.env.VITE_ADMIN_PASSWORD || "tds@1230").trim();
+    const targetEmail = (import.meta.env.VITE_ADMIN_EMAIL || "itopper@gmail.com").trim().toLowerCase();
+    const targetPassword = (import.meta.env.VITE_ADMIN_PASSWORD || "itopper@1230").trim();
 
     const inputEmail = email.trim().toLowerCase();
     const inputPassword = password.trim();
@@ -105,8 +105,8 @@ const AdminBlogsDashboard = () => {
     }
 
     if (
-      (inputEmail === targetEmail || inputEmail === "admin@itopper.com" || inputEmail === "tds@gmail.com") &&
-      (inputPassword === targetPassword || inputPassword === "tds@1230" || inputPassword === "admin123")
+      (inputEmail === targetEmail || inputEmail === "admin@itopper.com" || inputEmail === "itopper@gmail.com") &&
+      (inputPassword === targetPassword || inputPassword === "itopper@1230" || inputPassword === "admin123")
     ) {
       localStorage.setItem("admin_blog_auth", "true");
       setIsAuthenticated(true);
@@ -254,7 +254,7 @@ const AdminBlogsDashboard = () => {
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="tds@gmail.com"
+                  placeholder="itopper@gmail.com"
                   className="w-full bg-slate-50 border border-slate-200 focus:border-[#163F66] focus:bg-white rounded-xl pl-12 pr-4 py-3.5 text-slate-800 outline-none transition-all font-semibold text-sm"
                 />
               </div>
