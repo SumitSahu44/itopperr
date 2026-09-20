@@ -65,6 +65,7 @@ import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsOfService from "./pages/TermsOfService";
 import RefundPolicy from "./pages/RefundPolicy";
 import CancellationPolicy from "./pages/CancellationPolicy";
+import AboutUsPage from "./pages/AboutUsPage";
 import Navbar from "./components/Navigation";
 import ScrollToTop from "./pages/ScrollToTop";
 import FAQSection from "./components/Faq";
@@ -191,7 +192,8 @@ function App() {
             <Route path="/faculty/add-class" element={<AddClass />} />
             <Route path="/faculty/edit-class/:id" element={<EditClass />} />
 
-            {/* POLICIES */}
+            {/* POLICIES & ABOUT */}
+            <Route path="/about" element={<AboutUsPage />} />
             <Route path="/privacy" element={<PrivacyPolicy />} />
             <Route path="/refund" element={<RefundPolicy />} />
             <Route path="/terms-of-service" element={<TermsOfService />} />

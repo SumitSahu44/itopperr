@@ -29,20 +29,24 @@ const Footer = () => {
   }, []);
 
   return (
-    <footer className="bg-white text-slate-600 pt-5 pb-15 relative overflow-hidden border-t border-slate-200">
-      {/* 📱 Responsive Grid: 2 on mobile, 3 on tablet, 5 on large */}
-      <div className="relative container mx-auto px-6 py-5 md:py-16 grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-8 z-10">
+    <footer className="bg-white text-slate-600 pt-10 pb-12 relative overflow-hidden border-t border-slate-200">
+      {/* Responsive Grid: 2 on mobile, 3 on tablet, 5 on large */}
+      <div className="relative container mx-auto px-6 py-5 md:py-12 grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-8 z-10">
         {/* Company Info */}
         <div className="col-span-2 sm:col-span-1">
-          <img className="w-32 md:w-40 h-auto rounded-lg" src="/images/itopper.png" alt="iTopper" />
-          <p className="text-slate-500 mt-4 mb-6 leading-relaxed">
-            Empowering aspirants with comprehensive guidance and strategic preparation to conquer the UPSC Civil Services Examination.
+          <Link to="/">
+            <img className="w-36 md:w-44 h-auto rounded-lg" src="/images/itopper.png" alt="iTopper Logo" />
+          </Link>
+          <p className="text-slate-500 text-xs mt-4 mb-4 leading-relaxed font-medium">
+            An initiative by <strong className="text-slate-800">UPSC 2017 Topper & Ex-Bureaucrat Mr. Amit Kumar</strong> to empower aspirants with top quality mentorship for UPSC CSE & State PCS Exams.
           </p>
-          <div className="flex space-x-4 mt-4 items-center gap-3 text-sm">
-            <span className="text-slate-500">Checkout our linkedin page.</span>
+          <div className="flex space-x-4 mt-2 items-center gap-2 text-xs">
+            <span className="text-slate-500 font-semibold">LinkedIn Page:</span>
             <a
               href="https://www.linkedin.com/company/itopper"
-              className="w-10 h-10 flex items-center justify-center rounded-full border border-slate-300 hover:border-[#1d4ed8] hover:text-[#1d4ed8] hover:bg-blue-50 transition-all text-slate-400 shrink-0"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-9 h-9 flex items-center justify-center rounded-full border border-slate-300 hover:border-[#1d4ed8] hover:text-[#1d4ed8] hover:bg-blue-50 transition-all text-slate-500 shrink-0"
             >
               <FaLinkedinIn />
             </a>
@@ -51,120 +55,114 @@ const Footer = () => {
 
         {/* Address */}
         <div>
-          <h3 className="text-lg font-bold text-[#163F66] mb-4 border-b border-slate-100 pb-2">
-            Address
+          <h3 className="text-base font-extrabold text-[#163F66] mb-4 border-b border-slate-100 pb-2 uppercase tracking-wider text-xs">
+            Address & Contact
           </h3>
-          <ul className="space-y-3 text-slate-500">
+          <ul className="space-y-2.5 text-xs text-slate-600 font-medium">
             <li className="leading-relaxed">
-              iTopper, shop no 55, 2nd floor old Rajinder Nagar Delhi 110060 sub door
+              Shop No 55, 2nd Floor, Old Rajinder Nagar, Delhi 110060
             </li>
             <li>
-              <span className="text-slate-800 font-semibold">Email:</span>{" "}
-              contact@itopper.academy
+              <span className="text-slate-800 font-bold">Email:</span>{" "}
+              <a href="mailto:contact@itopper.academy" className="hover:text-[#1d4ed8]">contact@itopper.academy</a>
             </li>
             <li>
-              <span className="text-slate-800 font-semibold">Alt Email:</span>{" "}
-              itopperiasacademy@gmail.com
+              <span className="text-slate-800 font-bold">Alt Email:</span>{" "}
+              <a href="mailto:itopperiasacademy@gmail.com" className="hover:text-[#1d4ed8]">itopperiasacademy@gmail.com</a>
             </li>
             <li>
-              <span className="text-slate-800 font-semibold">Phone:</span> +91
-              8826064806
+              <span className="text-slate-800 font-bold">Phone:</span>{" "}
+              <a href="tel:9877536047" className="hover:text-[#1d4ed8]">9877536047</a> / <a href="tel:8826064806" className="hover:text-[#1d4ed8]">8826064806</a>
             </li>
           </ul>
         </div>
 
-        {/* Company Links */}
+        {/* Quick Links */}
         <div>
-          <h3 className="text-lg font-bold text-[#163F66] mb-4 border-b border-slate-100 pb-2">
+          <h3 className="text-base font-extrabold text-[#163F66] mb-4 border-b border-slate-100 pb-2 uppercase tracking-wider text-xs">
             Company
           </h3>
-          <ul className="space-y-3 font-medium">
+          <ul className="space-y-2.5 text-xs font-semibold">
             <li>
-              <HashLink
-                smooth
-                to="/#about"
-                className="hover:text-[#1d4ed8] transition-all"
+              <Link
+                to="/about"
+                className="hover:text-[#1d4ed8] transition-all text-slate-700 hover:underline"
               >
                 About Us
-              </HashLink>
+              </Link>
             </li>
             <li>
               <HashLink
                 smooth
                 to="/#courses"
-                className="hover:text-[#1d4ed8] transition-all"
+                className="hover:text-[#1d4ed8] transition-all text-slate-700 hover:underline"
               >
-                Courses
+                Courses & Programs
               </HashLink>
             </li>
             <li>
-              <HashLink
-                smooth
-                to="/login"
-                className="hover:text-[#1d4ed8] transition-all"
+              <Link
+                to="/evaluation"
+                className="hover:text-[#1d4ed8] transition-all text-slate-700 hover:underline"
               >
-                Get Started
-              </HashLink>
+                Answer Evaluation
+              </Link>
+            </li>
+            <li>
+              <Link
+                to="/login"
+                className="hover:text-[#1d4ed8] transition-all text-slate-700 hover:underline"
+              >
+                Student Portal
+              </Link>
             </li>
           </ul>
         </div>
 
-        {/* Courses */}
+        {/* Services */}
         <div>
-          <h3 className="text-lg font-bold text-[#163F66] mb-4 border-b border-slate-100 pb-2">
-            Courses
+          <h3 className="text-base font-extrabold text-[#163F66] mb-4 border-b border-slate-100 pb-2 uppercase tracking-wider text-xs">
+            Key Programs
           </h3>
-          <ul className="space-y-3 font-medium">
-            {/* Hardcoded UPSC Courses */}
+          <ul className="space-y-2.5 text-xs font-semibold text-slate-700">
             <li>
-              <a
-                href="#"
-                onClick={(e) => { e.preventDefault(); window.alert("This page is currently under construction. Please check back later!"); }}
-                className="hover:text-[#1d4ed8] transition-all"
-              >
-                UPSC General Studies
-              </a>
+              <HashLink smooth to="/#courses?tab=programs" className="hover:text-[#1d4ed8] transition-all">
+                Personalized Mentorship
+              </HashLink>
             </li>
             <li>
-              <a
-                href="#"
-                onClick={(e) => { e.preventDefault(); window.alert("This page is currently under construction. Please check back later!"); }}
-                className="hover:text-[#1d4ed8] transition-all"
-              >
-                Optional Subjects
-              </a>
+              <HashLink smooth to="/#courses?tab=mains" className="hover:text-[#1d4ed8] transition-all">
+                Daily Answer Writing
+              </HashLink>
             </li>
             <li>
-              <a
-                href="#"
-                onClick={(e) => { e.preventDefault(); window.alert("This page is currently under construction. Please check back later!"); }}
-                className="hover:text-[#1d4ed8] transition-all"
-              >
-                CSAT Preparation
-              </a>
+              <HashLink smooth to="/#courses?tab=mains" className="hover:text-[#1d4ed8] transition-all">
+                Mains Test Series
+              </HashLink>
             </li>
             <li>
-              <a
-                href="#"
-                onClick={(e) => { e.preventDefault(); window.alert("This page is currently under construction. Please check back later!"); }}
-                className="hover:text-[#1d4ed8] transition-all"
-              >
+              <HashLink smooth to="/#courses?tab=programs" className="hover:text-[#1d4ed8] transition-all">
+                Prelims Test Series
+              </HashLink>
+            </li>
+            <li>
+              <HashLink smooth to="/#courses?tab=modules" className="hover:text-[#1d4ed8] transition-all">
                 Interview Guidance
-              </a>
+              </HashLink>
             </li>
           </ul>
         </div>
 
         {/* Policies */}
         <div>
-          <h3 className="text-lg font-bold text-[#163F66] mb-4 border-b border-slate-100 pb-2">
-            Policies
+          <h3 className="text-base font-extrabold text-[#163F66] mb-4 border-b border-slate-100 pb-2 uppercase tracking-wider text-xs">
+            Legal & Policies
           </h3>
-          <ul className="space-y-3 font-medium">
+          <ul className="space-y-2.5 text-xs font-semibold">
             <li>
               <Link
                 to="/privacy"
-                className="hover:text-[#1d4ed8] transition-all"
+                className="hover:text-[#1d4ed8] transition-all text-slate-700 hover:underline"
               >
                 Privacy Policy
               </Link>
@@ -172,23 +170,23 @@ const Footer = () => {
             <li>
               <Link
                 to="/terms-of-service"
-                className="hover:text-[#1d4ed8] transition-all"
+                className="hover:text-[#1d4ed8] transition-all text-slate-700 hover:underline"
               >
-                Terms of Service
+                Terms & Conditions
               </Link>
             </li>
             <li>
               <Link
                 to="/refund"
-                className="hover:text-[#1d4ed8] transition-all"
+                className="hover:text-[#1d4ed8] transition-all text-slate-700 hover:underline"
               >
-                Refund Policy
+                Refund & Return Policy
               </Link>
             </li>
             <li>
               <Link
                 to="/cancellation"
-                className="hover:text-[#1d4ed8] transition-all"
+                className="hover:text-[#1d4ed8] transition-all text-slate-700 hover:underline"
               >
                 Cancellation Policy
               </Link>
@@ -198,20 +196,8 @@ const Footer = () => {
       </div>
 
       {/* Divider & Copyright */}
-      <div className="border-t border-slate-200 mt-8 pt-6 text-center text-sm font-semibold text-slate-500 relative z-10 bg-slate-50 pb-6">
-        © {new Date().getFullYear()} iTopper. All Rights Reserved. | Design &
-        Developed By{" "}
-        <span
-          className="text-transparent bg-clip-text font-bold"
-          style={{
-            background:
-              "linear-gradient(90deg, #1e3a8a 30%, #1d4ed8 60%, #3b82f6 100%)",
-            WebkitBackgroundClip: "text",
-            WebkitTextFillColor: "transparent",
-          }}
-        >
-          ❤️ Sumit Sahu
-        </span>
+      <div className="border-t border-slate-200 mt-6 pt-5 text-center text-xs font-semibold text-slate-500 relative z-10 bg-slate-50 pb-4">
+        © {new Date().getFullYear()} iTopper. All Rights Reserved. | Dedicated UPSC Civil Services Prep
       </div>
     </footer>
   );
