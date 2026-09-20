@@ -39,6 +39,7 @@ const EvaluationCheckoutModal = ({ isOpen, onClose, plan, onPaymentSuccess }) =>
   const [appliedCoupon, setAppliedCoupon] = useState(null);
   const [couponError, setCouponError] = useState("");
   const [receiptId, setReceiptId] = useState("");
+  const [redirectCountdown, setRedirectCountdown] = useState(0);
 
   useEffect(() => {
     if (isOpen) {
@@ -59,8 +60,6 @@ const EvaluationCheckoutModal = ({ isOpen, onClose, plan, onPaymentSuccess }) =>
   const basePrice = plan.finalPrice || 4999;
   const discountAmount = appliedCoupon ? appliedCoupon.discountAmount : 0;
   const finalPayable = Math.max(0, basePrice - discountAmount);
-
-  const [redirectCountdown, setRedirectCountdown] = useState(0);
 
   // Function to save purchase and show success screen
   const handleSuccess = (txnid, pricePaid) => {
