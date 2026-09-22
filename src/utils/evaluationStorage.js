@@ -21,8 +21,15 @@ export const DEFAULT_EVALUATIONS = [
     badge: "Popular",
     purchaseUrl: "/#contact",
     planPdf: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf",
+    planPdfTitle: "GS Paper 1 Program Syllabus & Micro-Topics Overview PDF",
     published: true,
-    order: 1
+    order: 1,
+    tests: [
+      { id: "eval-gs1-t1", testName: "Test 1: Modern Indian History & Freedom Struggle", questionPdf: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf" },
+      { id: "eval-gs1-t2", testName: "Test 2: Art, Culture & Ancient Literature", questionPdf: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf" },
+      { id: "eval-gs1-t3", testName: "Test 3: Physical & Indian Geography", questionPdf: "" },
+      { id: "eval-gs1-t4", testName: "Test 4: Indian Society & World History", questionPdf: "" }
+    ]
   },
   {
     _id: "eval-gs2",
@@ -41,8 +48,15 @@ export const DEFAULT_EVALUATIONS = [
     duration: "Till Mains 2026",
     badge: "High Recommended",
     purchaseUrl: "/#contact",
+    planPdf: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf",
+    planPdfTitle: "GS Paper 2 Polity & Governance Syllabus Overview PDF",
     published: true,
-    order: 2
+    order: 2,
+    tests: [
+      { id: "eval-gs2-t1", testName: "Test 1: Indian Constitution & Federal Framework", questionPdf: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf" },
+      { id: "eval-gs2-t2", testName: "Test 2: Governance, Welfare Schemes & Social Justice", questionPdf: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf" },
+      { id: "eval-gs2-t3", testName: "Test 3: International Relations & Global Organizations", questionPdf: "" }
+    ]
   },
   {
     _id: "eval-gs3",
@@ -61,8 +75,15 @@ export const DEFAULT_EVALUATIONS = [
     duration: "Till Mains 2026",
     badge: "Top Choice",
     purchaseUrl: "/#contact",
+    planPdf: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf",
+    planPdfTitle: "GS Paper 3 Economy & Environment Syllabus Overview PDF",
     published: true,
-    order: 3
+    order: 3,
+    tests: [
+      { id: "eval-gs3-t1", testName: "Test 1: Indian Economy & Agriculture Development", questionPdf: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf" },
+      { id: "eval-gs3-t2", testName: "Test 2: Environment, Biodiversity & Climate Change", questionPdf: "" },
+      { id: "eval-gs3-t3", testName: "Test 3: Science & Technology & Internal Security", questionPdf: "" }
+    ]
   },
   {
     _id: "eval-gs4",
@@ -81,8 +102,15 @@ export const DEFAULT_EVALUATIONS = [
     duration: "Till Mains 2026",
     badge: "Ethics Special",
     purchaseUrl: "/#contact",
+    planPdf: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf",
+    planPdfTitle: "GS Paper 4 Ethics Thinkers & Case Study Guide PDF",
     published: true,
-    order: 4
+    order: 4,
+    tests: [
+      { id: "eval-gs4-t1", testName: "Test 1: Ethics & Human Interface Theory", questionPdf: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf" },
+      { id: "eval-gs4-t2", testName: "Test 2: Emotional Intelligence & Probity in Governance", questionPdf: "" },
+      { id: "eval-gs4-t3", testName: "Test 3: Case Studies & Ethical Dilemmas Matrix", questionPdf: "" }
+    ]
   },
   {
     _id: "eval-opt-psir",
@@ -101,8 +129,15 @@ export const DEFAULT_EVALUATIONS = [
     duration: "Till Mains 2026",
     badge: "Most Popular",
     purchaseUrl: "/#contact",
+    planPdf: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf",
+    planPdfTitle: "Optional PSIR Syllabus & Scholarly Perspectives Guide PDF",
     published: true,
-    order: 5
+    order: 5,
+    tests: [
+      { id: "eval-psir-t1", testName: "Test 1: PSIR Paper 1 Section A - Political Theory & Thinkers", questionPdf: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf" },
+      { id: "eval-psir-t2", testName: "Test 2: PSIR Paper 1 Section B - Indian Government & Politics", questionPdf: "" },
+      { id: "eval-psir-t3", testName: "Test 3: PSIR Paper 2 - Comparative & International Politics", questionPdf: "" }
+    ]
   },
   {
     _id: "eval-opt-geog",
@@ -121,8 +156,15 @@ export const DEFAULT_EVALUATIONS = [
     duration: "Till Mains 2026",
     badge: "Specialized",
     purchaseUrl: "/#contact",
+    planPdf: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf",
+    planPdfTitle: "Geography Optional Diagram & Syllabus Guide PDF",
     published: true,
-    order: 6
+    order: 6,
+    tests: [
+      { id: "eval-geog-t1", testName: "Test 1: Geomorphology, Climatology & Oceanography", questionPdf: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf" },
+      { id: "eval-geog-t2", testName: "Test 2: Human Geography & Economic Geography", questionPdf: "" },
+      { id: "eval-geog-t3", testName: "Test 3: Geography of India & Map Work", questionPdf: "" }
+    ]
   },
   {
     _id: "eval-opt-socio",
@@ -141,8 +183,14 @@ export const DEFAULT_EVALUATIONS = [
     duration: "Till Mains 2026",
     badge: "High Success",
     purchaseUrl: "/#contact",
+    planPdf: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf",
+    planPdfTitle: "Sociology Optional Thinkers & Concepts Overview PDF",
     published: true,
-    order: 7
+    order: 7,
+    tests: [
+      { id: "eval-socio-t1", testName: "Test 1: Sociological Thinkers & Research Methods", questionPdf: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf" },
+      { id: "eval-socio-t2", testName: "Test 2: Indian Society, Caste & Social Transformations", questionPdf: "" }
+    ]
   },
   {
     _id: "eval-opt-anthro",
@@ -161,8 +209,14 @@ export const DEFAULT_EVALUATIONS = [
     duration: "Till Mains 2026",
     badge: "Topper Choice",
     purchaseUrl: "/#contact",
+    planPdf: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf",
+    planPdfTitle: "Anthropology Optional Syllabus & Diagram Guide PDF",
     published: true,
-    order: 8
+    order: 8,
+    tests: [
+      { id: "eval-anthro-t1", testName: "Test 1: Physical Anthropology & Human Evolution", questionPdf: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf" },
+      { id: "eval-anthro-t2", testName: "Test 2: Socio-Cultural & Indian Anthropology", questionPdf: "" }
+    ]
   },
   {
     _id: "eval-combo-1",
@@ -183,8 +237,17 @@ export const DEFAULT_EVALUATIONS = [
     duration: "Till Mains 2026",
     badge: "Best Value Combo",
     purchaseUrl: "/#contact",
+    planPdf: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf",
+    planPdfTitle: "GS 1-4 + Optional Full Combo Master Guidance PDF",
     published: true,
-    order: 9
+    order: 9,
+    tests: [
+      { id: "eval-combo1-t1", testName: "Test 1: GS Paper 1 Full Length Mock", questionPdf: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf" },
+      { id: "eval-combo1-t2", testName: "Test 2: GS Paper 2 Full Length Mock", questionPdf: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf" },
+      { id: "eval-combo1-t3", testName: "Test 3: GS Paper 3 Full Length Mock", questionPdf: "" },
+      { id: "eval-combo1-t4", testName: "Test 4: GS Paper 4 Ethics Full Length Mock", questionPdf: "" },
+      { id: "eval-combo1-t5", testName: "Test 5: Optional Paper 1 & 2 Combo Mock", questionPdf: "" }
+    ]
   },
   {
     _id: "eval-combo-2",
@@ -203,8 +266,15 @@ export const DEFAULT_EVALUATIONS = [
     duration: "Till Mains 2026",
     badge: "GS Super Saver",
     purchaseUrl: "/#contact",
+    planPdf: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf",
+    planPdfTitle: "GS Mains 1-4 Complete Package Guide PDF",
     published: true,
-    order: 10
+    order: 10,
+    tests: [
+      { id: "eval-combo2-t1", testName: "Test 1: GS Paper 1 & 2 Integrated Mock", questionPdf: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf" },
+      { id: "eval-combo2-t2", testName: "Test 2: GS Paper 3 & 4 Integrated Mock", questionPdf: "" },
+      { id: "eval-combo2-t3", testName: "Test 3: Essay Paper Special Mock", questionPdf: "" }
+    ]
   }
 ];
 
@@ -295,4 +365,54 @@ export const deleteEvaluation = async (id) => {
   const updated = current.filter(item => item._id !== id && item.id !== id);
   localStorage.setItem("itopper_evaluations_cache", JSON.stringify(updated));
   return true;
+};
+
+// Sync Results API
+export const getEvaluationResultsApi = async (email = '') => {
+  try {
+    const url = email ? `${API_BASE}/results?email=${encodeURIComponent(email)}` : `${API_BASE}/results`;
+    const res = await fetch(url);
+    if (res.ok) {
+      const data = await res.json();
+      if (Array.isArray(data) && data.length > 0) {
+        localStorage.setItem("itopper_evaluation_results", JSON.stringify(data));
+        return data;
+      }
+    }
+  } catch (err) {
+    console.warn("Backend evaluation results API unreachable, falling back to local storage:", err.message);
+  }
+  return JSON.parse(localStorage.getItem("itopper_evaluation_results") || "[]");
+};
+
+export const saveEvaluationResultApi = async (resultData) => {
+  try {
+    const res = await fetch(`${API_BASE}/results`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(resultData),
+    });
+    if (res.ok) {
+      return await res.json();
+    }
+  } catch (err) {
+    console.warn("Backend save evaluation result API failed, saving locally:", err.message);
+  }
+  return null;
+};
+
+export const submitAnswerSheetApi = async (submissionData) => {
+  try {
+    const res = await fetch(`${API_BASE}/submissions`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(submissionData),
+    });
+    if (res.ok) {
+      return await res.json();
+    }
+  } catch (err) {
+    console.warn("Backend submit answer sheet API failed, saving locally:", err.message);
+  }
+  return null;
 };

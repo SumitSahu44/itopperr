@@ -52,7 +52,8 @@ import {
   UserCheck
 } from "lucide-react";
 import { getBlogs, addBlog, updateBlog, deleteBlog } from "../utils/blogStorage";
-import { getEvaluations, addEvaluation, updateEvaluation, deleteEvaluation } from "../utils/evaluationStorage";
+import { getEvaluations, addEvaluation, updateEvaluation, deleteEvaluation, saveEvaluationResultApi } from "../utils/evaluationStorage";
+import { uploadFileToCloudinary } from "../utils/uploadStorage";
 import { getApiUrl } from "../config/api";
 
 const AdminPortal = ({ initialTab = "dashboard" }) => {
@@ -103,19 +104,45 @@ const AdminPortal = ({ initialTab = "dashboard" }) => {
   const [evalBadge, setEvalBadge] = useState("Popular");
   const [evalPurchaseUrl, setEvalPurchaseUrl] = useState("/#contact");
   const [evalPlanPdf, setEvalPlanPdf] = useState("");
+  const [evalPlanPdfTitle, setEvalPlanPdfTitle] = useState("Syllabus & Program Overview PDF");
+  const [evalTestsList, setEvalTestsList] = useState([
+    { id: "t1", testTitle: "Test 1: Modern Indian History & Freedom Struggle", questionPdf: "" },
+    { id: "t2", testTitle: "Test 2: Art, Culture & Ancient Literature", questionPdf: "" }
+  ]);
   const [evalPublished, setEvalPublished] = useState(true);
   const [isSavingEval, setIsSavingEval] = useState(false);
+
+  const handleAddTestItem = () => {
+    setEvalTestsList(prev => [
+      ...prev,
+      { id: `test-${Date.now()}-${prev.length + 1}`, testTitle: `Test ${prev.length + 1}: Mains Question Paper`, questionPdf: "" }
+    ]);
+  };
+
+  const handleUpdateTestItem = (index, field, value) => {
+    setEvalTestsList(prev => {
+      const updated = [...prev];
+      updated[index] = { ...updated[index], [field]: value };
+      return updated;
+    });
+  };
+
+  const handleRemoveTestItem = (index) => {
+    setEvalTestsList(prev => prev.filter((_, idx) => idx !== index));
+  };
 
   // Evaluation Results States (For Student Dashboard Results Tab)
   const [resultsList, setResultsList] = useState([]);
   const [showResultForm, setShowResultForm] = useState(false);
   const [resStudentEmail, setResStudentEmail] = useState("");
   const [resPlanTitle, setResPlanTitle] = useState("GS Paper 1 Mains Answer Evaluation");
+  const [resTestName, setResTestName] = useState("Test 1: Modern Indian History & Freedom Struggle");
   const [resPaperTag, setResPaperTag] = useState("GS Paper 1");
   const [resScore, setResScore] = useState("118 / 250");
   const [resRemarks, setResRemarks] = useState("Good structural clarity in History. Work on Geography diagrams and conclusion hooks.");
   const [resPdfUrl, setResPdfUrl] = useState("");
   const [resCategorySelect, setResCategorySelect] = useState("All");
+  const [resTargetType, setResTargetType] = useState("personal"); // 'personal' (specific student) or 'course_all' (all enrolled students)
 
   const getAvailablePlans = (categoryFilter = "All") => {
     const defaultPlans = [
@@ -301,22 +328,25 @@ const AdminPortal = ({ initialTab = "dashboard" }) => {
   const resetResultForm = () => {
     setResPlanTitle("GS Paper 1 Mains Answer Evaluation");
     setResPaperTag("GS Paper 1");
-    setResStudentEmail("");
+    setResStudentEmail("student@itopper.com");
+    setResTargetType("personal");
     setResScore("124 / 250");
     setResRemarks("Great structure & introduction. Add more flowcharts in section B.");
     setResPdfUrl("https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf");
   };
 
-  const handleSaveResult = () => {
+  const handleSaveResult = async () => {
     const title = resPlanTitle.trim() || "UPSC Mains Evaluation Result";
     const pdfUrl = resPdfUrl.trim() || "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf";
-    const targetEmail = resStudentEmail.trim() || "all";
+    const targetEmail = resTargetType === "course_all" ? "all" : (resStudentEmail.trim() || "student@itopper.com");
 
     const newResult = {
       id: "res-" + Date.now(),
       planTitle: title,
+      testName: resTestName.trim() || "Test 1",
       paperTag: resPaperTag.trim() || "GS Paper",
       studentEmail: targetEmail,
+      targetType: resTargetType,
       score: resScore.trim() || "118 / 250",
       evaluatedAt: new Date().toLocaleDateString("en-IN", { day: 'numeric', month: 'short', year: 'numeric' }),
       remarks: resRemarks.trim() || "Evaluated copy uploaded.",
@@ -326,6 +356,13 @@ const AdminPortal = ({ initialTab = "dashboard" }) => {
     const updated = [newResult, ...resultsList];
     setResultsList(updated);
     localStorage.setItem("itopper_evaluation_results", JSON.stringify(updated));
+
+    // Also sync to Live MongoDB API
+    try {
+      await saveEvaluationResultApi(newResult);
+    } catch (e) {
+      console.warn("MongoDB result sync failed, saved locally:", e);
+    }
 
     // Also update student submission status to Checked / Evaluated
     try {
@@ -343,7 +380,11 @@ const AdminPortal = ({ initialTab = "dashboard" }) => {
     }
 
     setShowResultForm(false);
-    alert("✅ Evaluation Result PDF uploaded & published! Student can now view their checked copy.");
+    alert(
+      targetEmail === "all"
+        ? `✅ Course Model Result PDF published for ALL students enrolled in "${title}"!`
+        : `✅ Personal Checked Copy PDF published strictly for student "${targetEmail}"!`
+    );
   };
 
   const handleDeleteResult = (id) => {
@@ -525,6 +566,11 @@ const AdminPortal = ({ initialTab = "dashboard" }) => {
     setEvalBadge("Popular");
     setEvalPurchaseUrl("/#contact");
     setEvalPlanPdf("");
+    setEvalPlanPdfTitle("Program Syllabus & Micro-Topics Overview PDF");
+    setEvalTestsList([
+      { id: "t-1", testTitle: "Test 1: Modern Indian History & Freedom Struggle", questionPdf: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf" },
+      { id: "t-2", testTitle: "Test 2: Art, Culture & Ancient Literature", questionPdf: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf" }
+    ]);
     setEvalPublished(true);
     setEditingEval(null);
   };
@@ -536,6 +582,14 @@ const AdminPortal = ({ initialTab = "dashboard" }) => {
     }
     setIsSavingEval(true);
     const featuresArray = evalFeatures.split('\n').filter(f => f.trim() !== '');
+    const validTests = evalTestsList
+      .filter(t => t.testTitle && t.testTitle.trim() !== '')
+      .map((t, idx) => ({
+        id: t.id || `test-${Date.now()}-${idx}`,
+        testName: t.testTitle.trim(),
+        testTitle: t.testTitle.trim(),
+        questionPdf: t.questionPdf ? t.questionPdf.trim() : ""
+      }));
 
     const evalData = {
       title: evalTitle.trim(),
@@ -549,7 +603,9 @@ const AdminPortal = ({ initialTab = "dashboard" }) => {
       badge: evalBadge.trim(),
       purchaseUrl: evalPurchaseUrl.trim() || "/#contact",
       planPdf: evalPlanPdf.trim(),
-      published: evalPublished
+      planPdfTitle: evalPlanPdfTitle.trim() || "Program Syllabus & Micro-Topics Overview PDF",
+      published: evalPublished,
+      tests: validTests
     };
 
     try {
@@ -1301,6 +1357,16 @@ const AdminPortal = ({ initialTab = "dashboard" }) => {
                           setEvalBadge(item.badge || "Popular");
                           setEvalPurchaseUrl(item.purchaseUrl || "/#contact");
                           setEvalPlanPdf(item.planPdf || "");
+                          setEvalPlanPdfTitle(item.planPdfTitle || "Program Syllabus & Micro-Topics Overview PDF");
+                          setEvalTestsList(
+                            Array.isArray(item.tests) && item.tests.length > 0
+                              ? item.tests.map((t, i) => ({
+                                  id: t.id || `test-${i}`,
+                                  testTitle: t.testName || t.testTitle || (typeof t === 'string' ? t : `Test ${i + 1}`),
+                                  questionPdf: t.questionPdf || ""
+                                }))
+                              : [{ id: "t-1", testTitle: "Test 1: Mains Question Paper", questionPdf: "" }]
+                          );
                           setEvalPublished(item.published !== undefined ? item.published : true);
                           setShowEvalForm(true);
                         }}
@@ -1496,14 +1562,32 @@ const AdminPortal = ({ initialTab = "dashboard" }) => {
                   </div>
 
                   <div>
-                    <label className="block text-xs font-extrabold text-slate-600 uppercase mb-2">Cover Image URL</label>
-                    <input
-                      type="text"
-                      value={blogImage}
-                      onChange={(e) => setBlogImage(e.target.value)}
-                      placeholder="https://..."
-                      className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-xs font-semibold outline-none"
-                    />
+                    <label className="block text-xs font-extrabold text-slate-600 uppercase mb-2">Cover Image URL / Upload</label>
+                    <div className="flex gap-2">
+                      <input
+                        type="text"
+                        value={blogImage}
+                        onChange={(e) => setBlogImage(e.target.value)}
+                        placeholder="https://..."
+                        className="flex-grow bg-white border border-slate-200 rounded-xl px-4 py-3 text-xs font-semibold outline-none"
+                      />
+                      <label className="px-3 py-3 bg-[#0a2968] text-white hover:bg-[#EF961D] rounded-xl font-extrabold text-xs flex items-center gap-1 cursor-pointer shrink-0 transition-colors">
+                        <Upload size={14} />
+                        <input
+                          type="file"
+                          accept="image/*"
+                          className="hidden"
+                          onChange={async (e) => {
+                            const file = e.target.files[0];
+                            if (file) {
+                              const cloudinaryUrl = await uploadFileToCloudinary(file, 'blog_cover_images');
+                              setBlogImage(cloudinaryUrl);
+                              alert(`✅ Blog cover image uploaded to Cloudinary!\n${cloudinaryUrl}`);
+                            }
+                          }}
+                        />
+                      </label>
+                    </div>
                   </div>
 
                   <div className="flex items-center gap-2 pt-2">
@@ -1661,38 +1745,138 @@ const AdminPortal = ({ initialTab = "dashboard" }) => {
                   />
                 </div>
 
-                <div className="md:col-span-2">
-                  <label className="block text-xs font-extrabold text-[#0a2968] uppercase mb-2">
-                    Plan PDF Document (Upload or Link PDF for Enrolled Students)
-                  </label>
-                  <div className="flex gap-2">
+                {/* GENERAL / PROGRAM OVERVIEW PDF SECTION */}
+                <div className="md:col-span-2 bg-blue-50/60 border border-blue-200 p-5 rounded-2xl space-y-4">
+                  <h3 className="text-sm font-black text-[#0a2968] flex items-center gap-2">
+                    <FileText size={18} className="text-[#EF961D]" /> Course Overview PDF (Syllabus / Guidance Guide)
+                  </h3>
+
+                  <div>
+                    <label className="block text-xs font-extrabold text-slate-700 uppercase mb-1">
+                      PDF Document Title (Shown in Student Dashboard)
+                    </label>
                     <input
                       type="text"
-                      value={evalPlanPdf}
-                      onChange={(e) => setEvalPlanPdf(e.target.value)}
-                      placeholder="e.g. https://example.com/question-paper.pdf or /docs/plan.pdf"
-                      className="flex-grow bg-slate-50 border border-slate-200 focus:border-[#0a2968] rounded-xl px-4 py-3 text-slate-800 text-sm font-semibold outline-none"
+                      value={evalPlanPdfTitle}
+                      onChange={(e) => setEvalPlanPdfTitle(e.target.value)}
+                      placeholder="e.g. Program Syllabus & Micro-Topics Overview PDF"
+                      className="w-full bg-white border border-slate-300 focus:border-[#0a2968] rounded-xl px-4 py-2.5 text-slate-800 text-sm font-semibold outline-none"
                     />
-                    <label className="px-4 py-3 bg-[#0a2968] text-white hover:bg-[#EF961D] rounded-xl font-extrabold text-xs flex items-center gap-1.5 cursor-pointer shrink-0 transition-colors shadow-xs">
-                      <Upload size={16} /> Upload PDF
-                      <input
-                        type="file"
-                        accept="application/pdf"
-                        className="hidden"
-                        onChange={(e) => {
-                          const file = e.target.files[0];
-                          if (file) {
-                            const fakeUrl = URL.createObjectURL(file);
-                            setEvalPlanPdf(fakeUrl);
-                            alert(`Selected PDF file: ${file.name}`);
-                          }
-                        }}
-                      />
-                    </label>
                   </div>
-                  <p className="text-[11px] text-slate-400 font-semibold mt-1">
-                    * This PDF will only be downloadable/printable by students who purchase this card plan.
-                  </p>
+
+                  <div>
+                    <label className="block text-xs font-extrabold text-slate-700 uppercase mb-1">
+                      PDF File URL / Upload
+                    </label>
+                    <div className="flex gap-2">
+                      <input
+                        type="text"
+                        value={evalPlanPdf}
+                        onChange={(e) => setEvalPlanPdf(e.target.value)}
+                        placeholder="e.g. https://example.com/syllabus.pdf or /docs/plan.pdf"
+                        className="flex-grow bg-white border border-slate-300 focus:border-[#0a2968] rounded-xl px-4 py-2.5 text-slate-800 text-sm font-semibold outline-none"
+                      />
+                      <label className="px-4 py-2.5 bg-[#0a2968] text-white hover:bg-[#EF961D] rounded-xl font-extrabold text-xs flex items-center gap-1.5 cursor-pointer shrink-0 transition-colors shadow-xs">
+                        <Upload size={15} /> Upload PDF
+                        <input
+                          type="file"
+                          accept="application/pdf"
+                          className="hidden"
+                          onChange={async (e) => {
+                            const file = e.target.files[0];
+                            if (file) {
+                              const cloudinaryUrl = await uploadFileToCloudinary(file, 'course_syllabus_pdfs');
+                              setEvalPlanPdf(cloudinaryUrl);
+                              alert(`✅ Syllabus PDF "${file.name}" uploaded to Cloudinary!`);
+                            }
+                          }}
+                        />
+                      </label>
+                    </div>
+                  </div>
+                </div>
+
+                {/* DYNAMIC TESTS BUILDER SECTION */}
+                <div className="md:col-span-2 bg-slate-50 border border-slate-200 p-5 rounded-2xl space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h3 className="text-sm font-black text-[#0a2968]">
+                        Dynamic Test Series Builder ({evalTestsList.length} Tests)
+                      </h3>
+                      <p className="text-[11px] text-slate-500 font-semibold">
+                        Add test titles & question PDFs test-by-test. Admin can add more tests anytime later!
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={handleAddTestItem}
+                      className="px-4 py-2 bg-[#0a2968] hover:bg-[#EF961D] text-white text-xs font-extrabold rounded-xl transition-all shadow-xs flex items-center gap-1.5 cursor-pointer"
+                    >
+                      <Plus size={15} /> Add New Test
+                    </button>
+                  </div>
+
+                  <div className="space-y-3 pt-2">
+                    {evalTestsList.map((testItem, idx) => (
+                      <div key={testItem.id || idx} className="bg-white p-4 rounded-xl border border-slate-200 shadow-2xs space-y-3">
+                        <div className="flex items-center justify-between gap-3">
+                          <span className="text-xs font-extrabold text-[#0a2968] bg-blue-50 px-2.5 py-1 rounded-lg border border-blue-100">
+                            Test #{idx + 1}
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() => handleRemoveTestItem(idx)}
+                            className="text-red-500 hover:text-red-700 p-1.5 rounded-lg hover:bg-red-50 transition-colors cursor-pointer"
+                            title="Remove Test"
+                          >
+                            <Trash2 size={16} />
+                          </button>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                          <div>
+                            <label className="block text-[11px] font-bold text-slate-600 uppercase mb-1">Test Title</label>
+                            <input
+                              type="text"
+                              value={testItem.testTitle}
+                              onChange={(e) => handleUpdateTestItem(idx, 'testTitle', e.target.value)}
+                              placeholder={`e.g. Test ${idx + 1}: Mains Practice Test`}
+                              className="w-full bg-slate-50 border border-slate-200 focus:border-[#0a2968] rounded-lg px-3 py-2 text-slate-800 text-xs font-semibold outline-none"
+                            />
+                          </div>
+
+                          <div>
+                            <label className="block text-[11px] font-bold text-slate-600 uppercase mb-1">Question Paper PDF (Optional)</label>
+                            <div className="flex gap-1.5">
+                              <input
+                                type="text"
+                                value={testItem.questionPdf}
+                                onChange={(e) => handleUpdateTestItem(idx, 'questionPdf', e.target.value)}
+                                placeholder="https://... PDF URL"
+                                className="flex-grow bg-slate-50 border border-slate-200 focus:border-[#0a2968] rounded-lg px-3 py-2 text-slate-800 text-xs font-semibold outline-none"
+                              />
+                              <label className="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-[#0a2968] border border-slate-300 rounded-lg font-bold text-[11px] flex items-center gap-1 cursor-pointer shrink-0">
+                                <Upload size={13} />
+                                <input
+                                  type="file"
+                                  accept="application/pdf"
+                                  className="hidden"
+                                  onChange={async (e) => {
+                                    const file = e.target.files[0];
+                                    if (file) {
+                                      const cloudinaryUrl = await uploadFileToCloudinary(file, 'test_question_pdfs');
+                                      handleUpdateTestItem(idx, 'questionPdf', cloudinaryUrl);
+                                      alert(`✅ Question Paper PDF for Test #${idx + 1} uploaded to Cloudinary!`);
+                                    }
+                                  }}
+                                />
+                              </label>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                 </div>
 
                 <div className="flex items-center gap-2 pt-4">
@@ -1810,6 +1994,92 @@ const AdminPortal = ({ initialTab = "dashboard" }) => {
                 />
               </div>
 
+              <div>
+                <label className="block text-xs font-extrabold text-[#0a2968] uppercase mb-2">Specific Test Name (e.g. Test 1, Test 2)</label>
+                <input
+                  type="text"
+                  value={resTestName}
+                  onChange={(e) => setResTestName(e.target.value)}
+                  placeholder="e.g. Test 1: Modern Indian History & Freedom Struggle"
+                  className="w-full bg-slate-50 border border-slate-200 focus:border-[#0a2968] rounded-xl px-4 py-3 text-slate-800 text-sm font-semibold outline-none"
+                />
+              </div>
+
+              {/* TARGET TYPE SELECTOR: PERSONAL CHECKED COPY VS COURSE MODEL RESULT */}
+              <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-3">
+                <label className="block text-xs font-black text-[#0a2968] uppercase tracking-wider">
+                  Target Audience / Visibility
+                </label>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <label
+                    onClick={() => setResTargetType("personal")}
+                    className={`p-3 rounded-xl border text-xs font-bold transition-all cursor-pointer flex items-start gap-2.5 ${
+                      resTargetType === "personal"
+                        ? "bg-white border-[#0a2968] text-[#0a2968] shadow-xs ring-2 ring-[#0a2968]/15"
+                        : "bg-white/60 border-slate-200 text-slate-600 hover:bg-white"
+                    }`}
+                  >
+                    <input
+                      type="radio"
+                      name="targetType"
+                      checked={resTargetType === "personal"}
+                      onChange={() => setResTargetType("personal")}
+                      className="mt-0.5"
+                    />
+                    <div>
+                      <span className="font-extrabold block">🔐 Personal Checked Copy</span>
+                      <span className="text-[10px] text-slate-500 block leading-tight mt-0.5">
+                        Visible ONLY to the specific student whose email is entered below.
+                      </span>
+                    </div>
+                  </label>
+
+                  <label
+                    onClick={() => {
+                      setResTargetType("course_all");
+                      setResStudentEmail("all");
+                    }}
+                    className={`p-3 rounded-xl border text-xs font-bold transition-all cursor-pointer flex items-start gap-2.5 ${
+                      resTargetType === "course_all"
+                        ? "bg-white border-[#0a2968] text-[#0a2968] shadow-xs ring-2 ring-[#0a2968]/15"
+                        : "bg-white/60 border-slate-200 text-slate-600 hover:bg-white"
+                    }`}
+                  >
+                    <input
+                      type="radio"
+                      name="targetType"
+                      checked={resTargetType === "course_all"}
+                      onChange={() => {
+                        setResTargetType("course_all");
+                        setResStudentEmail("all");
+                      }}
+                      className="mt-0.5"
+                    />
+                    <div>
+                      <span className="font-extrabold block">🌐 Course Model Answer / Result</span>
+                      <span className="text-[10px] text-slate-500 block leading-tight mt-0.5">
+                        Visible to ALL students enrolled in this course/plan.
+                      </span>
+                    </div>
+                  </label>
+                </div>
+
+                {resTargetType === "personal" && (
+                  <div className="pt-2 animate-in fade-in duration-150">
+                    <label className="block text-[11px] font-extrabold text-[#0a2968] uppercase mb-1">
+                      Student Email Address
+                    </label>
+                    <input
+                      type="email"
+                      value={resStudentEmail}
+                      onChange={(e) => setResStudentEmail(e.target.value)}
+                      placeholder="e.g. rahul.sharma@gmail.com or student@itopper.com"
+                      className="w-full bg-white border border-slate-300 focus:border-[#0a2968] rounded-xl px-3.5 py-2.5 text-slate-800 text-xs font-semibold outline-none shadow-xs"
+                    />
+                  </div>
+                )}
+              </div>
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                   <label className="block text-xs font-extrabold text-[#0a2968] uppercase mb-2">Paper / Tag Name</label>
@@ -1823,26 +2093,15 @@ const AdminPortal = ({ initialTab = "dashboard" }) => {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-extrabold text-[#0a2968] uppercase mb-2">Target Student Email (or 'all')</label>
+                  <label className="block text-xs font-extrabold text-[#0a2968] uppercase mb-2">Score / Marks Obtained</label>
                   <input
                     type="text"
-                    value={resStudentEmail}
-                    onChange={(e) => setResStudentEmail(e.target.value)}
-                    placeholder="student@itopper.com or leave blank for all"
+                    value={resScore}
+                    onChange={(e) => setResScore(e.target.value)}
+                    placeholder="e.g. 118 / 250"
                     className="w-full bg-slate-50 border border-slate-200 focus:border-[#0a2968] rounded-xl px-4 py-3 text-slate-800 text-sm font-semibold outline-none"
                   />
                 </div>
-              </div>
-
-              <div>
-                <label className="block text-xs font-extrabold text-[#0a2968] uppercase mb-2">Score / Marks Obtained</label>
-                <input
-                  type="text"
-                  value={resScore}
-                  onChange={(e) => setResScore(e.target.value)}
-                  placeholder="e.g. 118 / 250"
-                  className="w-full bg-slate-50 border border-slate-200 focus:border-[#0a2968] rounded-xl px-4 py-3 text-slate-800 text-sm font-semibold outline-none"
-                />
               </div>
 
               <div>
@@ -1874,12 +2133,12 @@ const AdminPortal = ({ initialTab = "dashboard" }) => {
                       type="file"
                       accept="application/pdf"
                       className="hidden"
-                      onChange={(e) => {
+                      onChange={async (e) => {
                         const file = e.target.files[0];
                         if (file) {
-                          const fakeUrl = URL.createObjectURL(file);
-                          setResPdfUrl(fakeUrl);
-                          alert(`Selected Evaluated Copy PDF: ${file.name}`);
+                          const cloudinaryUrl = await uploadFileToCloudinary(file, 'evaluated_checked_copies');
+                          setResPdfUrl(cloudinaryUrl);
+                          alert(`✅ Evaluated Copy PDF uploaded to Cloudinary!\n${cloudinaryUrl}`);
                         }
                       }}
                     />

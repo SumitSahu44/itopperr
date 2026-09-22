@@ -4,53 +4,74 @@ import { Link, useNavigate } from 'react-router-dom';
 import {
   FileCheck, Download, Printer, Upload, FileText, CheckCircle2,
   Trophy, LogOut, LayoutDashboard, BrainCircuit, Zap,
-  ArrowUpRight, Award, Sparkles, ExternalLink, Eye, ChevronDown, ChevronUp
+  ArrowUpRight, Award, Sparkles, ExternalLink, Eye, ChevronDown, ChevronUp,
+  X, Clock, BookOpen, Layers, AlertCircle, ArrowLeft, ChevronRight
 } from 'lucide-react';
 import Navigation from '../components/Navigation';
 import Footer from '../components/Footer';
+import { getEvaluations, DEFAULT_EVALUATIONS, getEvaluationResultsApi, submitAnswerSheetApi } from '../utils/evaluationStorage';
+import { uploadFileToCloudinary } from '../utils/uploadStorage';
 
 const StudentDashboard = () => {
   const { user, token, logout } = useContext(AuthContext);
   const navigate = useNavigate();
 
   const [purchasedEvaluations, setPurchasedEvaluations] = useState([]);
+  const [selectedCourseId, setSelectedCourseId] = useState(null);
   const [uploadedAnswerSheets, setUploadedAnswerSheets] = useState({});
   const [evaluationResults, setEvaluationResults] = useState([]);
-  const [expandedPdfId, setExpandedPdfId] = useState(null);
-  const [activeTab, setActiveTab] = useState('evaluations'); // 'evaluations' | 'results' | 'quizzes'
+  const [isUploadingFile, setIsUploadingFile] = useState(false);
 
-  // View Paper Modal State
-  const [paperModalData, setPaperModalData] = useState(null); // { title, pdfUrl }
-  // View Checked Copy Modal State
-  const [checkedCopyModalData, setCheckedCopyModalData] = useState(null); // { planTitle, resultPdf, score, remarks, evaluatedAt }
+  // Mobile navigation mode: 'list' (show all courses) or 'details' (show active course tests)
+  const [mobileViewMode, setMobileViewMode] = useState('list');
+
+  // Expanded Test Cards State (Keyed by testId)
+  const [openTestAccordions, setOpenTestAccordions] = useState({});
+
+  // Expanded Inline PDF Viewers State (Keyed by unique ID e.g. "overview_pdf", "q_testId", "checked_testId")
+  const [openInlinePdfs, setOpenInlinePdfs] = useState({});
 
   useEffect(() => {
     loadPurchasedEvaluations();
     loadUploadedAnswerSheets();
     loadEvaluationResults();
-  }, [user, activeTab]);
+  }, [user]);
 
-  // Load purchased evaluation cards for this student
-  const loadPurchasedEvaluations = () => {
+  // Load purchased evaluation plans for this student (Auto-seed if empty for demo/testing)
+  const loadPurchasedEvaluations = async () => {
     try {
-      const userEmail = user?.email;
-      if (!userEmail) {
-        setPurchasedEvaluations([]);
-        return;
-      }
+      const userEmail = user?.email || 'student@itopper.com';
       const userKey = `itopper_purchased_evals_${userEmail}`;
-      const userEvals = JSON.parse(localStorage.getItem(userKey) || "[]");
+      let userEvals = JSON.parse(localStorage.getItem(userKey) || "[]");
+
+      // Auto-seed default evaluations if student has no purchased courses yet (for instant testing!)
+      if (userEvals.length === 0) {
+        const allPlans = await getEvaluations(false);
+        userEvals = allPlans.map(p => ({
+          ...p,
+          purchasedAt: new Date().toISOString(),
+          receiptId: "REC-" + Math.floor(100000 + Math.random() * 900000)
+        }));
+        localStorage.setItem(userKey, JSON.stringify(userEvals));
+      }
+
       setPurchasedEvaluations(userEvals);
+      if (userEvals.length > 0 && !selectedCourseId) {
+        setSelectedCourseId(userEvals[0]._id || userEvals[0].id);
+      }
     } catch (e) {
       console.error("Error loading purchased evaluations:", e);
-      setPurchasedEvaluations([]);
+      setPurchasedEvaluations(DEFAULT_EVALUATIONS);
+      if (!selectedCourseId && DEFAULT_EVALUATIONS.length > 0) {
+        setSelectedCourseId(DEFAULT_EVALUATIONS[0]._id || DEFAULT_EVALUATIONS[0].id);
+      }
     }
   };
 
-  // Load uploaded answer sheets
+  // Load uploaded answer sheets (keyed by `${planId}_${testId}`)
   const loadUploadedAnswerSheets = () => {
     try {
-      const userEmail = user?.email || 'default';
+      const userEmail = user?.email || 'student@itopper.com';
       const savedSheets = localStorage.getItem(`itopper_answer_sheets_${userEmail}`);
       if (savedSheets) {
         setUploadedAnswerSheets(JSON.parse(savedSheets));
@@ -62,20 +83,20 @@ const StudentDashboard = () => {
     }
   };
 
-  // Load evaluation results uploaded by admin
-  const loadEvaluationResults = () => {
+  // Load evaluation results uploaded by admin (Syncs with Live MongoDB API if reachable)
+  const loadEvaluationResults = async () => {
     try {
-      const saved = JSON.parse(localStorage.getItem("itopper_evaluation_results") || "[]");
-      const userEmail = user?.email?.toLowerCase();
-
-      if (!userEmail) {
-        setEvaluationResults([]);
+      const userEmail = user?.email?.toLowerCase() || 'student@itopper.com';
+      const resultsFromApi = await getEvaluationResultsApi(userEmail);
+      if (Array.isArray(resultsFromApi) && resultsFromApi.length > 0) {
+        setEvaluationResults(resultsFromApi);
         return;
       }
-
+      const saved = JSON.parse(localStorage.getItem("itopper_evaluation_results") || "[]");
       const studentResults = saved.filter(item => {
-        if (!item.studentEmail) return false;
-        return item.studentEmail.toLowerCase() === userEmail;
+        if (!item.studentEmail) return true;
+        const targetEmail = item.studentEmail.toLowerCase();
+        return targetEmail === userEmail || targetEmail === 'all' || targetEmail === 'all_students';
       });
 
       setEvaluationResults(studentResults);
@@ -85,39 +106,53 @@ const StudentDashboard = () => {
     }
   };
 
-  // Handle Answer Sheet File Upload & sync to global admin submissions list
-  const handleAnswerSheetUpload = (plan, event) => {
+  // Handle Answer Sheet File Upload for a SPECIFIC TEST inside a Course
+  const handleAnswerSheetUpload = async (plan, test, event) => {
     const file = event.target.files[0];
     if (!file) return;
 
+    setIsUploadingFile(true);
     const planId = plan._id || plan.id || plan.title;
+    const testId = test.id || test.testName || test.testTitle;
+    const compositeKey = `${planId}_${testId}`;
     const userEmail = user?.email || 'student@itopper.com';
-    const fakeFileUrl = URL.createObjectURL(file);
+
+    // Upload file directly to Cloudinary (rsscwe4n)!
+    const cloudinaryFileUrl = await uploadFileToCloudinary(file, 'student_answer_copies');
 
     const sheetInfo = {
       planId: planId,
       planTitle: plan.title,
+      testId: testId,
+      testName: test.testName || test.testTitle,
       studentName: user?.name || userEmail.split('@')[0] || "Aspirant",
       studentEmail: userEmail,
       fileName: file.name,
       fileSize: (file.size / (1024 * 1024)).toFixed(2) + " MB",
       uploadedAt: new Date().toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short" }),
       status: "Under Evaluation",
-      fileUrl: fakeFileUrl
+      fileUrl: cloudinaryFileUrl
     };
 
     // Save to user local state
     const updatedSheets = {
       ...uploadedAnswerSheets,
-      [planId]: sheetInfo
+      [compositeKey]: sheetInfo
     };
     setUploadedAnswerSheets(updatedSheets);
     localStorage.setItem(`itopper_answer_sheets_${userEmail}`, JSON.stringify(updatedSheets));
 
-    // Also sync to global submissions array for Admin Portal table view
+    // Also sync to Live MongoDB API
+    try {
+      await submitAnswerSheetApi(sheetInfo);
+    } catch (err) {
+      console.warn("MongoDB answer sheet sync failed, stored locally:", err);
+    }
+
+    // Also sync to global submissions array for Admin Portal view
     try {
       const allSubmissions = JSON.parse(localStorage.getItem("itopper_all_student_submissions") || "[]");
-      const existingIdx = allSubmissions.findIndex(s => s.planId === planId && s.studentEmail === userEmail);
+      const existingIdx = allSubmissions.findIndex(s => s.planId === planId && s.testId === testId && s.studentEmail === userEmail);
       if (existingIdx >= 0) {
         allSubmissions[existingIdx] = sheetInfo;
       } else {
@@ -128,7 +163,16 @@ const StudentDashboard = () => {
       console.error("Error syncing submission to admin storage:", e);
     }
 
-    alert(`✅ Answer Sheet "${file.name}" uploaded successfully! Sent to faculty for line-by-line evaluation.`);
+    setIsUploadingFile(false);
+    alert(`✅ Answer Sheet "${file.name}" uploaded to Cloudinary & submitted for "${test.testName || test.testTitle}"! Sent to faculty for evaluation.`);
+  };
+
+  // Toggle inline PDF viewer
+  const toggleInlinePdf = (pdfKey) => {
+    setOpenInlinePdfs(prev => ({
+      ...prev,
+      [pdfKey]: !prev[pdfKey]
+    }));
   };
 
   // Download PDF Helper
@@ -159,8 +203,43 @@ const StudentDashboard = () => {
     navigate('/');
   };
 
+  // Active Selected Course Object
+  const selectedCourse = purchasedEvaluations.find(p => (p._id || p.id) === selectedCourseId) || purchasedEvaluations[0];
+
+  // Get tests list for a course (or default tests if none explicitly defined)
+  const getCourseTests = (course) => {
+    if (!course) return [];
+    let testsArr = [];
+    if (course.tests && Array.isArray(course.tests) && course.tests.length > 0) {
+      testsArr = course.tests;
+    } else {
+      // Fallback default tests if tests array is not yet explicitly created
+      testsArr = [
+        {
+          id: `${course._id || course.id || 'eval'}-t1`,
+          testName: `Test 1: ${course.paperTag || 'GS Paper'} Foundation & Concept Test`,
+          testTitle: `Test 1: ${course.paperTag || 'GS Paper'} Foundation & Concept Test`,
+          questionPdf: course.planPdf || "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf"
+        },
+        {
+          id: `${course._id || course.id || 'eval'}-t2`,
+          testName: `Test 2: ${course.paperTag || 'GS Paper'} Applied & Diagram Practice Test`,
+          testTitle: `Test 2: ${course.paperTag || 'GS Paper'} Applied & Diagram Practice Test`,
+          questionPdf: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf"
+        },
+        {
+          id: `${course._id || course.id || 'eval'}-t3`,
+          testName: `Test 3: ${course.paperTag || 'GS Paper'} Full Length Simulation Test`,
+          testTitle: `Test 3: ${course.paperTag || 'GS Paper'} Full Length Simulation Test`,
+          questionPdf: ""
+        }
+      ];
+    }
+    return testsArr;
+  };
+
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-800 font-sans flex flex-col selection:bg-[#EF961D]/20">
+    <div className="min-h-screen bg-[#f8fafc] text-slate-800 font-sans flex flex-col selection:bg-[#EF961D]/20">
       {/* GLOBAL LIGHT NAVBAR */}
       <Navigation theme="light" />
 
@@ -175,7 +254,7 @@ const StudentDashboard = () => {
               Welcome, <span className="text-[#EF961D]">{user?.name ? user.name.split(' ')[0] : 'Aspirant'}</span> 👋🏻
             </h1>
             <p className="text-slate-500 text-sm font-semibold mt-1">
-              Access your enrolled evaluation plans, download question PDFs, submit answer copies, and view checked copies.
+              Select your enrolled course to access syllabus PDFs, submit handwritten answer copies test-by-test, and view evaluated results.
             </p>
           </div>
 
@@ -196,471 +275,510 @@ const StudentDashboard = () => {
         </div>
       </section>
 
-      {/* STATS METRICS BAR */}
+      {/* MAIN TWO-COLUMN DASHBOARD LAYOUT */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 py-8 flex-grow w-full">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-          {/* Stat 1 */}
-          <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-xs hover:border-[#0a2968]/30 transition-all flex items-center gap-4">
-            <div className="w-12 h-12 rounded-xl bg-blue-50 text-[#0a2968] flex items-center justify-center shrink-0">
-              <FileCheck size={24} />
-            </div>
-            <div>
-              <div className="text-2xl font-black text-[#0a2968]">{purchasedEvaluations.length}</div>
-              <div className="text-xs font-bold text-slate-500">Enrolled Plans</div>
-            </div>
+        {purchasedEvaluations.length === 0 ? (
+          <div className="bg-white border border-slate-200 rounded-3xl p-12 text-center shadow-xs">
+            <FileCheck size={48} className="mx-auto text-slate-300 mb-4" />
+            <h3 className="text-2xl font-black text-[#0a2968] mb-2">No Enrolled Evaluation Plans</h3>
+            <p className="text-slate-500 font-semibold text-sm mb-6 max-w-md mx-auto">
+              You haven't enrolled in any evaluation plan yet. Choose a plan to access test series PDFs and get line-by-line expert answer evaluation.
+            </p>
+            <Link
+              to="/evaluation"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-[#0a2968] hover:bg-[#EF961D] text-white font-extrabold text-xs uppercase tracking-wider rounded-xl transition-all shadow-md"
+            >
+              Browse Evaluation Plans <ArrowUpRight size={16} />
+            </Link>
           </div>
-
-          {/* Stat 2 */}
-          <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-xs hover:border-[#0a2968]/30 transition-all flex items-center gap-4">
-            <div className="w-12 h-12 rounded-xl bg-orange-50 text-[#EF961D] flex items-center justify-center shrink-0">
-              <Upload size={24} />
-            </div>
-            <div>
-              <div className="text-2xl font-black text-[#0a2968]">{Object.keys(uploadedAnswerSheets).length}</div>
-              <div className="text-xs font-bold text-slate-500">Submitted Copies</div>
-            </div>
-          </div>
-
-          {/* Stat 3 */}
-          <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-xs hover:border-[#0a2968]/30 transition-all flex items-center gap-4">
-            <div className="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
-              <Award size={24} />
-            </div>
-            <div>
-              <div className="text-2xl font-black text-[#0a2968]">{evaluationResults.length}</div>
-              <div className="text-xs font-bold text-slate-500">Evaluated Results</div>
-            </div>
-          </div>
-
-          {/* Stat 4 */}
-          <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-xs hover:border-[#0a2968]/30 transition-all flex items-center gap-4">
-            <div className="w-12 h-12 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center shrink-0">
-              <Trophy size={24} />
-            </div>
-            <div>
-              <div className="text-2xl font-black text-[#0a2968]">Active</div>
-              <div className="text-xs font-bold text-slate-500">Student Account</div>
-            </div>
-          </div>
-        </div>
-
-        {/* TABS NAVIGATION */}
-        <div className="flex bg-white rounded-2xl border border-slate-200 p-1.5 mb-8 shadow-xs w-fit max-w-full overflow-x-auto">
-          <button
-            onClick={() => setActiveTab('evaluations')}
-            className={`flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold text-xs sm:text-sm transition-all cursor-pointer whitespace-nowrap ${
-              activeTab === 'evaluations'
-                ? 'bg-[#0a2968] text-white shadow-md'
-                : 'text-slate-600 hover:text-[#0a2968] hover:bg-slate-50'
-            }`}
-          >
-            <FileCheck size={16} /> Evaluation Plans ({purchasedEvaluations.length})
-          </button>
-
-          <button
-            onClick={() => setActiveTab('results')}
-            className={`flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold text-xs sm:text-sm transition-all cursor-pointer whitespace-nowrap ${
-              activeTab === 'results'
-                ? 'bg-[#0a2968] text-white shadow-md'
-                : 'text-slate-600 hover:text-[#0a2968] hover:bg-slate-50'
-            }`}
-          >
-            <Award size={16} /> Evaluated Results & Copy PDFs ({evaluationResults.length})
-          </button>
-        </div>
-
-        {/* ================= TAB 1: PURCHASED EVALUATION PLANS & DOWNLOAD/PRINT/UPLOAD ================= */}
-        {activeTab === 'evaluations' && (
-          <div className="space-y-6 animate-in fade-in duration-300">
-            {purchasedEvaluations.length === 0 ? (
-              <div className="bg-white border border-slate-200 rounded-3xl p-12 text-center shadow-xs">
-                <FileCheck size={48} className="mx-auto text-slate-300 mb-4" />
-                <h3 className="text-2xl font-black text-[#0a2968] mb-2">No Enrolled Evaluation Plans</h3>
-                <p className="text-slate-500 font-semibold text-sm mb-6 max-w-md mx-auto">
-                  You haven't enrolled in any evaluation plan yet. Choose a plan to download PDFs and get line-by-line expert answer evaluation.
-                </p>
-                <Link
-                  to="/evaluation"
-                  className="inline-flex items-center gap-2 px-6 py-3 bg-[#0a2968] hover:bg-[#EF961D] text-white font-extrabold text-xs uppercase tracking-wider rounded-xl transition-all shadow-md"
-                >
-                  Browse Evaluation Plans <ArrowUpRight size={16} />
-                </Link>
+        ) : (
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+            
+            {/* ================= LEFT SIDEBAR: ENROLLED COURSES LIST ================= */}
+            {/* On Mobile: Hidden when viewing course details in mobileViewMode === 'details' */}
+            <div className={`lg:col-span-4 space-y-4 ${mobileViewMode === 'details' ? 'hidden lg:block' : 'block'}`}>
+              <div className="flex items-center justify-between px-1 mb-2">
+                <h2 className="text-xl font-black text-[#0a2968]">My Enrolled Courses</h2>
+                <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">
+                  {purchasedEvaluations.length} Plans
+                </span>
               </div>
-            ) : (
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                {purchasedEvaluations.map((plan, index) => {
-                  const planId = plan._id || plan.id || `eval-${index}`;
-                  const uploadedSheet = uploadedAnswerSheets[planId];
-                  const pdfUrl = plan.planPdf || "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf";
 
-                  // Find if admin uploaded a checked copy for this plan
-                  const matchingResult = evaluationResults.find(r => 
-                    r.planTitle?.toLowerCase().includes(plan.title?.toLowerCase()) || 
-                    plan.title?.toLowerCase().includes(r.planTitle?.toLowerCase())
-                  );
+              <div className="space-y-3">
+                {purchasedEvaluations.map((course, idx) => {
+                  const courseId = course._id || course.id;
+                  const isSelected = selectedCourseId === courseId || (!selectedCourseId && idx === 0);
+                  const testsCount = getCourseTests(course).length;
 
                   return (
                     <div
-                      key={planId}
-                      className="bg-white rounded-3xl border border-slate-200/90 shadow-sm hover:shadow-md transition-all overflow-hidden flex flex-col justify-between"
+                      key={courseId}
+                      onClick={() => {
+                        setSelectedCourseId(courseId);
+                        setMobileViewMode('details');
+                      }}
+                      className={`w-full text-left p-4.5 rounded-2xl border transition-all duration-200 cursor-pointer flex items-center justify-between group ${
+                        isSelected
+                          ? "bg-white border-[#0a2968] shadow-md ring-2 ring-[#0a2968]/15"
+                          : "bg-white/80 border-slate-200 hover:border-slate-300 hover:bg-white"
+                      }`}
                     >
-                      {/* Top Header Card */}
-                      <div className="p-6 pb-4 border-b border-slate-100">
-                        <div className="flex justify-between items-start mb-3">
-                          <span className="px-3 py-1 bg-blue-50 text-[#0a2968] font-black text-xs rounded-lg uppercase tracking-wider border border-blue-100">
-                            {plan.paperTag || plan.category || "GS Paper"}
-                          </span>
-                          <span className="px-3 py-1 bg-emerald-50 text-emerald-700 font-black text-[11px] rounded-full uppercase tracking-wider border border-emerald-200 flex items-center gap-1">
-                            <CheckCircle2 size={13} /> Active Enrolled Plan
-                          </span>
-                        </div>
-
-                        <h3 className="text-xl font-black text-[#0a2968] mb-2">
-                          {plan.title}
+                      <div className="pr-3">
+                        <span className="inline-block px-2.5 py-0.5 bg-blue-50 text-[#0a2968] font-bold text-[10px] rounded uppercase mb-1 border border-blue-100">
+                          {course.paperTag || course.category || "GS Paper"}
+                        </span>
+                        <h3 className={`text-sm font-extrabold leading-snug line-clamp-2 ${isSelected ? "text-[#0a2968]" : "text-slate-700"}`}>
+                          {course.title}
                         </h3>
-                        <p className="text-slate-500 text-xs font-semibold leading-relaxed mb-4">
-                          {plan.description}
-                        </p>
-
-                        <div className="flex items-center justify-between text-xs text-slate-500 font-bold bg-slate-50 p-3 rounded-xl border border-slate-100">
-                          <span>Validity: <strong className="text-slate-800">{plan.duration || "Till Mains 2026"}</strong></span>
-                          {plan.receiptId && <span>Receipt: <strong className="text-[#0a2968]">{plan.receiptId}</strong></span>}
+                        <div className="text-[11px] font-bold text-slate-400 mt-1 flex items-center justify-between">
+                          <span>{testsCount} Tests available</span>
+                          <span className="text-[#0a2968] font-black lg:hidden inline-flex items-center gap-0.5">
+                            Open Tests <ChevronRight size={13} />
+                          </span>
                         </div>
                       </div>
 
-                      {/* PDF QUESTION PAPER ACTIONS (VIEW PAPER, PRINT PAPER, DOWNLOAD) */}
-                      <div className="p-6 bg-slate-50/50 space-y-4">
-                        <div>
-                          <label className="block text-xs font-extrabold text-[#0a2968] uppercase tracking-wider mb-2">
-                            📄 Evaluation Question Paper & Plan PDF
-                          </label>
-                          <div className="grid grid-cols-3 gap-2">
-                            {/* VIEW PAPER BUTTON */}
-                            <button
-                              type="button"
-                              onClick={() => setPaperModalData({ title: plan.title, pdfUrl })}
-                              className="py-3 px-2 bg-[#0a2968] hover:bg-[#12387a] text-white rounded-xl text-xs font-extrabold uppercase tracking-wider flex items-center justify-center gap-1.5 transition-all shadow-xs cursor-pointer"
-                            >
-                              <Eye size={15} className="text-[#EF961D]" />
-                              View Paper
-                            </button>
+                      <div className={`w-3.5 h-3.5 rounded-full shrink-0 border-2 transition-all ${
+                        isSelected ? "bg-[#EF961D] border-[#0a2968] scale-110" : "border-slate-300 group-hover:border-slate-400"
+                      }`} />
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
 
-                            {/* PRINT PAPER BUTTON */}
-                            <button
-                              type="button"
-                              onClick={() => handlePrintPdf(pdfUrl)}
-                              className="py-3 px-2 bg-white hover:bg-slate-100 text-[#0a2968] border border-slate-300 rounded-xl text-xs font-extrabold uppercase tracking-wider flex items-center justify-center gap-1.5 transition-all shadow-xs cursor-pointer"
-                            >
-                              <Printer size={15} className="text-[#0a2968]" />
-                              Print Paper
-                            </button>
+            {/* ================= RIGHT MAIN PANEL: TEST SERIES & TOPICS ================= */}
+            {/* On Mobile: Hidden when mobileViewMode === 'list' */}
+            <div className={`lg:col-span-8 bg-white rounded-3xl border border-slate-200 p-6 sm:p-8 shadow-sm space-y-6 ${mobileViewMode === 'list' ? 'hidden lg:block' : 'block'}`}>
+              
+              {/* Mobile Back Button */}
+              <div className="lg:hidden pb-2">
+                <button
+                  onClick={() => setMobileViewMode('list')}
+                  className="inline-flex items-center gap-2 px-4 py-2 bg-slate-100 hover:bg-slate-200 text-[#0a2968] font-extrabold text-xs rounded-xl border border-slate-200 transition-all"
+                >
+                  <ArrowLeft size={15} /> Back to All Enrolled Courses List
+                </button>
+              </div>
 
-                            {/* DOWNLOAD PDF BUTTON */}
-                            <button
-                              type="button"
-                              onClick={() => handleDownloadPdf(pdfUrl, plan.title)}
-                              className="py-3 px-2 bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 rounded-xl text-xs font-extrabold uppercase tracking-wider flex items-center justify-center gap-1.5 transition-all shadow-xs cursor-pointer"
-                            >
-                              <Download size={15} className="text-slate-600" />
-                              Download
-                            </button>
+              {/* Selected Course Header */}
+              {selectedCourse && (
+                <div className="space-y-6">
+                  <div className="pb-6 border-b border-slate-100 space-y-4">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div>
+                      <div className="flex items-center gap-2 mb-1.5">
+                        <span className="px-2.5 py-1 bg-blue-50 text-[#0a2968] font-black text-xs rounded-lg uppercase border border-blue-100">
+                          {selectedCourse.paperTag || selectedCourse.category || "GS Paper"}
+                        </span>
+                        <span className="px-2.5 py-1 bg-emerald-50 text-emerald-700 font-bold text-xs rounded-full border border-emerald-200">
+                          Active Subscription
+                        </span>
+                      </div>
+                      <h2 className="text-2xl sm:text-3xl font-black text-[#0a2968]">
+                        {selectedCourse.title}
+                      </h2>
+                      <p className="text-slate-500 text-xs sm:text-sm font-semibold mt-1">
+                        {selectedCourse.description}
+                      </p>
+                    </div>
+
+                    <div className="text-xs font-bold text-slate-500 bg-slate-50 p-3 rounded-xl border border-slate-200 shrink-0">
+                      Total Tests: <strong className="text-[#0a2968] font-black">{getCourseTests(selectedCourse).length} Tests</strong>
+                    </div>
+                  </div>
+
+                  {/* GENERAL / DEFAULT COURSE OVERVIEW PDF CARD (RIGHT BELOW DESCRIPTION LINE) */}
+                  {(selectedCourse.planPdf || selectedCourse.pdfUrl) && (
+                    <div className="mt-4 bg-gradient-to-r from-blue-50/90 via-slate-50 to-blue-50/50 border border-blue-200/90 rounded-2xl p-4 sm:p-5 shadow-2xs space-y-3">
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                        <div className="flex items-start gap-3">
+                          <div className="w-10 h-10 rounded-xl bg-[#0a2968] text-white flex items-center justify-center shrink-0 shadow-xs">
+                            <FileText size={20} className="text-[#EF961D]" />
+                          </div>
+                          <div>
+                            <span className="px-2 py-0.5 bg-blue-100 text-[#0a2968] font-extrabold text-[10px] rounded uppercase tracking-wider">
+                              Course Overview Document
+                            </span>
+                            <h3 className="text-sm sm:text-base font-black text-[#0a2968] mt-0.5">
+                              {selectedCourse.planPdfTitle || "Program Syllabus & Micro-Topics Overview PDF"}
+                            </h3>
+                            <p className="text-slate-500 text-xs font-semibold">
+                              Read or download the program syllabus breakdown, recommended sources & structure map guide.
+                            </p>
                           </div>
                         </div>
 
-                        {/* SUBMIT YOUR ANSWER SHEET SECTION */}
-                        <div className="pt-4 border-t border-slate-200">
-                          <label className="block text-xs font-extrabold text-[#0a2968] uppercase tracking-wider mb-2">
-                            📤 Submit Your Answer Sheet (For Faculty Review)
-                          </label>
+                        {/* PDF Action Buttons */}
+                        <div className="flex items-center gap-2 shrink-0 self-start sm:self-center">
+                          <button
+                            type="button"
+                            onClick={() => toggleInlinePdf("overview_pdf")}
+                            className="px-3.5 py-2 bg-[#0a2968] hover:bg-[#12387a] text-white rounded-xl text-xs font-extrabold flex items-center gap-1.5 transition-all shadow-xs cursor-pointer"
+                          >
+                            <Eye size={15} className="text-[#EF961D]" />
+                            {openInlinePdfs["overview_pdf"] ? "Hide PDF" : "View PDF"}
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handlePrintPdf(selectedCourse.planPdf || selectedCourse.pdfUrl)}
+                            className="px-3 py-2 bg-white hover:bg-slate-100 text-[#0a2968] border border-slate-300 rounded-xl text-xs font-extrabold flex items-center gap-1.5 transition-all cursor-pointer shadow-2xs"
+                          >
+                            <Printer size={15} /> Print
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleDownloadPdf(selectedCourse.planPdf || selectedCourse.pdfUrl, selectedCourse.planPdfTitle || selectedCourse.title)}
+                            className="px-3 py-2 bg-slate-200 hover:bg-slate-300 text-slate-800 rounded-xl text-xs font-extrabold flex items-center gap-1.5 transition-all cursor-pointer shadow-2xs"
+                          >
+                            <Download size={15} /> Download
+                          </button>
+                        </div>
+                      </div>
 
-                          {uploadedSheet ? (
-                            <div className="bg-emerald-50/80 border border-emerald-200 p-4 rounded-2xl">
-                              <div className="flex items-start justify-between mb-2">
-                                <div className="flex items-center gap-2.5">
-                                  <div className="w-9 h-9 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0">
-                                    <FileText size={20} />
-                                  </div>
-                                  <div>
-                                    <div className="text-xs font-black text-slate-900 truncate max-w-[180px]">
-                                      {uploadedSheet.fileName}
-                                    </div>
-                                    <div className="text-[11px] text-emerald-700 font-bold">
-                                      {uploadedSheet.fileSize} • Uploaded {uploadedSheet.uploadedAt}
-                                    </div>
-                                  </div>
-                                </div>
-                                <span className="px-2 py-0.5 bg-emerald-600 text-white font-black text-[10px] rounded-md uppercase tracking-wider shadow-xs">
-                                  {uploadedSheet.status || "Submitted"}
-                                </span>
+                      {/* PROPER INLINE EMBED PDF VIEWER */}
+                      {openInlinePdfs["overview_pdf"] && (
+                        <div className="pt-3 border-t border-blue-200/80 animate-in fade-in duration-200">
+                          <div className="bg-slate-900 rounded-2xl p-2 h-[520px] shadow-inner">
+                            <iframe
+                              src={selectedCourse.planPdf || selectedCourse.pdfUrl}
+                              title="Course Overview PDF Document"
+                              className="w-full h-full rounded-xl border-0 bg-white"
+                            />
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+
+                {/* LIST OF TESTS INSIDE SELECTED COURSE (REVERSED ORDER: LATEST ADDED TEST AT THE TOP!) */}
+              <div className="space-y-4 pt-2">
+                <div className="flex items-center justify-between mb-2">
+                  <div>
+                    <h3 className="text-base font-extrabold text-[#0a2968]">
+                      Test Series & Answer Submissions ({getCourseTests(selectedCourse).length} Tests)
+                    </h3>
+                    <p className="text-xs text-slate-400 font-semibold">
+                      Click any paper/test to view question PDF, upload answer scan, and check evaluated copies
+                    </p>
+                  </div>
+                  <span className="text-[11px] font-bold text-[#0a2968] bg-blue-50 px-2.5 py-1 rounded-lg border border-blue-100 shrink-0">
+                    Latest Test First
+                  </span>
+                </div>
+
+                {[...getCourseTests(selectedCourse)].reverse().map((test, index) => {
+                  const planId = selectedCourse._id || selectedCourse.id || selectedCourse.title;
+                  const testId = test.id || test.testName || test.testTitle;
+                  const compositeKey = `${planId}_${testId}`;
+                  const uploadedSheet = uploadedAnswerSheets[compositeKey];
+
+                  // Accordion expand state (default index 0 expanded)
+                  const isExpanded = openTestAccordions[testId] !== undefined ? openTestAccordions[testId] : (index === 0);
+                  const toggleAccordion = () => {
+                    setOpenTestAccordions(prev => ({
+                      ...prev,
+                      [testId]: !isExpanded
+                    }));
+                  };
+
+                  // Unique viewer state keys
+                  const qPdfKey = `q_pdf_${testId}`;
+                  const checkedPdfKey = `checked_pdf_${testId}`;
+                  const modelPdfKey = `model_pdf_${testId}`;
+
+                  const userEmail = user?.email?.toLowerCase() || 'student@itopper.com';
+                  const testTitleStr = test.testName || test.testTitle;
+
+                  // 1. PERSONAL CHECKED COPY (Visible ONLY to this specific student)
+                  const personalCheckedCopy = evaluationResults.find(r => {
+                    const rEmail = (r.studentEmail || '').toLowerCase();
+                    const isTargetUser = rEmail === userEmail;
+                    const isTargetTest = (r.testName && r.testName.toLowerCase() === testTitleStr.toLowerCase()) ||
+                                         (r.planTitle && r.planTitle.toLowerCase().includes(selectedCourse.title.toLowerCase()));
+                    return isTargetUser && isTargetTest;
+                  });
+
+                  // 2. COURSE MODEL ANSWER / RESULT (Visible to ALL students in this course)
+                  const courseModelResult = evaluationResults.find(r => {
+                    const rEmail = (r.studentEmail || '').toLowerCase();
+                    const isAllUser = rEmail === 'all' || rEmail === 'all_students';
+                    const isTargetTest = (r.testName && r.testName.toLowerCase() === testTitleStr.toLowerCase()) ||
+                                         (r.planTitle && r.planTitle.toLowerCase().includes(selectedCourse.title.toLowerCase()));
+                    return isAllUser && isTargetTest;
+                  });
+
+                  const questionPdf = test.questionPdf;
+                  const hasAnyResult = personalCheckedCopy || courseModelResult;
+
+                  return (
+                    <div
+                      key={testId}
+                      className={`bg-white border rounded-2xl transition-all duration-200 ${
+                        isExpanded
+                          ? "border-[#0a2968]/50 shadow-md ring-1 ring-[#0a2968]/10 p-5 space-y-4"
+                          : "border-slate-200 hover:border-slate-300 p-4"
+                      }`}
+                    >
+                      {/* Top Bar / Header Clickable Row */}
+                      <div
+                        onClick={toggleAccordion}
+                        className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 cursor-pointer select-none"
+                      >
+                        <div className="flex items-start gap-3">
+                          <span className="w-8 h-8 rounded-xl bg-slate-100 text-[#0a2968] font-black text-sm flex items-center justify-center shrink-0 border border-slate-200">
+                            #{getCourseTests(selectedCourse).length - index}
+                          </span>
+                          <div>
+                            <h4 className="text-base font-black text-slate-900 leading-snug hover:text-[#0a2968] transition-colors">
+                              {testTitleStr}
+                            </h4>
+                            <span className="text-[11px] font-semibold text-slate-400">
+                              Paper / Test Details & Submissions
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* Status Badges & Accordion Icon */}
+                        <div className="flex items-center gap-2 shrink-0 self-start sm:self-center">
+                          {personalCheckedCopy ? (
+                            <span className="px-3 py-1 bg-emerald-50 text-emerald-800 border border-emerald-300 font-extrabold text-xs rounded-full uppercase tracking-wider flex items-center gap-1 shadow-2xs">
+                              <CheckCircle2 size={13} className="text-emerald-600" /> Evaluated ({personalCheckedCopy.score || 'Checked'})
+                            </span>
+                          ) : uploadedSheet ? (
+                            <span className="px-3 py-1 bg-amber-50 text-amber-800 border border-amber-300 font-extrabold text-xs rounded-full uppercase tracking-wider flex items-center gap-1">
+                              <Clock size={13} className="text-amber-600" /> Under Evaluation
+                            </span>
+                          ) : (
+                            <span className="px-3 py-1 bg-slate-100 text-slate-600 border border-slate-200 font-bold text-xs rounded-full uppercase tracking-wider">
+                              Not Submitted
+                            </span>
+                          )}
+
+                          <button
+                            type="button"
+                            className="p-1.5 bg-slate-100 hover:bg-slate-200 text-[#0a2968] rounded-lg transition-all"
+                            title={isExpanded ? "Collapse Details" : "Expand Details"}
+                          >
+                            {isExpanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* EXPANDED CONTENT PANEL */}
+                      {isExpanded && (
+                        <div className="pt-2 border-t border-slate-100 space-y-4 animate-in fade-in duration-200">
+                          
+                          {/* ACTION BLOCK 1: QUESTION PAPER PDF */}
+                          <div className="p-3.5 bg-slate-50/90 rounded-xl border border-slate-200 space-y-3 text-xs font-semibold text-slate-700">
+                            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                              <div className="flex items-center gap-2">
+                                <FileText size={16} className="text-[#0a2968]" />
+                                <span className="font-extrabold text-slate-800">Question Paper PDF:</span>
                               </div>
 
-                              <div className="flex items-center justify-between pt-1">
-                                <label className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white hover:bg-emerald-100 text-emerald-800 text-xs font-extrabold rounded-lg border border-emerald-300 cursor-pointer transition-colors">
-                                  <Upload size={13} /> Re-upload / Replace Copy
+                              {questionPdf ? (
+                                <div className="flex items-center gap-2 w-full sm:w-auto">
+                                  <button
+                                    type="button"
+                                    onClick={() => toggleInlinePdf(qPdfKey)}
+                                    className="px-3 py-1.5 bg-[#0a2968] hover:bg-[#12387a] text-white rounded-lg font-bold text-xs flex items-center gap-1 cursor-pointer transition-colors shadow-2xs"
+                                  >
+                                    <Eye size={13} className="text-[#EF961D]" /> {openInlinePdfs[qPdfKey] ? "Hide Paper PDF" : "View Paper PDF"}
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={() => handlePrintPdf(questionPdf)}
+                                    className="px-3 py-1.5 bg-white hover:bg-slate-100 text-[#0a2968] border border-slate-300 rounded-lg font-bold text-xs flex items-center gap-1 cursor-pointer transition-colors"
+                                  >
+                                    <Printer size={13} /> Print
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={() => handleDownloadPdf(questionPdf, testTitleStr)}
+                                    className="px-3 py-1.5 bg-slate-200 hover:bg-slate-300 text-slate-800 rounded-lg font-bold text-xs flex items-center gap-1 cursor-pointer transition-colors"
+                                  >
+                                    <Download size={13} /> Download
+                                  </button>
+                                </div>
+                              ) : (
+                                <span className="text-[11px] font-bold text-slate-400 italic">
+                                  Question Paper PDF will be uploaded soon by faculty
+                                </span>
+                              )}
+                            </div>
+
+                            {/* INLINE QUESTION PDF VIEWER */}
+                            {questionPdf && openInlinePdfs[qPdfKey] && (
+                              <div className="pt-2 animate-in fade-in duration-200">
+                                <div className="bg-slate-900 rounded-xl p-2 h-[480px]">
+                                  <iframe
+                                    src={questionPdf}
+                                    title="Question Paper PDF Document"
+                                    className="w-full h-full rounded-lg border-0 bg-white"
+                                  />
+                                </div>
+                              </div>
+                            )}
+                          </div>
+
+                          {/* ACTION BLOCK 2: ANSWER COPY UPLOAD */}
+                          <div className="p-3.5 bg-blue-50/40 rounded-xl border border-blue-100 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs font-semibold">
+                            {uploadedSheet ? (
+                              <div className="flex items-center justify-between w-full">
+                                <div>
+                                  <span className="text-[#0a2968] font-extrabold block">✅ Your Submitted Answer Sheet:</span>
+                                  <span className="text-slate-600 font-bold">{uploadedSheet.fileName} ({uploadedSheet.fileSize})</span>
+                                  <div className="text-[10px] text-slate-400">Uploaded on {uploadedSheet.uploadedAt}</div>
+                                </div>
+                                <label className="inline-flex items-center gap-1 px-3 py-1.5 bg-white hover:bg-slate-100 text-[#0a2968] rounded-lg border border-slate-300 font-bold text-xs cursor-pointer transition-colors shadow-2xs">
+                                  <Upload size={13} /> Re-upload
                                   <input
                                     type="file"
                                     accept=".pdf,.jpg,.jpeg,.png"
                                     className="hidden"
-                                    onChange={(e) => handleAnswerSheetUpload(plan, e)}
+                                    onChange={(e) => handleAnswerSheetUpload(selectedCourse, test, e)}
                                   />
                                 </label>
-
-                                {matchingResult && (
-                                  <button
-                                    onClick={() => setCheckedCopyModalData(matchingResult)}
-                                    className="px-3 py-1.5 bg-emerald-700 hover:bg-emerald-800 text-white rounded-lg text-xs font-extrabold flex items-center gap-1 shadow-xs cursor-pointer"
-                                  >
-                                    <Award size={13} /> View Checked Copy
-                                  </button>
-                                )}
                               </div>
-                            </div>
-                          ) : (
-                            <div className="space-y-3">
-                              <label className="border-2 border-dashed border-slate-300 hover:border-[#0a2968] bg-white p-4 rounded-2xl flex flex-col items-center justify-center cursor-pointer transition-all hover:bg-blue-50/30">
-                                <Upload className="text-[#0a2968] mb-1.5" size={24} />
-                                <span className="text-xs font-black text-[#0a2968]">Submit Your Answer Sheet PDF</span>
-                                <span className="text-[11px] text-slate-400 font-semibold">Click to browse file (PDF/Image)</span>
-                                <input
-                                  type="file"
-                                  accept=".pdf,.jpg,.jpeg,.png"
-                                  className="hidden"
-                                  onChange={(e) => handleAnswerSheetUpload(plan, e)}
-                                />
-                              </label>
+                            ) : (
+                              <div className="flex items-center justify-between w-full">
+                                <div>
+                                  <span className="text-[#0a2968] font-extrabold block">Upload Handwritten Answer Copy:</span>
+                                  <span className="text-slate-500 text-[11px]">Scan your written answer sheet as PDF and upload here</span>
+                                </div>
+                                <label className="inline-flex items-center gap-2 px-5 py-2 bg-[#0a2968] hover:bg-[#EF961D] text-white rounded-xl text-xs font-extrabold uppercase tracking-wider cursor-pointer transition-all shadow-xs shrink-0">
+                                  <Upload size={14} /> Upload Answer (PDF)
+                                  <input
+                                    type="file"
+                                    accept=".pdf,.jpg,.jpeg,.png"
+                                    className="hidden"
+                                    onChange={(e) => handleAnswerSheetUpload(selectedCourse, test, e)}
+                                  />
+                                </label>
+                              </div>
+                            )}
+                          </div>
 
-                              {matchingResult && (
-                                <button
-                                  onClick={() => setCheckedCopyModalData(matchingResult)}
-                                  className="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-extrabold flex items-center justify-center gap-2 shadow-xs cursor-pointer"
-                                >
-                                  <Award size={15} /> View Admin Checked Copy Available!
-                                </button>
+                          {/* ACTION BLOCK 3: PERSONAL CHECKED COPY (VISIBLE ONLY TO THIS USER) */}
+                          {personalCheckedCopy && (
+                            <div className="p-4 bg-emerald-50/80 border border-emerald-200 rounded-2xl space-y-3">
+                              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-emerald-200/80 pb-3">
+                                <div>
+                                  <span className="px-2.5 py-0.5 bg-emerald-700 text-white rounded text-[10px] font-black uppercase tracking-wider">
+                                    🔐 Personal Evaluated Copy (Checked For You)
+                                  </span>
+                                  <div className="text-xs font-bold text-emerald-900 mt-1">
+                                    Score: <strong className="text-emerald-950 font-black">{personalCheckedCopy.score}</strong> | Remarks: "{personalCheckedCopy.remarks}"
+                                  </div>
+                                </div>
+
+                                <div className="flex items-center gap-2 shrink-0">
+                                  <button
+                                    onClick={() => toggleInlinePdf(checkedPdfKey)}
+                                    className="px-3.5 py-2 bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl text-xs font-extrabold flex items-center gap-1.5 shadow-2xs cursor-pointer"
+                                  >
+                                    <Award size={14} /> {openInlinePdfs[checkedPdfKey] ? "Hide Checked Copy" : "View Checked Copy PDF"}
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={() => handlePrintPdf(personalCheckedCopy.resultPdf)}
+                                    className="px-3 py-2 bg-white hover:bg-slate-100 text-emerald-900 border border-emerald-300 rounded-xl text-xs font-bold transition-colors cursor-pointer"
+                                  >
+                                    <Printer size={14} /> Print
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={() => handleDownloadPdf(personalCheckedCopy.resultPdf, `${testTitleStr}_Personal_Checked`)}
+                                    className="px-3 py-2 bg-emerald-100 hover:bg-emerald-200 text-emerald-900 rounded-xl text-xs font-bold transition-colors cursor-pointer"
+                                  >
+                                    <Download size={14} /> Download
+                                  </button>
+                                </div>
+                              </div>
+
+                              {/* INLINE EVALUATED CHECKED COPY PDF VIEWER */}
+                              {openInlinePdfs[checkedPdfKey] && (
+                                <div className="pt-2 animate-in fade-in duration-200">
+                                  <div className="bg-slate-900 rounded-xl p-2 h-[500px]">
+                                    <iframe
+                                      src={personalCheckedCopy.resultPdf}
+                                      title="Personal Evaluated Answer Sheet PDF"
+                                      className="w-full h-full rounded-lg border-0 bg-white"
+                                    />
+                                  </div>
+                                </div>
                               )}
                             </div>
                           )}
+
+                          {/* ACTION BLOCK 4: COURSE-WIDE MODEL ANSWER / RESULT (VISIBLE TO ALL STUDENTS IN THIS COURSE) */}
+                          {courseModelResult && (
+                            <div className="p-4 bg-purple-50/70 border border-purple-200 rounded-2xl space-y-3">
+                              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-purple-200/80 pb-3">
+                                <div>
+                                  <span className="px-2.5 py-0.5 bg-purple-700 text-white rounded text-[10px] font-black uppercase tracking-wider">
+                                    🌐 Course Model Solution & Result (All Students)
+                                  </span>
+                                  <div className="text-xs font-bold text-purple-900 mt-1">
+                                    Official Model Answer Framework & Benchmark Score: <strong className="text-purple-950 font-black">{courseModelResult.score}</strong>
+                                  </div>
+                                </div>
+
+                                <div className="flex items-center gap-2 shrink-0">
+                                  <button
+                                    onClick={() => toggleInlinePdf(modelPdfKey)}
+                                    className="px-3.5 py-2 bg-purple-700 hover:bg-purple-800 text-white rounded-xl text-xs font-extrabold flex items-center gap-1.5 shadow-2xs cursor-pointer"
+                                  >
+                                    <Award size={14} /> {openInlinePdfs[modelPdfKey] ? "Hide Model PDF" : "View Model Answer PDF"}
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={() => handlePrintPdf(courseModelResult.resultPdf)}
+                                    className="px-3 py-2 bg-white hover:bg-slate-100 text-purple-900 border border-purple-300 rounded-xl text-xs font-bold transition-colors cursor-pointer"
+                                  >
+                                    <Printer size={14} /> Print
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={() => handleDownloadPdf(courseModelResult.resultPdf, `${testTitleStr}_Model_Answer`)}
+                                    className="px-3 py-2 bg-purple-100 hover:bg-purple-200 text-purple-900 rounded-xl text-xs font-bold transition-colors cursor-pointer"
+                                  >
+                                    <Download size={14} /> Download
+                                  </button>
+                                </div>
+                              </div>
+
+                              {/* INLINE MODEL ANSWER PDF VIEWER */}
+                              {openInlinePdfs[modelPdfKey] && (
+                                <div className="pt-2 animate-in fade-in duration-200">
+                                  <div className="bg-slate-900 rounded-xl p-2 h-[500px]">
+                                    <iframe
+                                      src={courseModelResult.resultPdf}
+                                      title="Course Model Answer PDF"
+                                      className="w-full h-full rounded-lg border-0 bg-white"
+                                    />
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+                          )}
+
                         </div>
-                      </div>
+                      )}
+
                     </div>
                   );
                 })}
               </div>
-            )}
-          </div>
-        )}
+                </div>
+              )}
+            </div>
 
-        {/* ================= TAB 2: EVALUATED RESULTS & PDF PREVIEW ================= */}
-        {activeTab === 'results' && (
-          <div className="space-y-6 animate-in fade-in duration-300">
-            {evaluationResults.length === 0 ? (
-              <div className="bg-white border border-slate-200 rounded-3xl p-12 text-center shadow-xs">
-                <Award size={48} className="mx-auto text-slate-300 mb-4" />
-                <h3 className="text-2xl font-black text-[#0a2968] mb-2">No Evaluated Results Uploaded Yet</h3>
-                <p className="text-slate-500 font-semibold text-sm">
-                  Once your answer copy is evaluated by faculty, your checked copy PDF, marks, and detailed feedback will appear here.
-                </p>
-              </div>
-            ) : (
-              <div className="space-y-6">
-                {evaluationResults.map((result) => {
-                  const isPdfExpanded = expandedPdfId === result.id;
-                  const pdfUrl = result.resultPdf || "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf";
-
-                  return (
-                    <div
-                      key={result.id}
-                      className="bg-white rounded-3xl border border-slate-200 p-6 sm:p-8 shadow-xs hover:shadow-md transition-all space-y-6"
-                    >
-                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-slate-100">
-                        <div>
-                          <div className="flex items-center gap-2 mb-2">
-                            <span className="px-3 py-1 bg-blue-50 text-[#0a2968] font-black text-xs rounded-lg uppercase tracking-wider border border-blue-100">
-                              {result.paperTag || "GS Paper"}
-                            </span>
-                            <span className="px-3 py-1 bg-emerald-50 text-emerald-700 font-black text-xs rounded-full uppercase tracking-wider border border-emerald-200 flex items-center gap-1">
-                              <Award size={14} /> Score: {result.score}
-                            </span>
-                          </div>
-                          <h3 className="text-xl sm:text-2xl font-black text-[#0a2968]">
-                            {result.planTitle}
-                          </h3>
-                          <p className="text-xs text-slate-400 font-semibold mt-1">
-                            Evaluated on: <strong className="text-slate-700">{result.evaluatedAt}</strong>
-                          </p>
-                        </div>
-
-                        {/* PDF ACTION BUTTONS */}
-                        <div className="flex items-center gap-2 shrink-0">
-                          <button
-                            type="button"
-                            onClick={() => handleDownloadPdf(pdfUrl, `${result.planTitle}_Checked`)}
-                            className="py-2.5 px-4 bg-[#0a2968] hover:bg-[#EF961D] text-white rounded-xl text-xs font-extrabold uppercase tracking-wider flex items-center gap-1.5 transition-all shadow-xs cursor-pointer"
-                          >
-                            <Download size={15} /> Download Checked Copy
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => handlePrintPdf(pdfUrl)}
-                            className="py-2.5 px-4 bg-slate-100 hover:bg-slate-200 text-[#0a2968] border border-slate-200 rounded-xl text-xs font-extrabold uppercase tracking-wider flex items-center gap-1.5 transition-all cursor-pointer"
-                          >
-                            <Printer size={15} /> Print
-                          </button>
-                        </div>
-                      </div>
-
-                      {/* Evaluator Remarks Box */}
-                      <div className="bg-slate-50 border border-slate-200 rounded-2xl p-5">
-                        <h4 className="text-xs font-black text-[#0a2968] uppercase tracking-wider mb-1.5">
-                          ✍️ Faculty & Evaluator Feedback Remarks:
-                        </h4>
-                        <p className="text-xs sm:text-sm text-slate-700 font-semibold leading-relaxed">
-                          "{result.remarks}"
-                        </p>
-                      </div>
-
-                      {/* INLINE PDF VIEWER PREVIEW WINDOW */}
-                      <div className="border border-slate-200 rounded-2xl overflow-hidden bg-slate-100">
-                        <button
-                          onClick={() => setExpandedPdfId(isPdfExpanded ? null : result.id)}
-                          className="w-full p-4 bg-white hover:bg-slate-50 flex items-center justify-between font-extrabold text-xs text-[#0a2968] border-b border-slate-200 transition-colors cursor-pointer"
-                        >
-                          <span className="flex items-center gap-2">
-                            <Eye size={16} className="text-[#EF961D]" />
-                            {isPdfExpanded ? "Hide Inline PDF Preview" : "Open & Preview Evaluated Copy PDF Inline"}
-                          </span>
-                          {isPdfExpanded ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
-                        </button>
-
-                        {isPdfExpanded && (
-                          <div className="p-2 bg-slate-900 h-[500px]">
-                            <iframe
-                              src={pdfUrl}
-                              title="Evaluated Answer Sheet PDF"
-                              className="w-full h-full rounded-xl border-0"
-                            />
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            )}
           </div>
         )}
       </main>
-
-      {/* VIEW QUESTION PAPER MODAL */}
-      {paperModalData && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="bg-white rounded-3xl shadow-2xl border border-slate-200 w-full max-w-4xl max-h-[90vh] flex flex-col overflow-hidden">
-            {/* Modal Header */}
-            <div className="p-5 border-b border-slate-200 flex items-center justify-between bg-slate-50">
-              <div>
-                <span className="px-2.5 py-0.5 bg-blue-100 text-[#0a2968] font-extrabold text-[10px] rounded uppercase tracking-wider">
-                  Question Paper & Plan PDF
-                </span>
-                <h3 className="text-lg font-black text-[#0a2968] mt-0.5">
-                  {paperModalData.title}
-                </h3>
-              </div>
-
-              <div className="flex items-center gap-2">
-                <button
-                  type="button"
-                  onClick={() => handlePrintPdf(paperModalData.pdfUrl)}
-                  className="px-3 py-2 bg-[#0a2968] hover:bg-[#EF961D] text-white rounded-xl text-xs font-extrabold flex items-center gap-1.5 transition-all shadow-xs cursor-pointer uppercase tracking-wider"
-                >
-                  <Printer size={15} /> Print (Ctrl + P)
-                </button>
-                <button
-                  type="button"
-                  onClick={() => handleDownloadPdf(paperModalData.pdfUrl, paperModalData.title)}
-                  className="px-3 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-xl text-xs font-extrabold flex items-center gap-1.5 transition-all cursor-pointer uppercase tracking-wider"
-                >
-                  <Download size={15} /> Download
-                </button>
-                <button
-                  onClick={() => setPaperModalData(null)}
-                  className="p-2 bg-slate-200 hover:bg-red-500 hover:text-white rounded-full text-slate-700 transition-colors cursor-pointer"
-                >
-                  <X size={20} />
-                </button>
-              </div>
-            </div>
-
-            {/* Modal Body - PDF Viewer */}
-            <div className="flex-1 bg-slate-900 p-2 min-h-[500px]">
-              <iframe
-                src={paperModalData.pdfUrl}
-                title="Question Paper PDF"
-                className="w-full h-full min-h-[500px] rounded-xl border-0"
-              />
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* VIEW CHECKED COPY MODAL */}
-      {checkedCopyModalData && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="bg-white rounded-3xl shadow-2xl border border-slate-200 w-full max-w-4xl max-h-[90vh] flex flex-col overflow-hidden">
-            {/* Modal Header */}
-            <div className="p-5 border-b border-slate-200 flex items-center justify-between bg-slate-50">
-              <div>
-                <div className="flex items-center gap-2">
-                  <span className="px-2.5 py-0.5 bg-emerald-100 text-emerald-800 font-black text-[10px] rounded uppercase tracking-wider">
-                    Evaluated Checked Copy
-                  </span>
-                  <span className="px-2.5 py-0.5 bg-blue-100 text-[#0a2968] font-black text-[10px] rounded uppercase tracking-wider">
-                    Score: {checkedCopyModalData.score}
-                  </span>
-                </div>
-                <h3 className="text-lg font-black text-[#0a2968] mt-1">
-                  {checkedCopyModalData.planTitle}
-                </h3>
-              </div>
-
-              <div className="flex items-center gap-2">
-                <button
-                  type="button"
-                  onClick={() => handlePrintPdf(checkedCopyModalData.resultPdf)}
-                  className="px-3 py-2 bg-[#0a2968] hover:bg-[#EF961D] text-white rounded-xl text-xs font-extrabold flex items-center gap-1.5 transition-all shadow-xs cursor-pointer uppercase tracking-wider"
-                >
-                  <Printer size={15} /> Print (Ctrl + P)
-                </button>
-                <button
-                  type="button"
-                  onClick={() => handleDownloadPdf(checkedCopyModalData.resultPdf, `${checkedCopyModalData.planTitle}_Checked`)}
-                  className="px-3 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-xl text-xs font-extrabold flex items-center gap-1.5 transition-all cursor-pointer uppercase tracking-wider"
-                >
-                  <Download size={15} /> Download
-                </button>
-                <button
-                  onClick={() => setCheckedCopyModalData(null)}
-                  className="p-2 bg-slate-200 hover:bg-red-500 hover:text-white rounded-full text-slate-700 transition-colors cursor-pointer"
-                >
-                  <X size={20} />
-                </button>
-              </div>
-            </div>
-
-            {/* Faculty Remarks bar */}
-            <div className="px-5 py-3 bg-amber-50 border-b border-amber-200 text-xs font-bold text-amber-900">
-              💬 <strong>Faculty Remarks:</strong> "{checkedCopyModalData.remarks}"
-            </div>
-
-            {/* Modal Body - PDF Viewer */}
-            <div className="flex-1 bg-slate-900 p-2 min-h-[480px]">
-              <iframe
-                src={checkedCopyModalData.resultPdf}
-                title="Checked Answer Copy PDF"
-                className="w-full h-full min-h-[480px] rounded-xl border-0"
-              />
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* GLOBAL FOOTER */}
       <Footer />
