@@ -133,9 +133,9 @@ function App() {
                   {/* Landing page has its own layout */}
                   {/* <NewHero /> */}
                   <ProfessionalHero />
-                  <EvaluationHowItWorks />
                   {/* <About /> */}
                   <Courses />
+                  <EvaluationHowItWorks />
                   {/* <CoreValues /> */}
                   {/* <StudyWithMe /> */}
                   <Testimonials />

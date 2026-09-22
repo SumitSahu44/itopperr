@@ -14,6 +14,7 @@ import {
   Award,
   TrendingUp,
   Layers,
+  FileCheck,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate, useLocation } from "react-router-dom";
@@ -26,6 +27,7 @@ const tabs = [
   { id: "mains", label: "Mains Writing", icon: PenTool },
   { id: "modules", label: "Modules", icon: Layers },
   { id: "rank", label: "Rank", icon: Award },
+  { id: "evaluation", label: "Evaluation", icon: FileCheck, link: "/evaluation" },
 ];
 
 
@@ -474,18 +476,24 @@ const Courses = () => {
         </div>
 
         {/* ─── Tab Switcher ─── */}
-        <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3 mb-4 max-w-xl mx-auto">
-          {tabs.map(({ id, label, icon: Icon }) => (
+        <div className="flex flex-wrap md:flex-nowrap items-center justify-center gap-2 sm:gap-2.5 md:gap-3 mb-4 max-w-4xl mx-auto">
+          {tabs.map(({ id, label, icon: Icon, link }) => (
             <button
               key={id}
-              onClick={() => setActiveTab(id)}
-              className={`relative flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs sm:text-sm font-extrabold border transition-all duration-300 cursor-pointer overflow-hidden ${activeTab === id
+              onClick={() => {
+                if (link) {
+                  navigate(link);
+                } else {
+                  setActiveTab(id);
+                }
+              }}
+              className={`relative flex items-center justify-center gap-1.5 sm:gap-2 px-3.5 sm:px-4 md:px-4.5 py-2.5 rounded-xl text-xs sm:text-sm font-extrabold border transition-all duration-300 cursor-pointer overflow-hidden shrink-0 ${activeTab === id
                   ? "bg-[#163F66] text-white border-[#163F66] shadow-lg shadow-[#163F66]/20 scale-105"
                   : "bg-white text-slate-600 border-slate-200 hover:border-[#163F66]/40 hover:text-[#163F66] hover:bg-[#163F66]/3"
                 }`}
             >
-              <Icon size={14} strokeWidth={2.5} />
-              {label}
+              <Icon size={14} strokeWidth={2.5} className="shrink-0" />
+              <span className="whitespace-nowrap">{label}</span>
               {activeTab === id && (
                 <motion.span
                   layoutId="tab-active-pill"

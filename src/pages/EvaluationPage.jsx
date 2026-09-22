@@ -206,9 +206,6 @@ const EvaluationPage = () => {
         </div>
       </section>
 
-      {/* HOW IT WORKS & SAMPLE EVALUATIONS SECTION */}
-      <EvaluationHowItWorks />
-
       {/* EVALUATION PLANS SECTION */}
       <section className="py-12 px-4 sm:px-6 max-w-7xl mx-auto flex-grow w-full">
         {/* Category Tabs Header */}
@@ -361,6 +358,9 @@ const EvaluationPage = () => {
           </div>
         )}
       </section>
+
+      {/* HOW IT WORKS & SAMPLE EVALUATIONS SECTION */}
+      <EvaluationHowItWorks />
 
       {/* WHY CHOOSE ITOPPER EVALUATION */}
       <section className="py-12 bg-white border-y border-slate-200/80 px-4 sm:px-6">
