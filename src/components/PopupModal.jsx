@@ -50,7 +50,7 @@ const PopupModal = () => {
 
         {/* Popup Image */}
         <img
-          src="/images/new-popup.jpeg"
+          src="/images/newpopup2.jpeg"
           alt="Special Offer"
           className="w-full h-auto object-cover block cursor-pointer"
           onClick={handleImageClick}

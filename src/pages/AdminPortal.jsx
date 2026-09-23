@@ -49,7 +49,9 @@ import {
   Filter,
   RefreshCw,
   BarChart3,
-  UserCheck
+  UserCheck,
+  Menu,
+  ChevronRight
 } from "lucide-react";
 import { getBlogs, addBlog, updateBlog, deleteBlog } from "../utils/blogStorage";
 import { getEvaluations, addEvaluation, updateEvaluation, deleteEvaluation, saveEvaluationResultApi } from "../utils/evaluationStorage";
@@ -62,6 +64,7 @@ const AdminPortal = ({ initialTab = "dashboard" }) => {
   const [activeAdminTab, setActiveAdminTab] = useState(tabFromQuery || initialTab || "dashboard");
 
   const editorRef = useRef(null);
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
 
   // Authentication State
   const [isAuthenticated, setIsAuthenticated] = useState(
@@ -177,6 +180,10 @@ const AdminPortal = ({ initialTab = "dashboard" }) => {
   const [purchasesList, setPurchasesList] = useState([]);
   const [adminSearchTerm, setAdminSearchTerm] = useState("");
   const [adminCategoryFilter, setAdminCategoryFilter] = useState("All");
+
+  // Interactive Stat Cards Modals State: null | 'students' | 'revenue'
+  const [activeStatModal, setActiveStatModal] = useState(null);
+  const [studentModalSearch, setStudentModalSearch] = useState("");
 
   const fetchStudentSubmissions = () => {
     try {
@@ -708,97 +715,320 @@ const AdminPortal = ({ initialTab = "dashboard" }) => {
     );
   }
 
+  // Calculate aggregated unique enrolled students list from purchasesList
+  const uniqueStudentsMap = new Map();
+  (purchasesList || []).forEach(p => {
+    const email = (p.studentEmail || p.email || 'student@itopper.com').toLowerCase();
+    const price = Number(p.finalPrice || p.finalPaid || 4999);
+    if (!uniqueStudentsMap.has(email)) {
+      uniqueStudentsMap.set(email, {
+        name: p.studentName || email.split('@')[0] || "Aspirant",
+        email: email,
+        totalSpent: price,
+        plansCount: 1,
+        lastPurchasedAt: p.purchasedAt || "Recently",
+        plansList: [p.title || "Evaluation Plan"]
+      });
+    } else {
+      const existing = uniqueStudentsMap.get(email);
+      existing.totalSpent += price;
+      existing.plansCount += 1;
+      if (p.title && !existing.plansList.includes(p.title)) {
+        existing.plansList.push(p.title);
+      }
+    }
+  });
+  const uniqueStudentsList = Array.from(uniqueStudentsMap.values());
+
+  const navMenuItems = [
+    {
+      id: "dashboard",
+      label: "Overview Dashboard",
+      icon: BarChart3,
+      badge: purchasesList.length > 0 ? `${purchasesList.length}` : null,
+      badgeColor: "bg-[#EF961D]/20 text-[#EF961D]"
+    },
+    {
+      id: "blogs",
+      label: "Blogs Manager",
+      icon: FileText,
+      badge: blogs.length > 0 ? `${blogs.length}` : null,
+      badgeColor: "bg-blue-500/20 text-blue-300"
+    },
+    {
+      id: "evaluations",
+      label: "Evaluation Cards",
+      icon: Layers,
+      badge: evaluations.length > 0 ? `${evaluations.length}` : null,
+      badgeColor: "bg-purple-500/20 text-purple-300"
+    },
+    {
+      id: "results",
+      label: "Upload Results",
+      icon: Award,
+      badge: resultsList.length > 0 ? `${resultsList.length}` : null,
+      badgeColor: "bg-emerald-500/20 text-emerald-300"
+    }
+  ];
+
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-800 font-sans selection:bg-[#EF961D]/20">
-      {/* ADMIN TOPBAR */}
-      <div className="sticky top-0 z-30 bg-white border-b border-slate-200 shadow-sm">
-        <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <img
-              src="/images/itopper.png"
-              alt="iTopper Logo"
-              className="h-12 sm:h-14 object-contain"
-            />
-            <span className="bg-[#0a2968]/10 text-[#0a2968] text-xs sm:text-sm font-black px-3.5 py-1.5 rounded-xl border border-[#0a2968]/15 uppercase tracking-wider hidden sm:inline-block">
-              iTopper Admin Portal
-            </span>
-          </div>
-
-          {/* MAIN ADMIN TAB SWITCHER */}
-          <div className="flex items-center bg-slate-100 p-1.5 rounded-2xl border border-slate-200 overflow-x-auto max-w-full">
-            <button
-              onClick={() => {
-                setActiveAdminTab("dashboard");
-                setSearchParams({ tab: "dashboard" });
-              }}
-              className={`flex items-center gap-2 px-5 py-2 rounded-xl text-xs sm:text-sm font-extrabold transition-all cursor-pointer whitespace-nowrap ${
-                activeAdminTab === "dashboard"
-                  ? "bg-[#0a2968] text-white shadow-md"
-                  : "text-slate-600 hover:text-[#0a2968]"
-              }`}
-            >
-              <BarChart3 size={16} /> Overview Dashboard
-            </button>
-            <button
-              onClick={() => {
-                setActiveAdminTab("blogs");
-                setSearchParams({ tab: "blogs" });
-              }}
-              className={`flex items-center gap-2 px-5 py-2 rounded-xl text-xs sm:text-sm font-extrabold transition-all cursor-pointer whitespace-nowrap ${
-                activeAdminTab === "blogs"
-                  ? "bg-[#0a2968] text-white shadow-md"
-                  : "text-slate-600 hover:text-[#0a2968]"
-              }`}
-            >
-              <FileText size={16} /> Blogs Manager
-            </button>
-            <button
-              onClick={() => {
-                setActiveAdminTab("evaluations");
-                setSearchParams({ tab: "evaluations" });
-              }}
-              className={`flex items-center gap-2 px-5 py-2 rounded-xl text-xs sm:text-sm font-extrabold transition-all cursor-pointer ${
-                activeAdminTab === "evaluations"
-                  ? "bg-[#0a2968] text-white shadow-md"
-                  : "text-slate-600 hover:text-[#0a2968]"
-              }`}
-            >
-              <Layers size={16} /> Evaluation Cards
-            </button>
-            <button
-              onClick={() => {
-                setActiveAdminTab("results");
-                setSearchParams({ tab: "results" });
-              }}
-              className={`flex items-center gap-2 px-5 py-2 rounded-xl text-xs sm:text-sm font-extrabold transition-all cursor-pointer ${
-                activeAdminTab === "results"
-                  ? "bg-[#0a2968] text-white shadow-md"
-                  : "text-slate-600 hover:text-[#0a2968]"
-              }`}
-            >
-              <Award size={16} /> Upload Results
-            </button>
-          </div>
-
+    <div className="min-h-screen bg-[#f8fafc] text-slate-800 font-sans selection:bg-[#EF961D]/20 flex flex-col lg:flex-row">
+      
+      {/* ================= 1. DESKTOP FIXED LEFT SIDEBAR (lg:flex) ================= */}
+      <aside className="fixed left-0 top-0 bottom-0 w-64 bg-[#0b1329] text-white z-40 hidden lg:flex flex-col justify-between border-r border-slate-800/80 shadow-2xl">
+        {/* Brand Header */}
+        <div className="p-5 border-b border-slate-800/80">
           <div className="flex items-center gap-3">
-            <Link
-              to="/evaluation"
-              target="_blank"
-              className="hidden lg:flex items-center gap-1.5 text-xs font-bold text-[#0a2968] hover:text-[#EF961D] px-3.5 py-2 border border-slate-200 rounded-full hover:bg-slate-50 transition-all"
-            >
-              View Evaluation Page <ExternalLink size={12} />
-            </Link>
+            <div className="p-2 bg-white rounded-2xl shadow-md border border-slate-100 flex items-center justify-center shrink-0">
+              <img
+                src="/images/itopper.png"
+                alt="iTopper Logo"
+                className="h-8 w-auto object-contain"
+              />
+            </div>
+            <div>
+              <h1 className="font-black text-base text-white tracking-wide leading-none">
+                iTopper <span className="text-[#EF961D]">IAS</span>
+              </h1>
+              <span className="text-[10px] font-bold text-slate-400 tracking-wider uppercase inline-flex items-center gap-1 mt-1">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                Admin Console
+              </span>
+            </div>
+          </div>
+        </div>
+
+        {/* Navigation Menu Links */}
+        <div className="p-4 space-y-6 flex-grow overflow-y-auto">
+          <div>
+            <span className="text-[10px] font-black uppercase tracking-widest text-slate-400 px-3 block mb-3">
+              Main Menu
+            </span>
+            <nav className="space-y-1.5">
+              {navMenuItems.map((item) => {
+                const IconComponent = item.icon;
+                const isActive = activeAdminTab === item.id;
+
+                return (
+                  <button
+                    key={item.id}
+                    onClick={() => {
+                      setActiveAdminTab(item.id);
+                      setSearchParams({ tab: item.id });
+                    }}
+                    className={`w-full flex items-center justify-between px-3.5 py-3 rounded-2xl font-bold text-xs transition-all duration-200 cursor-pointer group ${
+                      isActive
+                        ? "bg-gradient-to-r from-[#163F66] to-[#0a2968] text-white shadow-lg border-l-4 border-[#EF961D] pl-3"
+                        : "text-slate-300 hover:text-white hover:bg-slate-800/60"
+                    }`}
+                  >
+                    <div className="flex items-center gap-3">
+                      <IconComponent
+                        size={18}
+                        className={`transition-colors ${isActive ? "text-[#EF961D]" : "text-slate-400 group-hover:text-slate-200"}`}
+                      />
+                      <span>{item.label}</span>
+                    </div>
+
+                    {item.badge && (
+                      <span className={`px-2 py-0.5 rounded-full text-[10px] font-extrabold ${item.badgeColor}`}>
+                        {item.badge}
+                      </span>
+                    )}
+                  </button>
+                );
+              })}
+            </nav>
+          </div>
+        </div>
+
+        {/* Sidebar Bottom Footer Actions */}
+        <div className="p-4 border-t border-slate-800/80 space-y-3 bg-[#080d1d]">
+          <Link
+            to="/evaluation"
+            target="_blank"
+            className="w-full flex items-center justify-between px-3.5 py-2.5 bg-slate-800/70 hover:bg-slate-800 text-slate-300 hover:text-white rounded-xl text-xs font-bold transition-all border border-slate-700/60"
+          >
+            <span className="flex items-center gap-2">
+              <ExternalLink size={14} className="text-[#EF961D]" /> View Evaluation Page
+            </span>
+            <ChevronRight size={13} className="text-slate-500" />
+          </Link>
+
+          <div className="pt-2 flex items-center justify-between border-t border-slate-800/50">
+            <div className="flex items-center gap-2.5 overflow-hidden">
+              <div className="w-8 h-8 rounded-full bg-[#0a2968] border border-slate-700 text-[#EF961D] flex items-center justify-center font-black text-xs shrink-0">
+                A
+              </div>
+              <div className="overflow-hidden">
+                <div className="text-xs font-extrabold text-white truncate">Administrator</div>
+                <div className="text-[10px] font-semibold text-slate-400 truncate">itopper@gmail.com</div>
+              </div>
+            </div>
+
             <button
               onClick={handleLogout}
-              className="flex items-center gap-1.5 text-xs font-bold text-red-600 hover:text-red-700 px-4 py-2 border border-red-200 rounded-full hover:bg-red-50 transition-all shadow-sm cursor-pointer"
+              className="p-2 text-slate-400 hover:text-red-400 hover:bg-red-500/10 rounded-xl transition-all cursor-pointer shrink-0"
+              title="Logout from Admin Portal"
             >
-              <LogOut size={13} /> Logout
+              <LogOut size={16} />
             </button>
           </div>
         </div>
+      </aside>
+
+      {/* ================= 2. MOBILE TOP HEADER BAR & DRAWER (lg:hidden) ================= */}
+      <div className="lg:hidden sticky top-0 z-30 bg-[#0b1329] text-white border-b border-slate-800 px-4 py-3 flex items-center justify-between shadow-md w-full">
+        <div className="flex items-center gap-3">
+          <button
+            onClick={() => setIsMobileSidebarOpen(true)}
+            className="p-2 bg-slate-800/80 hover:bg-slate-800 text-slate-200 rounded-xl transition-colors cursor-pointer"
+          >
+            <Menu size={20} />
+          </button>
+          <img
+            src="/images/itopper.png"
+            alt="iTopper Logo"
+            className="h-8 w-auto object-contain bg-white rounded-lg p-1"
+          />
+          <span className="font-extrabold text-xs text-white uppercase tracking-wider">
+            {navMenuItems.find(n => n.id === activeAdminTab)?.label || "Admin Console"}
+          </span>
+        </div>
+
+        <button
+          onClick={handleLogout}
+          className="p-2 text-red-400 hover:bg-red-500/10 rounded-xl transition-colors cursor-pointer"
+        >
+          <LogOut size={18} />
+        </button>
       </div>
 
-      <main className="max-w-7xl mx-auto px-6 py-10">
+      {/* Mobile Sidebar Slide-Over Drawer */}
+      {isMobileSidebarOpen && (
+        <div className="fixed inset-0 z-50 lg:hidden flex">
+          <div
+            className="absolute inset-0 bg-black/60 backdrop-blur-xs transition-opacity"
+            onClick={() => setIsMobileSidebarOpen(false)}
+          />
+
+          <div className="relative w-72 bg-[#0b1329] text-white h-full shadow-2xl flex flex-col justify-between z-10 animate-in slide-in-from-left duration-250 border-r border-slate-800">
+            {/* Drawer Header */}
+            <div className="p-5 border-b border-slate-800 flex items-center justify-between">
+              <div className="flex items-center gap-2.5">
+                <img
+                  src="/images/itopper.png"
+                  alt="iTopper Logo"
+                  className="h-8 w-auto object-contain bg-white rounded-lg p-1"
+                />
+                <span className="font-black text-sm text-white">Admin Console</span>
+              </div>
+              <button
+                onClick={() => setIsMobileSidebarOpen(false)}
+                className="p-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg cursor-pointer"
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            {/* Drawer Links */}
+            <div className="p-4 space-y-2 flex-grow overflow-y-auto">
+              {navMenuItems.map((item) => {
+                const IconComponent = item.icon;
+                const isActive = activeAdminTab === item.id;
+
+                return (
+                  <button
+                    key={item.id}
+                    onClick={() => {
+                      setActiveAdminTab(item.id);
+                      setSearchParams({ tab: item.id });
+                      setIsMobileSidebarOpen(false);
+                    }}
+                    className={`w-full flex items-center justify-between px-4 py-3 rounded-2xl font-bold text-xs transition-all cursor-pointer ${
+                      isActive
+                        ? "bg-[#0a2968] text-white border-l-4 border-[#EF961D]"
+                        : "text-slate-300 hover:bg-slate-800/80"
+                    }`}
+                  >
+                    <div className="flex items-center gap-3">
+                      <IconComponent size={18} className={isActive ? "text-[#EF961D]" : "text-slate-400"} />
+                      <span>{item.label}</span>
+                    </div>
+
+                    {item.badge && (
+                      <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${item.badgeColor}`}>
+                        {item.badge}
+                      </span>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Drawer Footer */}
+            <div className="p-4 border-t border-slate-800 space-y-3 bg-[#080d1d]">
+              <Link
+                to="/evaluation"
+                target="_blank"
+                onClick={() => setIsMobileSidebarOpen(false)}
+                className="w-full flex items-center justify-between px-3.5 py-2.5 bg-slate-800/70 text-slate-300 rounded-xl text-xs font-bold"
+              >
+                <span className="flex items-center gap-2">
+                  <ExternalLink size={14} className="text-[#EF961D]" /> View Evaluation Page
+                </span>
+                <ChevronRight size={13} className="text-slate-500" />
+              </Link>
+
+              <button
+                onClick={() => {
+                  setIsMobileSidebarOpen(false);
+                  handleLogout();
+                }}
+                className="w-full py-2.5 bg-red-600/20 hover:bg-red-600/30 text-red-300 font-bold text-xs rounded-xl flex items-center justify-center gap-2 cursor-pointer border border-red-500/20"
+              >
+                <LogOut size={15} /> Logout Admin
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ================= 3. MAIN CONTENT CONTAINER (lg:pl-64) ================= */}
+      <div className="flex-grow lg:pl-64 flex flex-col min-w-0">
+        
+        {/* TOP CONTENT HEADER BAR */}
+        <header className="bg-white border-b border-slate-200 px-6 sm:px-8 py-4 flex items-center justify-between shadow-2xs shrink-0">
+          <div>
+            <div className="flex items-center gap-2 text-xs font-bold text-slate-400">
+              <span>Admin Console</span>
+              <span>/</span>
+              <span className="text-[#0a2968] font-black">
+                {navMenuItems.find(n => n.id === activeAdminTab)?.label || "Overview Dashboard"}
+              </span>
+            </div>
+            <h2 className="text-xl sm:text-2xl font-black text-[#0a2968] tracking-tight mt-0.5">
+              {navMenuItems.find(n => n.id === activeAdminTab)?.label || "Overview Dashboard"}
+            </h2>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <span className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-50 text-emerald-700 text-xs font-bold rounded-full border border-emerald-200">
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+              Live Sync Active
+            </span>
+            <button
+              onClick={fetchDashboardAnalytics}
+              className="p-2 bg-slate-100 hover:bg-slate-200 text-[#0a2968] rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 border border-slate-200 cursor-pointer shadow-2xs"
+              title="Refresh Dashboard Analytics Data"
+            >
+              <RefreshCw size={15} /> <span className="hidden sm:inline">Refresh Data</span>
+            </button>
+          </div>
+        </header>
+
+        {/* MAIN BODY AREA */}
+        <main className="p-4 sm:p-6 lg:p-8 flex-grow">
         {/* ================= TAB 0: DASHBOARD OVERVIEW & ANALYTICS ================= */}
         {activeAdminTab === "dashboard" && (
           <div className="animate-in fade-in slide-in-from-bottom-4 duration-300 space-y-10">
@@ -818,76 +1048,104 @@ const AdminPortal = ({ initialTab = "dashboard" }) => {
               </button>
             </div>
 
-            {/* SUMMARY STATS GRID */}
+            {/* SUMMARY STATS GRID (INTERACTIVE CLICKABLE CARDS) */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {/* Card 1: Total Registered / Enrolled Students */}
-              <div className="bg-white rounded-3xl border border-slate-200 p-6 shadow-sm flex items-center justify-between">
+              <div
+                onClick={() => {
+                  setStudentModalSearch("");
+                  setActiveStatModal("students");
+                }}
+                className="bg-white rounded-3xl border border-slate-200 p-6 shadow-sm flex items-center justify-between hover:border-[#0a2968] hover:shadow-lg hover:-translate-y-1 transition-all duration-200 cursor-pointer group relative overflow-hidden"
+                title="Click to view full Enrolled Students Directory"
+              >
                 <div>
                   <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">
                     Enrolled Students
                   </span>
-                  <div className="text-3xl font-black text-[#0a2968]">
-                    {new Set(purchasesList.map(p => p.studentEmail || p.email)).size}
+                  <div className="text-3xl font-black text-[#0a2968] group-hover:scale-105 transition-transform origin-left">
+                    {new Set(purchasesList.map(p => (p.studentEmail || p.email || 'student@itopper.com').toLowerCase())).size}
                   </div>
-                  <span className="text-[11px] font-bold text-emerald-600 mt-1 inline-block">
-                    Active Aspirants
+                  <span className="text-[11px] font-bold text-emerald-600 mt-1 inline-flex items-center gap-1">
+                    Active Aspirants <span className="text-[10px] text-slate-400 group-hover:text-[#0a2968] font-semibold">(Click to view ↗)</span>
                   </span>
                 </div>
-                <div className="w-14 h-14 rounded-2xl bg-blue-50 text-[#0a2968] flex items-center justify-center shrink-0">
+                <div className="w-14 h-14 rounded-2xl bg-blue-50 text-[#0a2968] group-hover:bg-[#0a2968] group-hover:text-white transition-all flex items-center justify-center shrink-0 shadow-2xs">
                   <Users size={28} />
                 </div>
               </div>
 
               {/* Card 2: Total Plan Purchases */}
-              <div className="bg-white rounded-3xl border border-slate-200 p-6 shadow-sm flex items-center justify-between">
+              <div
+                onClick={() => {
+                  setAdminSearchTerm("");
+                  setAdminCategoryFilter("All");
+                  const el = document.getElementById("purchased-plans-table-section");
+                  if (el) el.scrollIntoView({ behavior: "smooth" });
+                }}
+                className="bg-white rounded-3xl border border-slate-200 p-6 shadow-sm flex items-center justify-between hover:border-emerald-600 hover:shadow-lg hover:-translate-y-1 transition-all duration-200 cursor-pointer group relative overflow-hidden"
+                title="Click to view all purchased plans table"
+              >
                 <div>
                   <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">
                     Plans Purchased
                   </span>
-                  <div className="text-3xl font-black text-[#0a2968]">
+                  <div className="text-3xl font-black text-[#0a2968] group-hover:scale-105 transition-transform origin-left">
                     {purchasesList.length}
                   </div>
-                  <span className="text-[11px] font-bold text-blue-600 mt-1 inline-block">
-                    Total Enrollments
+                  <span className="text-[11px] font-bold text-blue-600 mt-1 inline-flex items-center gap-1">
+                    Total Enrollments <span className="text-[10px] text-slate-400 group-hover:text-blue-600 font-semibold">(View table ↗)</span>
                   </span>
                 </div>
-                <div className="w-14 h-14 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
+                <div className="w-14 h-14 rounded-2xl bg-emerald-50 text-emerald-600 group-hover:bg-emerald-600 group-hover:text-white transition-all flex items-center justify-center shrink-0 shadow-2xs">
                   <CreditCard size={28} />
                 </div>
               </div>
 
               {/* Card 3: Total Revenue */}
-              <div className="bg-white rounded-3xl border border-slate-200 p-6 shadow-sm flex items-center justify-between">
+              <div
+                onClick={() => setActiveStatModal("revenue")}
+                className="bg-white rounded-3xl border border-slate-200 p-6 shadow-sm flex items-center justify-between hover:border-[#EF961D] hover:shadow-lg hover:-translate-y-1 transition-all duration-200 cursor-pointer group relative overflow-hidden"
+                title="Click to view Revenue Collections Breakdown"
+              >
                 <div>
                   <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">
                     Total Revenue
                   </span>
-                  <div className="text-3xl font-black text-[#0a2968]">
+                  <div className="text-3xl font-black text-[#0a2968] group-hover:scale-105 transition-transform origin-left">
                     ₹{purchasesList.reduce((sum, p) => sum + (Number(p.finalPrice || p.finalPaid || 4999)), 0).toLocaleString("en-IN")}
                   </div>
-                  <span className="text-[11px] font-bold text-emerald-600 mt-1 inline-block">
-                    Total Collections
+                  <span className="text-[11px] font-bold text-emerald-600 mt-1 inline-flex items-center gap-1">
+                    Total Collections <span className="text-[10px] text-slate-400 group-hover:text-[#EF961D] font-semibold">(Breakdown ↗)</span>
                   </span>
                 </div>
-                <div className="w-14 h-14 rounded-2xl bg-orange-50 text-[#EF961D] flex items-center justify-center shrink-0">
+                <div className="w-14 h-14 rounded-2xl bg-orange-50 text-[#EF961D] group-hover:bg-[#EF961D] group-hover:text-white transition-all flex items-center justify-center shrink-0 shadow-2xs">
                   <DollarSign size={28} />
                 </div>
               </div>
 
               {/* Card 4: Active Evaluation Plans */}
-              <div className="bg-white rounded-3xl border border-slate-200 p-6 shadow-sm flex items-center justify-between">
+              <div
+                onClick={() => {
+                  setActiveAdminTab("evaluations");
+                  setSearchParams({ tab: "evaluations" });
+                  window.scrollTo({ top: 0, behavior: "smooth" });
+                }}
+                className="bg-white rounded-3xl border border-slate-200 p-6 shadow-sm flex items-center justify-between hover:border-purple-600 hover:shadow-lg hover:-translate-y-1 transition-all duration-200 cursor-pointer group relative overflow-hidden"
+                title="Click to manage Evaluation Cards"
+              >
                 <div>
                   <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">
                     Evaluation Cards
                   </span>
-                  <div className="text-3xl font-black text-[#0a2968]">
+                  <div className="text-3xl font-black text-[#0a2968] group-hover:scale-105 transition-transform origin-left">
                     {evaluations.length}
                   </div>
-                  <span className="text-[11px] font-bold text-purple-600 mt-1 inline-block">
-                    Live Plans Active
+                  <span className="text-[11px] font-bold text-purple-600 mt-1 inline-flex items-center gap-1">
+                    Live Plans Active <span className="text-[10px] text-slate-400 group-hover:text-purple-600 font-semibold">(Manage cards ↗)</span>
                   </span>
                 </div>
-                <div className="w-14 h-14 rounded-2xl bg-purple-50 text-purple-600 flex items-center justify-center shrink-0">
+                <div className="w-14 h-14 rounded-2xl bg-purple-50 text-purple-600 group-hover:bg-purple-600 group-hover:text-white transition-all flex items-center justify-center shrink-0 shadow-2xs">
                   <Layers size={28} />
                 </div>
               </div>
@@ -1040,7 +1298,7 @@ const AdminPortal = ({ initialTab = "dashboard" }) => {
             </div>
 
             {/* ================= SECTION 2: ENROLLED STUDENTS & PURCHASED PLANS TABLE ================= */}
-            <div className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden p-6 sm:p-8">
+            <div id="purchased-plans-table-section" className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden p-6 sm:p-8">
               <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6 pb-6 border-b border-slate-100">
                 <div>
                   <h3 className="text-xl font-black text-[#0a2968]">
@@ -1149,6 +1407,269 @@ const AdminPortal = ({ initialTab = "dashboard" }) => {
                 </table>
               </div>
             </div>
+
+            {/* ================= MODAL 1: ENROLLED STUDENTS DIRECTORY MODAL ================= */}
+            {activeStatModal === "students" && (
+              <div className="fixed inset-0 z-50 flex items-center justify-center p-4 font-sans selection:bg-[#EF961D]/20">
+                {/* Backdrop */}
+                <div
+                  className="absolute inset-0 bg-[#0a2968]/50 backdrop-blur-xs transition-opacity"
+                  onClick={() => setActiveStatModal(null)}
+                />
+
+                {/* Modal Box */}
+                <div className="relative z-10 w-full max-w-4xl bg-white rounded-3xl shadow-2xl border border-slate-200 overflow-hidden flex flex-col max-h-[90vh] animate-in fade-in zoom-in-95 duration-200">
+                  {/* Modal Header */}
+                  <div className="bg-gradient-to-r from-[#0a2968] to-[#163F66] text-white p-6 flex items-center justify-between shadow-sm shrink-0">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center text-[#EF961D]">
+                        <Users size={22} />
+                      </div>
+                      <div>
+                        <h3 className="font-extrabold text-lg sm:text-xl">Enrolled Aspirants Directory</h3>
+                        <p className="text-xs text-slate-300 font-medium">
+                          All registered student accounts with enrolled evaluation plans ({uniqueStudentsList.length} Unique Aspirants)
+                        </p>
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => setActiveStatModal(null)}
+                      className="p-2 hover:bg-white/10 rounded-full text-slate-300 hover:text-white transition-colors cursor-pointer"
+                    >
+                      <X size={20} />
+                    </button>
+                  </div>
+
+                  {/* Modal Toolbar: Search & Summary Chips */}
+                  <div className="p-6 bg-slate-50 border-b border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-4 shrink-0">
+                    <div className="relative w-full sm:w-80">
+                      <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
+                      <input
+                        type="text"
+                        value={studentModalSearch}
+                        onChange={(e) => setStudentModalSearch(e.target.value)}
+                        placeholder="Search student name or email..."
+                        className="w-full bg-white border border-slate-200 focus:border-[#0a2968] rounded-xl pl-9 pr-3 py-2.5 text-xs font-semibold outline-none text-slate-800 shadow-2xs"
+                      />
+                    </div>
+
+                    <div className="flex items-center gap-3 text-xs font-bold text-slate-600">
+                      <span className="px-3 py-1.5 bg-blue-100/80 text-[#0a2968] rounded-xl border border-blue-200">
+                        Total Active Aspirants: <strong>{uniqueStudentsList.length}</strong>
+                      </span>
+                      <span className="px-3 py-1.5 bg-emerald-100/80 text-emerald-800 rounded-xl border border-emerald-200">
+                        Total Purchases: <strong>{purchasesList.length}</strong>
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Modal Body Table */}
+                  <div className="p-6 overflow-y-auto flex-grow">
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-left border-collapse">
+                        <thead>
+                          <tr className="border-b border-slate-200 text-[11px] font-black uppercase text-slate-400 tracking-wider">
+                            <th className="py-3 px-4">Student Aspirant</th>
+                            <th className="py-3 px-4">Enrolled Plans Count</th>
+                            <th className="py-3 px-4">Purchased Courses</th>
+                            <th className="py-3 px-4">Total Amount Spent</th>
+                            <th className="py-3 px-4 text-right">Action</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-slate-100 text-xs font-semibold text-slate-700">
+                          {uniqueStudentsList
+                            .filter(st => {
+                              const query = studentModalSearch.toLowerCase();
+                              return !query || st.name.toLowerCase().includes(query) || st.email.toLowerCase().includes(query);
+                            })
+                            .map((student, idx) => (
+                              <tr key={idx} className="hover:bg-slate-50 transition-colors">
+                                <td className="py-4 px-4">
+                                  <div className="font-extrabold text-slate-900 text-sm">{student.name}</div>
+                                  <div className="text-xs text-slate-500 font-medium">{student.email}</div>
+                                </td>
+
+                                <td className="py-4 px-4">
+                                  <span className="px-3 py-1 bg-blue-50 text-[#0a2968] font-black text-xs rounded-full border border-blue-100">
+                                    {student.plansCount} {student.plansCount === 1 ? 'Plan' : 'Plans'}
+                                  </span>
+                                </td>
+
+                                <td className="py-4 px-4 max-w-xs">
+                                  <div className="flex flex-wrap gap-1">
+                                    {student.plansList.map((planTitle, pIdx) => (
+                                      <span key={pIdx} className="px-2 py-0.5 bg-slate-100 text-slate-700 text-[10px] font-bold rounded border border-slate-200 line-clamp-1">
+                                        {planTitle}
+                                      </span>
+                                    ))}
+                                  </div>
+                                </td>
+
+                                <td className="py-4 px-4 font-black text-emerald-700 text-sm">
+                                  ₹{student.totalSpent.toLocaleString("en-IN")}
+                                </td>
+
+                                <td className="py-4 px-4 text-right">
+                                  <button
+                                    onClick={() => {
+                                      setActiveStatModal(null);
+                                      setAdminSearchTerm(student.email);
+                                      const el = document.getElementById("purchased-plans-table-section");
+                                      if (el) el.scrollIntoView({ behavior: "smooth" });
+                                    }}
+                                    className="px-3 py-1.5 bg-[#0a2968] hover:bg-[#EF961D] text-white rounded-xl text-[11px] font-bold uppercase tracking-wider transition-all cursor-pointer shadow-2xs"
+                                  >
+                                    View Purchases ↗
+                                  </button>
+                                </td>
+                              </tr>
+                            ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* ================= MODAL 2: REVENUE COLLECTIONS BREAKDOWN MODAL ================= */}
+            {activeStatModal === "revenue" && (
+              <div className="fixed inset-0 z-50 flex items-center justify-center p-4 font-sans selection:bg-[#EF961D]/20">
+                {/* Backdrop */}
+                <div
+                  className="absolute inset-0 bg-[#0a2968]/50 backdrop-blur-xs transition-opacity"
+                  onClick={() => setActiveStatModal(null)}
+                />
+
+                {/* Modal Box */}
+                <div className="relative z-10 w-full max-w-5xl bg-white rounded-3xl shadow-2xl border border-slate-200 overflow-hidden flex flex-col max-h-[90vh] animate-in fade-in zoom-in-95 duration-200">
+                  {/* Modal Header */}
+                  <div className="bg-gradient-to-r from-[#0a2968] to-[#163F66] text-white p-6 flex items-center justify-between shadow-sm shrink-0">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center text-[#EF961D]">
+                        <DollarSign size={22} />
+                      </div>
+                      <div>
+                        <h3 className="font-extrabold text-lg sm:text-xl">Revenue Analytics & Collections Breakdown</h3>
+                        <p className="text-xs text-slate-300 font-medium">
+                          Detailed financial breakdown of total course sales, category-wise revenue & transaction receipts
+                        </p>
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => setActiveStatModal(null)}
+                      className="p-2 hover:bg-white/10 rounded-full text-slate-300 hover:text-white transition-colors cursor-pointer"
+                    >
+                      <X size={20} />
+                    </button>
+                  </div>
+
+                  {/* Modal Body */}
+                  <div className="p-6 overflow-y-auto flex-grow space-y-6">
+                    
+                    {/* CATEGORY-WISE REVENUE SUMMARY CARDS */}
+                    <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
+                      <div className="p-4 bg-blue-50 border border-blue-200 rounded-2xl">
+                        <span className="text-[11px] font-bold uppercase tracking-wider text-[#0a2968] block">GS Papers Collections</span>
+                        <div className="text-2xl font-black text-[#0a2968] mt-1">
+                          ₹{purchasesList.filter(p => p.category === "GS").reduce((s, p) => s + Number(p.finalPrice || p.finalPaid || 4999), 0).toLocaleString("en-IN")}
+                        </div>
+                        <span className="text-[10px] font-bold text-slate-500 mt-1 block">
+                          {purchasesList.filter(p => p.category === "GS").length} GS Orders
+                        </span>
+                      </div>
+
+                      <div className="p-4 bg-purple-50 border border-purple-200 rounded-2xl">
+                        <span className="text-[11px] font-bold uppercase tracking-wider text-purple-900 block">Optional Subjects</span>
+                        <div className="text-2xl font-black text-purple-950 mt-1">
+                          ₹{purchasesList.filter(p => p.category === "Optional").reduce((s, p) => s + Number(p.finalPrice || p.finalPaid || 4999), 0).toLocaleString("en-IN")}
+                        </div>
+                        <span className="text-[10px] font-bold text-slate-500 mt-1 block">
+                          {purchasesList.filter(p => p.category === "Optional").length} Optional Orders
+                        </span>
+                      </div>
+
+                      <div className="p-4 bg-amber-50 border border-amber-200 rounded-2xl">
+                        <span className="text-[11px] font-bold uppercase tracking-wider text-amber-900 block">Combo Programs</span>
+                        <div className="text-2xl font-black text-amber-950 mt-1">
+                          ₹{purchasesList.filter(p => p.category === "Combo" || (!p.category && p.title?.includes("Combo"))).reduce((s, p) => s + Number(p.finalPrice || p.finalPaid || 4999), 0).toLocaleString("en-IN")}
+                        </div>
+                        <span className="text-[10px] font-bold text-slate-500 mt-1 block">
+                          {purchasesList.filter(p => p.category === "Combo" || (!p.category && p.title?.includes("Combo"))).length} Combo Orders
+                        </span>
+                      </div>
+
+                      <div className="p-4 bg-emerald-50 border border-emerald-200 rounded-2xl">
+                        <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-900 block">Total Overall Revenue</span>
+                        <div className="text-2xl font-black text-emerald-950 mt-1">
+                          ₹{purchasesList.reduce((s, p) => s + Number(p.finalPrice || p.finalPaid || 4999), 0).toLocaleString("en-IN")}
+                        </div>
+                        <span className="text-[10px] font-bold text-emerald-700 mt-1 block">
+                          {purchasesList.length} Successful Transactions
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* ITEMISED TRANSACTIONS TABLE */}
+                    <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden p-5 space-y-4">
+                      <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+                        <h4 className="text-base font-extrabold text-[#0a2968]">Itemized Revenue Receipts Log ({purchasesList.length})</h4>
+                        <button
+                          onClick={() => window.print()}
+                          className="px-3.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer"
+                        >
+                          <Printer size={14} /> Print Summary
+                        </button>
+                      </div>
+
+                      <div className="overflow-x-auto">
+                        <table className="w-full text-left border-collapse">
+                          <thead>
+                            <tr className="border-b border-slate-200 text-[11px] font-black uppercase text-slate-400 tracking-wider">
+                              <th className="py-3 px-4">Receipt ID & Date</th>
+                              <th className="py-3 px-4">Student Name & Email</th>
+                              <th className="py-3 px-4">Purchased Course / Plan</th>
+                              <th className="py-3 px-4">Category</th>
+                              <th className="py-3 px-4 text-right">Amount Collected</th>
+                            </tr>
+                          </thead>
+                          <tbody className="divide-y divide-slate-100 text-xs font-semibold text-slate-700">
+                            {purchasesList.map((item, idx) => (
+                              <tr key={idx} className="hover:bg-slate-50 transition-colors">
+                                <td className="py-3.5 px-4 font-mono font-bold text-slate-800">
+                                  <div>{item.receiptId || `REC-${100000 + idx}`}</div>
+                                  <div className="text-[10px] text-slate-400 font-sans font-medium">{item.purchasedAt || "Recently"}</div>
+                                </td>
+
+                                <td className="py-3.5 px-4">
+                                  <div className="font-extrabold text-slate-900">{item.studentName || item.studentEmail?.split('@')[0] || "Aspirant"}</div>
+                                  <div className="text-[11px] text-slate-500 font-medium">{item.studentEmail || "student@itopper.com"}</div>
+                                </td>
+
+                                <td className="py-3.5 px-4 font-extrabold text-[#0a2968] max-w-xs">
+                                  {item.title}
+                                </td>
+
+                                <td className="py-3.5 px-4">
+                                  <span className="px-2.5 py-1 bg-blue-50 text-[#0a2968] font-extrabold text-[10px] rounded uppercase border border-blue-100">
+                                    {item.paperTag || item.category || "GS"}
+                                  </span>
+                                </td>
+
+                                <td className="py-3.5 px-4 text-right font-black text-emerald-700 text-sm">
+                                  ₹{(Number(item.finalPrice || item.finalPaid || 4999)).toLocaleString("en-IN")}
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         )}
 
@@ -1481,8 +2002,9 @@ const AdminPortal = ({ initialTab = "dashboard" }) => {
           </div>
         )}
       </main>
+    </div>
 
-      {/* BLOG FORM SLIDE OVER */}
+    {/* BLOG FORM SLIDE OVER */}
       {showBlogForm && (
         <div className="fixed inset-0 z-50 flex justify-end">
           <div className="absolute inset-0 bg-slate-900/50 backdrop-blur-sm" onClick={() => setShowBlogForm(false)} />

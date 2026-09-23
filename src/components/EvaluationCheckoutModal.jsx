@@ -152,15 +152,22 @@ const EvaluationCheckoutModal = ({ isOpen, onClose, plan, onPaymentSuccess }) =>
     }
   };
 
+  const isLocal = typeof window !== "undefined" && (
+    window.location.hostname === "localhost" ||
+    window.location.hostname === "127.0.0.1" ||
+    window.location.hostname.endsWith(".local")
+  );
+
   // Quick Guest Login
   const handleQuickDemoLogin = () => {
     const demoUser = {
-      id: "demo_student_" + Date.now(),
-      name: "UPSC Aspirant",
-      email: "student@itopper.com",
-      role: "student"
+      id: "demo_student_fixed",
+      name: "Demo Aspirant",
+      email: "demo@itopper.com",
+      role: "student",
+      isDemo: true
     };
-    login(demoUser, "demo_token_" + Date.now());
+    login(demoUser, "demo_token_fixed");
     startPaymentGateway(demoUser);
   };
 
@@ -297,15 +304,17 @@ const EvaluationCheckoutModal = ({ isOpen, onClose, plan, onPaymentSuccess }) =>
                 </button>
               </form>
 
-              {/* Fast 1-Click Guest Login button */}
-              <div className="mt-5 pt-4 border-t border-slate-100 text-center">
-                <button
-                  onClick={handleQuickDemoLogin}
-                  className="text-xs font-bold text-[#0a2968] hover:text-[#EF961D] transition-colors inline-flex items-center gap-1.5 bg-blue-50/80 px-4 py-2 rounded-xl border border-blue-100 cursor-pointer"
-                >
-                  <Sparkles size={14} className="text-[#EF961D]" /> Guest Login & Open Payment Gateway
-                </button>
-              </div>
+              {/* Fast 1-Click Guest Login button (Only on local environment) */}
+              {isLocal && (
+                <div className="mt-5 pt-4 border-t border-slate-100 text-center">
+                  <button
+                    onClick={handleQuickDemoLogin}
+                    className="text-xs font-bold text-[#0a2968] hover:text-[#EF961D] transition-colors inline-flex items-center gap-1.5 bg-blue-50/80 px-4 py-2 rounded-xl border border-blue-100 cursor-pointer"
+                  >
+                    <Sparkles size={14} className="text-[#EF961D]" /> Guest Login & Open Payment Gateway
+                  </button>
+                </div>
+              )}
             </div>
           )}
 

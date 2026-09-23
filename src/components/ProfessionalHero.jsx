@@ -175,7 +175,7 @@ const ProfessionalHero = () => {
         >
           <div className="relative rounded-2xl overflow-hidden shadow-2xl border-4 border-[#0a2968]/20 bg-white group hover:scale-[1.01] transition-all duration-300">
             <img
-              src="/images/poster.jpeg"
+              src="/images/1.jpg.jpeg"
               alt="iTopper Poster"
               className="w-full h-auto object-cover"
             />

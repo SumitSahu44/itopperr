@@ -37,15 +37,20 @@ const StudentDashboard = () => {
     loadEvaluationResults();
   }, [user]);
 
-  // Load purchased evaluation plans for this student (Auto-seed if empty for demo/testing)
+  // Load purchased evaluation plans for this student
   const loadPurchasedEvaluations = async () => {
     try {
-      const userEmail = user?.email || 'student@itopper.com';
+      if (!user?.email) {
+        setPurchasedEvaluations([]);
+        return;
+      }
+      const userEmail = user.email;
+      const isDemoUser = user?.isDemo || user?.id === 'demo_student_fixed' || userEmail === 'demo@itopper.com';
       const userKey = `itopper_purchased_evals_${userEmail}`;
       let userEvals = JSON.parse(localStorage.getItem(userKey) || "[]");
 
-      // Auto-seed default evaluations if student has no purchased courses yet (for instant testing!)
-      if (userEvals.length === 0) {
+      // Auto-seed default evaluations ONLY for demo testing account if empty
+      if (userEvals.length === 0 && isDemoUser) {
         const allPlans = await getEvaluations(false);
         userEvals = allPlans.map(p => ({
           ...p,
@@ -61,10 +66,7 @@ const StudentDashboard = () => {
       }
     } catch (e) {
       console.error("Error loading purchased evaluations:", e);
-      setPurchasedEvaluations(DEFAULT_EVALUATIONS);
-      if (!selectedCourseId && DEFAULT_EVALUATIONS.length > 0) {
-        setSelectedCourseId(DEFAULT_EVALUATIONS[0]._id || DEFAULT_EVALUATIONS[0].id);
-      }
+      setPurchasedEvaluations([]);
     }
   };
 
